@@ -21,7 +21,9 @@ enum MobilityProfile {
   WHEELCHAIR
   LIMITED_MOBILITY
   VISUAL_IMPAIRMENT
+  VISUALLY_IMPAIRED
   HEARING_IMPAIRMENT
+  HEARING_IMPAIRED
   STROLLER
   CUSTOM
 }
@@ -104,6 +106,10 @@ model UserPreference {
   mobility_profile        MobilityProfile       @default(CUSTOM)
   requires_step_free      Boolean               @default(false)
   requires_elevator       Boolean               @default(false)
+  avoid_stairs            Boolean               @default(false)
+  prefer_voice_guidance   Boolean               @default(false)
+  high_contrast           Boolean               @default(false)
+  text_scale              Float                 @default(1.0)
   max_slope_percent       Float?
   min_door_width_cm       Int?
   requires_tactile_paving Boolean               @default(false)
@@ -375,10 +381,11 @@ model RefreshToken {
   token_hash              String                @unique
   expires_at              DateTime
   revoked                 Boolean               @default(false)
+  revoked_at              DateTime?
+  replaced_by_token_id    String?
   created_at              DateTime              @default(now())
 
   @@index([user_id])
   @@index([token_hash])
   @@map("refresh_tokens")
 }
-
