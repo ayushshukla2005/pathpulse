@@ -8,3 +8,4 @@ This service will host the Python FastAPI microservice responsible for intellige
 - **Computer Vision & Image Assistance**: Analyze uploaded user photographs to detect stairs, steep slopes, or obstacles that impede mobility.
 - **Duplicate Detection**: Identify semantically similar or proximate issues submitted for the same facility or venue.
 - **Summary Generation**: Generate concise, actionable maintenance summaries and remediation tasks for facility administrators.
+
