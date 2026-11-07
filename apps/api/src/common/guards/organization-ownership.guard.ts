@@ -43,6 +43,13 @@ export class OrganizationOwnershipGuard implements CanActivate {
         select: { building: { select: { venue: { select: { organization_id: true } } } } },
       });
       targetOrgId = edge?.building?.venue?.organization_id ?? null;
+    } else if (params.facilityId || params.id) {
+      const facilityId = params.facilityId ?? params.id;
+      const facility = await this.prisma.facility.findUnique({
+        where: { id: facilityId },
+        select: { venue: { select: { organization_id: true } } },
+      });
+      targetOrgId = facility?.venue?.organization_id ?? null;
     }
 
     if (!targetOrgId) {

@@ -1,5 +1,13 @@
 import { plainToInstance } from "class-transformer";
-import { IsNotEmpty, IsNumber, IsString, Min, MinLength, validateSync } from "class-validator";
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+  MinLength,
+  validateSync,
+} from "class-validator";
 
 const PLACEHOLDER_SECRETS = [
   "your-super-secret-jwt-access-key-here",
@@ -35,12 +43,18 @@ export class EnvironmentVariables {
   @IsString()
   @IsNotEmpty()
   REDIS_URL!: string;
+
+  @IsOptional()
+  @IsNumber()
+  ROUTE_CACHE_TTL_SECONDS: number = 900;
 }
 
 export function validateEnv(config: Record<string, unknown>): EnvironmentVariables {
   const validatedConfig = plainToInstance(EnvironmentVariables, {
     ...config,
     API_PORT: config.API_PORT !== undefined ? Number(config.API_PORT) : 4000,
+    ROUTE_CACHE_TTL_SECONDS:
+      config.ROUTE_CACHE_TTL_SECONDS !== undefined ? Number(config.ROUTE_CACHE_TTL_SECONDS) : 900,
   });
 
   const errors = validateSync(validatedConfig, {

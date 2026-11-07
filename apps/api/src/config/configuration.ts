@@ -5,6 +5,7 @@ export interface AppConfig {
   jwtAccessSecret: string;
   jwtRefreshSecret: string;
   redisUrl: string;
+  routeCacheTtlSeconds: number;
 }
 
 export default (): AppConfig => ({
@@ -14,4 +15,7 @@ export default (): AppConfig => ({
   jwtAccessSecret: process.env.JWT_ACCESS_SECRET as string,
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET as string,
   redisUrl: process.env.REDIS_URL as string,
+  routeCacheTtlSeconds: process.env.ROUTE_CACHE_TTL_SECONDS
+    ? parseInt(process.env.ROUTE_CACHE_TTL_SECONDS, 10)
+    : 900,
 });

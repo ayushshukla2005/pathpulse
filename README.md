@@ -34,6 +34,8 @@ The backend API validates environment variables at startup and fails fast if any
 - `JWT_ACCESS_SECRET`: Secret key for signing access tokens (minimum 32 characters; default placeholder strings are rejected).
 - `JWT_REFRESH_SECRET`: Secret key for signing refresh tokens (minimum 32 characters; default placeholder strings are rejected).
 - `REDIS_URL`: Redis connection URL for queues and caching (e.g. `redis://localhost:6379`).
+- `TEST_REDIS_URL`: Redis connection URL with an isolated database index for integration tests (e.g. `redis://localhost:6379/1`).
+- `ROUTE_CACHE_TTL_SECONDS`: Route calculation cache time-to-live in seconds (defaults to `900` / 15 minutes).
 - `SEED_ADMIN_PASSWORD`: Password for the demo organization admin (`demo-admin@pathpulse.local`) when running database seed scripts.
 
 ### 2. Install Dependencies

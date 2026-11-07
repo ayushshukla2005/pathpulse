@@ -1,8 +1,10 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { APP_GUARD } from "@nestjs/core";
+import { EventEmitterModule } from "@nestjs/event-emitter";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { AuthModule } from "./auth/auth.module";
 import { BuildingsModule } from "./buildings/buildings.module";
+import { CacheModule } from "./cache/cache.module";
 import { JwtAuthGuard } from "./common/guards/jwt-auth.guard";
 import { RolesGuard } from "./common/guards/roles.guard";
 import { RequestIdMiddleware } from "./common/middleware/request-id.middleware";
@@ -18,6 +20,8 @@ import { VenuesModule } from "./venues/venues.module";
   imports: [
     AppConfigModule,
     DatabaseModule,
+    CacheModule,
+    EventEmitterModule.forRoot(),
     ThrottlerModule.forRoot([
       {
         ttl: 60000,

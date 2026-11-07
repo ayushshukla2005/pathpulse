@@ -182,6 +182,7 @@ model Building {
   venue                   Venue                 @relation(fields: [venue_id], references: [id], onDelete: Cascade)
   name                    String
   building_code           String?
+  graph_version           Int                   @default(1)
   created_at              DateTime              @default(now())
   updated_at              DateTime              @updatedAt
   floors                  Floor[]
