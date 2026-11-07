@@ -315,3 +315,4 @@ Cryptographically secure refresh tokens for authentication sessions.
   - PostgreSQL `CHECK` constraints are column-local or row-local to the single table being evaluated; they cannot perform subqueries or join across parent foreign keys (`map_nodes.floor_id`).
   - While a deferred constraint trigger is required when cross-referencing mutually dependent rows inserted in arbitrary order, navigation nodes are strictly persisted before edges can link them.
   - An immediate `BEFORE INSERT OR UPDATE` row-level trigger validates the condition instantaneously at execution time, failing early with a descriptive error message before committing any invalid edge topology.
+

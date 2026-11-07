@@ -31,3 +31,4 @@ CREATE TRIGGER trg_elevator_different_floors
 BEFORE INSERT OR UPDATE ON "map_edges"
 FOR EACH ROW
 EXECUTE FUNCTION check_elevator_different_floors();
+

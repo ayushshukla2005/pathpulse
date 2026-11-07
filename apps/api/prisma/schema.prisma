@@ -381,3 +381,4 @@ model RefreshToken {
   @@index([token_hash])
   @@map("refresh_tokens")
 }
+

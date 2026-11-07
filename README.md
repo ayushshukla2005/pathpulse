@@ -24,6 +24,17 @@ Copy the example environment file to create your local `.env`:
 cp .env.example .env
 ```
 
+#### Required Environment Variables
+
+The backend API validates environment variables at startup and fails fast if any required setting is missing or uses insecure default placeholders:
+
+- `DATABASE_URL`: Full PostgreSQL connection string (e.g. `postgresql://user:password@localhost:5432/pathpulse`).
+- `WEB_ORIGIN`: Allowed frontend origin for CORS (e.g. `http://localhost:3000`).
+- `API_PORT`: Port on which the API listens (defaults to `4000`).
+- `JWT_ACCESS_SECRET`: Secret key for signing access tokens (minimum 32 characters; default placeholder strings are rejected).
+- `JWT_REFRESH_SECRET`: Secret key for signing refresh tokens (minimum 32 characters; default placeholder strings are rejected).
+- `REDIS_URL`: Redis connection URL for queues and caching (e.g. `redis://localhost:6379`).
+
 ### 2. Install Dependencies
 
 Install all monorepo dependencies:
@@ -54,7 +65,23 @@ Verify that PostgreSQL and the PostGIS spatial extension are operating correctly
 docker compose exec postgres psql -U pathpulse -d pathpulse -c "SELECT PostGIS_Version();"
 ```
 
-### 5. Run Quality Checks
+### 5. Build and Test the API
+
+Build the NestJS API application:
+
+```bash
+cd apps/api
+pnpm build
+```
+
+Run unit tests and end-to-end tests:
+
+```bash
+pnpm test
+pnpm test:e2e
+```
+
+### 6. Code Quality Checks
 
 Run linting across all workspaces:
 
@@ -67,4 +94,3 @@ Run TypeScript compilation checks across all workspaces:
 ```bash
 pnpm typecheck
 ```
-
