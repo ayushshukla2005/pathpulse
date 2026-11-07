@@ -1,9 +1,11 @@
 # PathPulse Agent Rules
 
 ## Product
+
 PathPulse is an accessibility-aware indoor and outdoor navigation platform. Users with mobility, visual, and other access needs find places, navigate routes inside buildings (including multi-floor routing via lifts and ramps), see whether facilities are verified and operational, and report barriers for institutions to fix. Accessibility preferences are navigation preferences, never medical diagnoses.
 
 ## Non-negotiable product rules
+
 1. Unknown accessibility data is never treated as accessible. Every route segment is labeled CONFIRMED, UNVERIFIED, or UNAVAILABLE.
 2. A step-free profile never receives a confirmed route containing stairs.
 3. A route never depends on a confirmed out-of-service lift.
@@ -12,6 +14,7 @@ PathPulse is an accessibility-aware indoor and outdoor navigation platform. User
 6. Every protected endpoint enforces role checks and ownership checks.
 
 ## Tech stack (do not change without asking the user)
+
 - Frontend: Next.js (App Router), TypeScript, Tailwind CSS, shadcn/ui, MapLibre GL JS
 - Backend: Node.js, NestJS, TypeScript (strict), REST under /api/v1, class-validator DTOs
 - Database: PostgreSQL 16 with PostGIS 3.4, Prisma for migrations and typed queries, raw SQL via $queryRaw for PostGIS geometry
@@ -23,6 +26,7 @@ PathPulse is an accessibility-aware indoor and outdoor navigation platform. User
 - Monorepo: pnpm workspaces
 
 ## Code rules
+
 - No comments inside code unless the user explicitly asks.
 - Strict TypeScript. No `any` unless justified in a comment-free note in the chat reply.
 - Complete, runnable files. No placeholders such as "// rest of code here".
@@ -30,6 +34,7 @@ PathPulse is an accessibility-aware indoor and outdoor navigation platform. User
 - Prefer clean, minimal, idiomatic code over clever code.
 
 ## Working rules
+
 - Complete only the current step. Do not start the next step.
 - Prefer working files over long planning. Keep any plan to a few lines.
 - Run the verification commands yourself and report the actual output.

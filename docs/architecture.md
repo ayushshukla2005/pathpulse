@@ -78,4 +78,3 @@ flowchart TD
   - Independent runtime environments: Node.js handles I/O-intensive navigation queries and WebSockets, while Python manages memory-heavy image and tensor operations.
   - Failure containment: Heavy computer vision jobs or ML failures never block core navigation, authentication, or reporting operations.
   - Strict human verification invariant: The AI service returns suggestions (confidence scores, detected barrier classes); core business logic marks all AI outputs as suggestions requiring human or moderator verification before committing state changes.
-

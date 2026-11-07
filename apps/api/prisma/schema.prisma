@@ -68,31 +68,36 @@ enum ReportStatus {
 
 enum FacilityType {
   ELEVATOR
+  LIFT
   RAMP
   ACCESSIBLE_RESTROOM
+  WASHROOM
   ENTRANCE
+  RECEPTION
   TACTILE_PAVING
   PARKING_BAY
   HELP_DESK
+  OTHER
 }
 
 model User {
-  id                      String                @id @default(uuid())
-  email                   String                @unique
-  password_hash           String
-  name                    String
-  role                    UserRole              @default(USER)
-  organization_id         String?
-  organization            Organization?         @relation(fields: [organization_id], references: [id], onDelete: SetNull)
-  created_at              DateTime              @default(now())
-  updated_at              DateTime              @updatedAt
-  preferences             UserPreference?
-  refresh_tokens          RefreshToken[]
-  issue_reports           IssueReport[]
-  verifications           Verification[]
-  maintenance_tasks       MaintenanceTask[]
-  notifications           Notification[]
-  audit_logs              AuditLog[]
+  id                        String                @id @default(uuid())
+  email                     String                @unique
+  password_hash             String
+  name                      String
+  role                      UserRole              @default(USER)
+  organization_id           String?
+  organization              Organization?         @relation(fields: [organization_id], references: [id], onDelete: SetNull)
+  created_at                DateTime              @default(now())
+  updated_at                DateTime              @updatedAt
+  preferences               UserPreference?
+  refresh_tokens            RefreshToken[]
+  organization_memberships  OrganizationMember[]
+  issue_reports             IssueReport[]
+  verifications             Verification[]
+  maintenance_tasks         MaintenanceTask[]
+  notifications             Notification[]
+  audit_logs                AuditLog[]
 
   @@index([organization_id])
   @@index([role])
@@ -127,10 +132,27 @@ model Organization {
   created_at              DateTime              @default(now())
   updated_at              DateTime              @updatedAt
   users                   User[]
+  members                 OrganizationMember[]
   venues                  Venue[]
   maintenance_tasks       MaintenanceTask[]
 
   @@map("organizations")
+}
+
+model OrganizationMember {
+  id              String       @id @default(uuid())
+  organization_id String
+  organization    Organization @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+  user_id         String
+  user            User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  role            UserRole     @default(ORGANIZATION_ADMIN)
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
+
+  @@unique([organization_id, user_id])
+  @@index([organization_id])
+  @@index([user_id])
+  @@map("organization_members")
 }
 
 model Venue {

@@ -34,6 +34,7 @@ The backend API validates environment variables at startup and fails fast if any
 - `JWT_ACCESS_SECRET`: Secret key for signing access tokens (minimum 32 characters; default placeholder strings are rejected).
 - `JWT_REFRESH_SECRET`: Secret key for signing refresh tokens (minimum 32 characters; default placeholder strings are rejected).
 - `REDIS_URL`: Redis connection URL for queues and caching (e.g. `redis://localhost:6379`).
+- `SEED_ADMIN_PASSWORD`: Password for the demo organization admin (`demo-admin@pathpulse.local`) when running database seed scripts.
 
 ### 2. Install Dependencies
 
@@ -65,7 +66,17 @@ Verify that PostgreSQL and the PostGIS spatial extension are operating correctly
 docker compose exec postgres psql -U pathpulse -d pathpulse -c "SELECT PostGIS_Version();"
 ```
 
-### 5. Build and Test the API
+### 5. Database Migrations and Seeding
+
+Run Prisma migrations and seed the sample campus data:
+
+```bash
+cd apps/api
+pnpm exec prisma migrate deploy
+pnpm db:seed
+```
+
+### 6. Build and Test the API
 
 Build the NestJS API application:
 
