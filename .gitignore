@@ -5,6 +5,9 @@ dist
 .env.*.local
 coverage
 .next
+test-results
+playwright-report
+blob-report
 *.tsbuildinfo
 __pycache__
 *.py[cod]

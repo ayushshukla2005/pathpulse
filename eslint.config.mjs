@@ -7,6 +7,7 @@ export default tseslint.config(js.configs.recommended, ...tseslint.configs.recom
     "**/dist/**",
     "**/.next/**",
     "**/coverage/**",
+    "**/next-env.d.ts",
     "apps/ai-service/**",
   ],
 });

@@ -37,6 +37,9 @@ The backend API validates environment variables at startup and fails fast if any
 - `TEST_REDIS_URL`: Redis connection URL with an isolated database index for integration tests (e.g. `redis://localhost:6379/1`).
 - `ROUTE_CACHE_TTL_SECONDS`: Route calculation cache time-to-live in seconds (defaults to `900` / 15 minutes).
 - `SEED_ADMIN_PASSWORD`: Password for the demo organization admin (`demo-admin@pathpulse.local`) when running database seed scripts.
+- `NEXT_PUBLIC_API_URL`: Client-side base URL for API requests (e.g. `http://localhost:3000`).
+- `API_BASE_URL`: Backend NestJS API URL used by Next.js server route handlers (e.g. `http://localhost:4000`).
+- `COOKIE_SECRET`: Secret key for session cookie signing (minimum 32 characters; default placeholder strings are rejected).
 
 ### 2. Install Dependencies
 
@@ -46,7 +49,16 @@ Install all monorepo dependencies:
 pnpm install
 ```
 
-### 3. Start Local Infrastructure Services
+### 3. Build Shared Packages
+
+Build the TypeScript shared packages before running apps:
+
+```bash
+pnpm --filter @pathpulse/shared-types build
+pnpm --filter @pathpulse/validation build
+```
+
+### 4. Start Local Infrastructure Services
 
 Start PostgreSQL with PostGIS, Redis, and MinIO in the background:
 
@@ -54,7 +66,7 @@ Start PostgreSQL with PostGIS, Redis, and MinIO in the background:
 docker compose up -d
 ```
 
-### 4. Verify Services
+### 5. Verify Services
 
 Check that all containerized services are running and healthy:
 
@@ -68,7 +80,7 @@ Verify that PostgreSQL and the PostGIS spatial extension are operating correctly
 docker compose exec postgres psql -U pathpulse -d pathpulse -c "SELECT PostGIS_Version();"
 ```
 
-### 5. Database Migrations and Seeding
+### 6. Database Migrations and Seeding
 
 Run Prisma migrations and seed the sample campus data:
 
@@ -76,25 +88,57 @@ Run Prisma migrations and seed the sample campus data:
 cd apps/api
 pnpm exec prisma migrate deploy
 pnpm db:seed
+cd ../..
 ```
 
-### 6. Build and Test the API
+### 7. Run the Applications (Startup Order)
 
-Build the NestJS API application:
+Start the services in the following order:
+
+1. **Infrastructure**: `docker compose up -d` (PostgreSQL, Redis, MinIO)
+2. **API Backend**:
+   ```bash
+   pnpm --filter @pathpulse/api start:dev
+   ```
+   Listens on `http://localhost:4000` with Swagger docs at `http://localhost:4000/docs`.
+3. **Web Frontend**:
+   ```bash
+   pnpm --filter @pathpulse/web dev
+   ```
+   Listens on `http://localhost:3000`.
+
+### 8. Testing
+
+Run backend tests:
 
 ```bash
 cd apps/api
-pnpm build
-```
-
-Run unit tests and end-to-end tests:
-
-```bash
 pnpm test
 pnpm test:e2e
+cd ../..
 ```
 
-### 6. Code Quality Checks
+Run frontend unit, component, and accessibility E2E tests:
+
+```bash
+cd apps/web
+pnpm test
+pnpm test:e2e
+cd ../..
+```
+
+### 9. Production Builds
+
+Build all packages and applications:
+
+```bash
+pnpm --filter @pathpulse/shared-types build
+pnpm --filter @pathpulse/validation build
+pnpm --filter @pathpulse/api build
+pnpm --filter @pathpulse/web build
+```
+
+### 10. Code Quality Checks
 
 Run linting across all workspaces:
 
