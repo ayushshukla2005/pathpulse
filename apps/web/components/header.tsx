@@ -2,11 +2,20 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import { getNotifications } from "@/lib/api/notifications";
 import { useAuth } from "@/lib/auth/auth-context";
 import { AccessibilityMenu } from "./accessibility-menu";
 
 export function Header() {
   const { user, isAuthenticated, logout } = useAuth();
+
+  const { data: notificationsData } = useQuery({
+    queryKey: ["notifications"],
+    queryFn: getNotifications,
+    enabled: isAuthenticated,
+    refetchInterval: 30000,
+  });
 
   return (
     <>
@@ -52,17 +61,39 @@ export function Header() {
               {isAuthenticated ? (
                 <>
                   <Link
+                    href="/notifications"
+                    className="relative rounded-md border-2 border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)]"
+                    aria-label={`Notifications${
+                      notificationsData?.unreadCount
+                        ? `, ${notificationsData.unreadCount} unread`
+                        : ""
+                    }`}
+                  >
+                    Notifications
+                    {notificationsData && notificationsData.unreadCount > 0 ? (
+                      <span
+                        className="ml-1.5 inline-flex items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-xs font-bold text-white"
+                        aria-hidden="true"
+                      >
+                        {notificationsData.unreadCount}
+                      </span>
+                    ) : null}
+                  </Link>
+
+                  <Link
                     href="/reports"
                     className="rounded-md border-2 border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)]"
                   >
                     My Reports
                   </Link>
+
                   <Link
                     href="/profile"
                     className="rounded-md border-2 border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)]"
                   >
                     Profile ({user?.name || "User"})
                   </Link>
+
                   <button
                     type="button"
                     onClick={() => logout()}

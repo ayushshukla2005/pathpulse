@@ -7,6 +7,7 @@ allowBuilds:
   "@prisma/engines": true
   prisma: true
   esbuild: true
+  "msgpackr-extract": true
 
 minimumReleaseAgeExclude:
   - "@tanstack/query-core@5.107.1"

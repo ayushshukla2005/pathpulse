@@ -345,3 +345,68 @@ export interface PaginatedReportsResponse {
   limit: number;
   totalPages: number;
 }
+
+export type WorkflowAction =
+  | "REVIEW"
+  | "VERIFY"
+  | "REJECT"
+  | "ASSIGN"
+  | "SUBMIT_RESOLUTION"
+  | "CONFIRM_RESOLUTION"
+  | "REOPEN"
+  | "CLOSE_REJECTED";
+
+export interface AllowedActionItem {
+  action: WorkflowAction;
+  label: string;
+  targetStatus: ReportStatus;
+  requiresReason?: boolean;
+}
+
+export interface ReportWorkflowSummary {
+  id: string;
+  trackingCode: string;
+  status: ReportStatus;
+  category: ReportCategory;
+  reopenCount: number;
+  assignedToUserId: string | null;
+  verifiedByUserId: string | null;
+  resolvedAt: string | null;
+  allowedActions: AllowedActionItem[];
+}
+
+export interface AuditLogItem {
+  id: string;
+  actorUserId: string | null;
+  actorName: string | null;
+  action: string;
+  fromStatus: string | null;
+  toStatus: string | null;
+  reason: string | null;
+  createdAt: string;
+}
+
+export interface DuplicateSuggestion {
+  candidateId: string;
+  trackingCode: string;
+  title: string | null;
+  similarity: number;
+  status: ReportStatus;
+  createdAt: string;
+}
+
+export interface UserNotificationItem {
+  id: string;
+  reportId: string | null;
+  type: string;
+  title: string;
+  message: string;
+  link: string | null;
+  readAt: string | null;
+  createdAt: string;
+}
+
+export interface NotificationsListResponse {
+  items: UserNotificationItem[];
+  unreadCount: number;
+}

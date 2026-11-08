@@ -387,4 +387,204 @@ test.describe("Axe Accessibility Scans", () => {
 
     expect(seriousOrCritical).toEqual([]);
   });
+
+  test("Moderator review page has zero serious or critical accessibility violations", async ({
+    page,
+    context,
+  }) => {
+    await context.addCookies([
+      {
+        name: "pp_refresh",
+        value: "e2e-test-token",
+        domain: "localhost",
+        path: "/",
+      },
+    ]);
+
+    await page.route(/\/api\/auth\/session$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          authenticated: true,
+          accessToken: "mock-access-token",
+          user: {
+            id: "mod-axe-1",
+            email: "mod@pathpulse.local",
+            name: "Axe Moderator",
+            role: "MODERATOR",
+            createdAt: new Date().toISOString(),
+            preferences: null,
+          },
+        }),
+      });
+    });
+
+    await page.route(/\/api\/v1\/notifications$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ items: [], unreadCount: 0 }),
+      });
+    });
+
+    await page.route(/\/api\/v1\/reports\/axe-mod-rep$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          id: "axe-mod-rep",
+          tracking_code: "REP-20261108-AXE1",
+          user_id: "user-1",
+          venue_id: "venue-central",
+          facility_id: null,
+          category: "BROKEN_LIFT",
+          title: "Elevator out of service",
+          description: "Elevator buttons unresponsive",
+          status: "UNDER_REVIEW",
+          latitude: 12.9716,
+          longitude: 77.5946,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          evidence: [],
+          venue: { id: "venue-central", name: "Central Campus Center" },
+          facility: null,
+        }),
+      });
+    });
+
+    await page.route(/\/api\/v1\/reports\/axe-mod-rep\/workflow-summary$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          id: "axe-mod-rep",
+          trackingCode: "REP-20261108-AXE1",
+          status: "UNDER_REVIEW",
+          category: "BROKEN_LIFT",
+          reopenCount: 0,
+          assignedToUserId: null,
+          verifiedByUserId: null,
+          resolvedAt: null,
+          allowedActions: [
+            { action: "VERIFY", label: "Verify Barrier", targetStatus: "VERIFIED" },
+            {
+              action: "REJECT",
+              label: "Reject Report",
+              targetStatus: "REJECTED",
+              requiresReason: true,
+            },
+          ],
+        }),
+      });
+    });
+
+    await page.route(/\/api\/v1\/reports\/axe-mod-rep\/audit$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify([
+          {
+            id: "aud-1",
+            actorUserId: "mod-1",
+            actorName: "Axe Moderator",
+            action: "REVIEW",
+            fromStatus: "SUBMITTED",
+            toStatus: "UNDER_REVIEW",
+            reason: null,
+            createdAt: new Date().toISOString(),
+          },
+        ]),
+      });
+    });
+
+    await page.route(/\/api\/v1\/reports\/axe-mod-rep\/duplicates$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify([]),
+      });
+    });
+
+    await page.goto("/moderation/reports/axe-mod-rep");
+    await expect(page.locator("h1")).toContainText("Review Report: REP-20261108-AXE1");
+
+    const scanResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+
+    const seriousOrCritical = scanResults.violations.filter(
+      (v) => v.impact === "serious" || v.impact === "critical",
+    );
+
+    expect(seriousOrCritical).toEqual([]);
+  });
+
+  test("Notifications page has zero serious or critical accessibility violations", async ({
+    page,
+    context,
+  }) => {
+    await context.addCookies([
+      {
+        name: "pp_refresh",
+        value: "e2e-test-token",
+        domain: "localhost",
+        path: "/",
+      },
+    ]);
+
+    await page.route(/\/api\/auth\/session$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          authenticated: true,
+          accessToken: "mock-access-token",
+          user: {
+            id: "user-1",
+            email: "user@pathpulse.local",
+            name: "User One",
+            role: "USER",
+            createdAt: new Date().toISOString(),
+            preferences: null,
+          },
+        }),
+      });
+    });
+
+    await page.route(/\/api\/v1\/notifications$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          items: [
+            {
+              id: "notif-1",
+              reportId: "rep-1",
+              type: "REPORT_VERIFIED",
+              title: "Report Verified",
+              message: "Your report REP-20261108-AXE1 has been verified.",
+              link: "/reports/rep-1",
+              readAt: null,
+              createdAt: new Date().toISOString(),
+            },
+          ],
+          unreadCount: 1,
+        }),
+      });
+    });
+
+    await page.goto("/notifications");
+    await expect(page.locator("h1")).toContainText("Notifications");
+
+    const scanResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+
+    const seriousOrCritical = scanResults.violations.filter(
+      (v) => v.impact === "serious" || v.impact === "critical",
+    );
+
+    expect(seriousOrCritical).toEqual([]);
+  });
 });

@@ -100,6 +100,8 @@ model User {
   refresh_tokens            RefreshToken[]
   organization_memberships  OrganizationMember[]
   issue_reports             IssueReport[]
+  assigned_reports          IssueReport[]         @relation("AssignedReports")
+  verified_reports          IssueReport[]         @relation("VerifiedReports")
   verifications             Verification[]
   maintenance_tasks         MaintenanceTask[]
   notifications             Notification[]
@@ -307,6 +309,12 @@ model IssueReport {
   title                   String?
   description             String
   status                  ReportStatus          @default(SUBMITTED)
+  assigned_to_user_id     String?
+  assigned_to             User?                 @relation("AssignedReports", fields: [assigned_to_user_id], references: [id], onDelete: SetNull)
+  resolved_at             DateTime?
+  verified_by_user_id     String?
+  verified_by             User?                 @relation("VerifiedReports", fields: [verified_by_user_id], references: [id], onDelete: SetNull)
+  reopen_count            Int                   @default(0)
   latitude                Float?
   longitude               Float?
   location                Unsupported("geography(Point, 4326)")?
@@ -315,12 +323,15 @@ model IssueReport {
   evidence                Evidence[]
   verifications           Verification[]
   maintenance_tasks       MaintenanceTask[]
+  notifications           Notification[]
 
   @@index([tracking_code])
   @@index([user_id])
   @@index([venue_id])
   @@index([facility_id])
   @@index([status])
+  @@index([assigned_to_user_id])
+  @@index([verified_by_user_id])
   @@map("issue_reports")
 }
 
@@ -381,13 +392,17 @@ model Notification {
   id                      String                @id @default(uuid())
   user_id                 String
   user                    User                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  title                   String
+  report_id               String?
+  report                  IssueReport?          @relation(fields: [report_id], references: [id], onDelete: SetNull)
+  type                    String                @default("STATUS_CHANGE")
+  title                   String                @default("Report Status Update")
   message                 String
   link                    String?
   read_at                 DateTime?
   created_at              DateTime              @default(now())
 
   @@index([user_id])
+  @@index([report_id])
   @@index([read_at])
   @@map("notifications")
 }
@@ -396,11 +411,15 @@ model AuditLog {
   id                      String                @id @default(uuid())
   user_id                 String?
   user                    User?                 @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  actor_user_id           String?
   action                  String
   entity_type             String
   entity_id               String
   venue_id                String?
   venue                   Venue?                @relation(fields: [venue_id], references: [id], onDelete: SetNull)
+  from_status             String?
+  to_status               String?
+  reason                  String?
   changes                 Json?
   created_at              DateTime              @default(now())
 
@@ -408,6 +427,7 @@ model AuditLog {
   @@index([entity_type])
   @@index([user_id])
   @@index([created_at])
+  @@index([entity_type, entity_id, created_at])
   @@map("audit_logs")
 }
 

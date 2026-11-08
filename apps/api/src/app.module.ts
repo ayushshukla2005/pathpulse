@@ -1,4 +1,6 @@
+import { BullModule } from "@nestjs/bullmq";
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import { APP_GUARD } from "@nestjs/core";
 import { EventEmitterModule } from "@nestjs/event-emitter";
 import { ThrottlerModule } from "@nestjs/throttler";
@@ -14,6 +16,7 @@ import { DatabaseModule } from "./database/database.module";
 import { FacilitiesModule } from "./facilities/facilities.module";
 import { HealthModule } from "./health/health.module";
 import { NavigationModule } from "./navigation/navigation.module";
+import { NotificationsModule } from "./notifications/notifications.module";
 import { ReportsModule } from "./reports/reports.module";
 import { UsersModule } from "./users/users.module";
 import { VenuesModule } from "./venues/venues.module";
@@ -23,6 +26,43 @@ import { VenuesModule } from "./venues/venues.module";
     AppConfigModule,
     DatabaseModule,
     CacheModule,
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        const redisUrl = config.get<string>("redisUrl") || "redis://localhost:6379";
+        try {
+          const parsed = new URL(redisUrl);
+          return {
+            connection: {
+              host: parsed.hostname || "localhost",
+              port: parsed.port ? parseInt(parsed.port, 10) : 6379,
+              password: parsed.password || undefined,
+              username: parsed.username || undefined,
+              db:
+                parsed.pathname && parsed.pathname.length > 1
+                  ? parseInt(parsed.pathname.slice(1), 10)
+                  : 0,
+              maxRetriesPerRequest: null,
+              enableOfflineQueue: false,
+              lazyConnect: true,
+              retryStrategy: () => null,
+            },
+          };
+        } catch {
+          return {
+            connection: {
+              host: "localhost",
+              port: 6379,
+              maxRetriesPerRequest: null,
+              enableOfflineQueue: false,
+              lazyConnect: true,
+              retryStrategy: () => null,
+            },
+          };
+        }
+      },
+    }),
     EventEmitterModule.forRoot(),
     ThrottlerModule.forRoot([
       {
@@ -38,6 +78,7 @@ import { VenuesModule } from "./venues/venues.module";
     NavigationModule,
     FacilitiesModule,
     ReportsModule,
+    NotificationsModule,
   ],
   providers: [
     {
