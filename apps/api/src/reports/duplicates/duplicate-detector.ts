@@ -19,6 +19,7 @@ export interface DuplicateSuggestion {
   similarity: number;
   status: ReportStatus;
   createdAt: string;
+  source?: "ai" | "token";
 }
 
 export interface DuplicateOptions {

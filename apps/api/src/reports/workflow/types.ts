@@ -1,3 +1,5 @@
+import { AiSuggestionItem } from "@pathpulse/shared-types";
+
 export type ReportStatus =
   | "SUBMITTED"
   | "UNDER_REVIEW"
@@ -94,4 +96,5 @@ export interface ReportWorkflowSummary {
   verifiedByUserId: string | null;
   resolvedAt: string | null;
   allowedActions: AllowedActionItem[];
+  aiSuggestions?: AiSuggestionItem[];
 }

@@ -2,11 +2,15 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
   UnprocessableEntityException,
 } from "@nestjs/common";
+import { InjectQueue } from "@nestjs/bullmq";
+import { Queue } from "bullmq";
 import { EvidenceStatus, Prisma, ReportCategory, ReportStatus, UserRole } from "@prisma/client";
 import { randomBytes, randomUUID } from "crypto";
+import { AiSuggestionItem } from "@pathpulse/shared-types";
 import { AuthenticatedUser } from "../common/decorators/current-user.decorator";
 import { PrismaService } from "../database/prisma.service";
 import { CreateEvidenceDto } from "./dto/create-evidence.dto";
@@ -42,6 +46,7 @@ export interface SanitizedReport {
   created_at: Date | string;
   updated_at: Date | string;
   evidence: SanitizedEvidence[];
+  aiSuggestions?: AiSuggestionItem[];
   venue?: { id: string; name: string } | null;
   facility?: { id: string; name: string } | null;
 }
@@ -68,9 +73,12 @@ export interface CompleteEvidenceResult {
 
 @Injectable()
 export class ReportsService {
+  private readonly logger = new Logger(ReportsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly storageService: StorageService,
+    @InjectQueue("report-ai-processing") private readonly aiQueue?: Queue,
   ) {}
 
   generateTrackingCode(): string {
@@ -150,6 +158,25 @@ export class ReportsService {
         evidence: true,
       },
     });
+
+    try {
+      if (this.aiQueue && typeof this.aiQueue.add === "function") {
+        await this.aiQueue.add(
+          "classify-report",
+          {
+            reportId: report.id,
+            description: report.description,
+          },
+          {
+            attempts: 3,
+            backoff: { type: "exponential", delay: 1000 },
+            removeOnComplete: true,
+          },
+        );
+      }
+    } catch (queueError) {
+      this.logger.warn(`Failed to enqueue AI classification job: ${queueError}`);
+    }
 
     return {
       id: report.id,
@@ -264,6 +291,7 @@ export class ReportsService {
       where: whereClause,
       include: {
         evidence: true,
+        ai_suggestions: true,
         venue: {
           select: {
             id: true,
@@ -322,6 +350,29 @@ export class ReportsService {
       created_at: report.created_at,
       updated_at: report.updated_at,
       evidence: sanitizedEvidence,
+      aiSuggestions: (
+        (
+          report as {
+            ai_suggestions?: Array<{
+              id: string;
+              report_id: string;
+              kind: string;
+              payload: unknown;
+              model_version: string;
+              requires_human_verification: boolean;
+              created_at: Date;
+            }>;
+          }
+        ).ai_suggestions ?? []
+      ).map((s) => ({
+        id: s.id,
+        reportId: s.report_id,
+        kind: s.kind as "CLASSIFICATION" | "DUPLICATE_SCORES" | "SUMMARY",
+        payload: s.payload as Record<string, unknown>,
+        modelVersion: s.model_version,
+        requiresHumanVerification: true as const,
+        createdAt: s.created_at instanceof Date ? s.created_at.toISOString() : String(s.created_at),
+      })),
       venue: report.venue ? { id: report.venue.id, name: report.venue.name } : null,
       facility: report.facility,
     };

@@ -6,6 +6,8 @@ import {
   UnprocessableEntityException,
 } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
+import { AiSuggestionItem } from "@pathpulse/shared-types";
+import { AiClientService } from "../../ai/ai-client.service";
 import { AuthenticatedUser } from "../../common/decorators/current-user.decorator";
 import { PrismaService } from "../../database/prisma.service";
 import { NotificationsService } from "../../notifications/notifications.service";
@@ -49,6 +51,7 @@ export class WorkflowService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notificationsService: NotificationsService,
+    private readonly aiClient?: AiClientService,
   ) {}
 
   async executeTransition(
@@ -401,10 +404,52 @@ export class WorkflowService {
       createdAt: target.created_at,
     };
 
-    return findDuplicateCandidates(targetCandidate, candidates, {
+    const tokenSuggestions = findDuplicateCandidates(targetCandidate, candidates, {
       threshold: 0.5,
       windowDays: 30,
-    });
+    }).map((s) => ({ ...s, source: "token" as const }));
+
+    if (this.aiClient && candidates.length > 0) {
+      try {
+        const aiResponse = await this.aiClient.scoreDuplicates({
+          candidateDescription: target.description,
+          comparisonReports: candidates.map((c) => ({
+            id: c.id,
+            description: c.description,
+          })),
+          threshold: 0.5,
+        });
+
+        if (aiResponse && Array.isArray(aiResponse.scores)) {
+          const candidatesById = new Map(candidates.map((c) => [c.id, c]));
+          const aiScores = aiResponse.scores
+            .filter((s) => s.isLikelyDuplicate)
+            .map((s) => {
+              const c = candidatesById.get(s.id);
+              if (!c) return null;
+              return {
+                candidateId: c.id,
+                trackingCode: c.trackingCode,
+                title: c.title,
+                similarity: s.similarityScore,
+                status: c.status,
+                createdAt:
+                  c.createdAt instanceof Date ? c.createdAt.toISOString() : String(c.createdAt),
+                source: "ai" as const,
+              };
+            })
+            .filter((item): item is NonNullable<typeof item> => item !== null);
+
+          if (aiScores.length > 0) {
+            return aiScores;
+          }
+        }
+      } catch {
+        return tokenSuggestions;
+      }
+    }
+
+    return tokenSuggestions;
   }
 
   async getReportWorkflowSummary(
@@ -468,6 +513,21 @@ export class WorkflowService {
       isMember,
     );
 
+    const rawSuggestions = await this.prisma.aiSuggestion.findMany({
+      where: { report_id: reportId },
+      orderBy: { created_at: "desc" },
+    });
+
+    const aiSuggestions: AiSuggestionItem[] = rawSuggestions.map((s) => ({
+      id: s.id,
+      reportId: s.report_id,
+      kind: s.kind as "CLASSIFICATION" | "DUPLICATE_SCORES" | "SUMMARY",
+      payload: s.payload as Record<string, unknown>,
+      modelVersion: s.model_version,
+      requiresHumanVerification: true as const,
+      createdAt: s.created_at.toISOString ? s.created_at.toISOString() : String(s.created_at),
+    }));
+
     return {
       id: report.id,
       trackingCode: report.tracking_code,
@@ -478,6 +538,7 @@ export class WorkflowService {
       verifiedByUserId: report.verified_by_user_id,
       resolvedAt: report.resolved_at ? report.resolved_at.toISOString() : null,
       allowedActions: allowed,
+      aiSuggestions,
     };
   }
 }

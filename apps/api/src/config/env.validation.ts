@@ -82,6 +82,34 @@ export class EnvironmentVariables {
   @IsNumber()
   @Min(1)
   WS_SUBSCRIPTION_RATE_LIMIT: number = 10;
+
+  @IsOptional()
+  @IsString()
+  AI_SERVICE_URL: string = "http://localhost:8000";
+
+  @IsOptional()
+  @IsString()
+  AI_SERVICE_TOKEN: string = "dev-pathpulse-ai-internal-service-token-secret";
+
+  @IsOptional()
+  @IsNumber()
+  @Min(100)
+  AI_TIMEOUT_MS: number = 2000;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  AI_BREAKER_FAILURE_THRESHOLD: number = 3;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(100)
+  AI_BREAKER_RESET_TIMEOUT_MS: number = 10000;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  AI_BREAKER_HALF_OPEN_SUCCESS_THRESHOLD: number = 1;
 }
 
 export function validateEnv(config: Record<string, unknown>): EnvironmentVariables {
@@ -112,6 +140,25 @@ export function validateEnv(config: Record<string, unknown>): EnvironmentVariabl
       config.WS_SUBSCRIPTION_RATE_LIMIT !== undefined
         ? Number(config.WS_SUBSCRIPTION_RATE_LIMIT)
         : 10,
+    AI_SERVICE_URL:
+      config.AI_SERVICE_URL !== undefined ? String(config.AI_SERVICE_URL) : "http://localhost:8000",
+    AI_SERVICE_TOKEN:
+      config.AI_SERVICE_TOKEN !== undefined
+        ? String(config.AI_SERVICE_TOKEN)
+        : "dev-pathpulse-ai-internal-service-token-secret",
+    AI_TIMEOUT_MS: config.AI_TIMEOUT_MS !== undefined ? Number(config.AI_TIMEOUT_MS) : 2000,
+    AI_BREAKER_FAILURE_THRESHOLD:
+      config.AI_BREAKER_FAILURE_THRESHOLD !== undefined
+        ? Number(config.AI_BREAKER_FAILURE_THRESHOLD)
+        : 3,
+    AI_BREAKER_RESET_TIMEOUT_MS:
+      config.AI_BREAKER_RESET_TIMEOUT_MS !== undefined
+        ? Number(config.AI_BREAKER_RESET_TIMEOUT_MS)
+        : 10000,
+    AI_BREAKER_HALF_OPEN_SUCCESS_THRESHOLD:
+      config.AI_BREAKER_HALF_OPEN_SUCCESS_THRESHOLD !== undefined
+        ? Number(config.AI_BREAKER_HALF_OPEN_SUCCESS_THRESHOLD)
+        : 1,
   });
 
   const errors = validateSync(validatedConfig, {

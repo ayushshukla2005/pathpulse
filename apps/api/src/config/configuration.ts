@@ -14,6 +14,12 @@ export interface AppConfig {
   s3ForcePathStyle: boolean;
   s3PresignedExpirySeconds: number;
   wsSubscriptionRateLimit: number;
+  aiServiceUrl: string;
+  aiServiceToken: string;
+  aiTimeoutMs: number;
+  aiBreakerFailureThreshold: number;
+  aiBreakerResetTimeoutMs: number;
+  aiBreakerHalfOpenSuccessThreshold: number;
 }
 
 export default (): AppConfig => ({
@@ -38,4 +44,16 @@ export default (): AppConfig => ({
   wsSubscriptionRateLimit: process.env.WS_SUBSCRIPTION_RATE_LIMIT
     ? parseInt(process.env.WS_SUBSCRIPTION_RATE_LIMIT, 10)
     : 10,
+  aiServiceUrl: process.env.AI_SERVICE_URL || "http://localhost:8000",
+  aiServiceToken: process.env.AI_SERVICE_TOKEN || "dev-pathpulse-ai-internal-service-token-secret",
+  aiTimeoutMs: process.env.AI_TIMEOUT_MS ? parseInt(process.env.AI_TIMEOUT_MS, 10) : 2000,
+  aiBreakerFailureThreshold: process.env.AI_BREAKER_FAILURE_THRESHOLD
+    ? parseInt(process.env.AI_BREAKER_FAILURE_THRESHOLD, 10)
+    : 3,
+  aiBreakerResetTimeoutMs: process.env.AI_BREAKER_RESET_TIMEOUT_MS
+    ? parseInt(process.env.AI_BREAKER_RESET_TIMEOUT_MS, 10)
+    : 10000,
+  aiBreakerHalfOpenSuccessThreshold: process.env.AI_BREAKER_HALF_OPEN_SUCCESS_THRESHOLD
+    ? parseInt(process.env.AI_BREAKER_HALF_OPEN_SUCCESS_THRESHOLD, 10)
+    : 1,
 });

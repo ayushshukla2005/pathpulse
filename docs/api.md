@@ -123,3 +123,4 @@
   - Event: `facility.status.changed` emitted to room `building:{buildingId}`.
   - Payload: `{ facilityId, facilityType, name, buildingId, status, verificationLevel, lastVerifiedAt, graphVersion }`.
   - Privacy guarantee: No report data or sensitive internal metadata is ever broadcast over WebSockets.
+

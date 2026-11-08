@@ -1,0 +1,36 @@
+[project]
+name = "pathpulse-ai-service"
+version = "1.0.0"
+description = "PathPulse AI Service for report classification, summarisation, and duplicate scoring"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi==0.115.8",
+    "pydantic==2.10.6",
+    "pydantic-settings==2.8.0",
+    "uvicorn[standard]==0.34.0",
+    "scikit-learn==1.6.1",
+    "numpy==2.2.3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.3.4",
+    "httpx==0.28.1",
+    "ruff==0.9.9",
+]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint.per-file-ignores]
+"evaluation/evaluate.py" = ["E402"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

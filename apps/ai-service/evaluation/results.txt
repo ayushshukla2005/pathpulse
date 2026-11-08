@@ -1,0 +1,37 @@
+PathPulse AI Classification Evaluation Results
+Model Version: LogisticRegression + TF-IDF (1,2 ngrams)
+Total Samples: 40 (Train: 28, Evaluation: 12)
+Split: 70% Train / 30% Stratified Held-out Evaluation
+
+Classification Report:
+                       precision    recall  f1-score   support
+
+          BROKEN_LIFT      1.000     1.000     1.000         3
+         BLOCKED_RAMP      0.750     1.000     0.857         3
+INACCESSIBLE_ENTRANCE      1.000     1.000     1.000         3
+                OTHER      1.000     0.667     0.800         3
+
+             accuracy                          0.917        12
+            macro avg      0.938     0.917     0.914        12
+         weighted avg      0.938     0.917     0.914        12
+
+Confusion Matrix (Rows=True, Columns=Predicted):
+Labels: BROKEN_LIFT, BLOCKED_RAMP, INACCESSIBLE_ENTRANCE, OTHER
+BROKEN_LIFT           : [3, 0, 0, 0]
+BLOCKED_RAMP          : [0, 3, 0, 0]
+INACCESSIBLE_ENTRANCE : [0, 0, 3, 0]
+OTHER                 : [0, 1, 0, 2]
+
+Per-Sample Predictions on Held-Out Set:
+[PASS] id=syn-25 actual=INACCESSIBLE_ENTRANCE pred=INACCESSIBLE_ENTRANCE conf=0.75 text="Revolving door is jammed and the adjacent accessible handica..."
+[FAIL] id=syn-35 actual=OTHER pred=BLOCKED_RAMP conf=0.33 text="Handrail along the corridor access walkway is loose and wigg..."
+[PASS] id=syn-03 actual=BROKEN_LIFT pred=BROKEN_LIFT conf=0.75 text="Wheelchair lift call button on floor 2 is unresponsive and d..."
+[PASS] id=syn-07 actual=BROKEN_LIFT pred=BROKEN_LIFT conf=0.75 text="Elevator interior emergency phone is dead and makes no dial ..."
+[PASS] id=syn-40 actual=OTHER pred=OTHER conf=0.39 text="Emergency strobe light in the accessible bathroom is unplugg..."
+[PASS] id=syn-36 actual=OTHER pred=OTHER conf=0.33 text="Water leak from the ceiling has created a large puddle acros..."
+[PASS] id=syn-14 actual=BLOCKED_RAMP pred=BLOCKED_RAMP conf=0.75 text="A commercial delivery van is parked over the sidewalk curb c..."
+[PASS] id=syn-10 actual=BROKEN_LIFT pred=BROKEN_LIFT conf=0.75 text="Freight elevator used for mobility access is shut down for s..."
+[PASS] id=syn-15 actual=BLOCKED_RAMP pred=BLOCKED_RAMP conf=0.75 text="Large commercial garbage dumpsters are obstructing the side ..."
+[PASS] id=syn-17 actual=BLOCKED_RAMP pred=BLOCKED_RAMP conf=0.75 text="Wet leaves and mud have accumulated on the ramp making the s..."
+[PASS] id=syn-22 actual=INACCESSIBLE_ENTRANCE pred=INACCESSIBLE_ENTRANCE conf=0.75 text="The automated wheelchair push paddle switch at the west entr..."
+[PASS] id=syn-28 actual=INACCESSIBLE_ENTRANCE pred=INACCESSIBLE_ENTRANCE conf=0.75 text="Door intercom button to call reception for accessible entry ..."

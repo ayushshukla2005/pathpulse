@@ -325,6 +325,7 @@ model IssueReport {
   verifications           Verification[]
   maintenance_tasks       MaintenanceTask[]
   notifications           Notification[]
+  ai_suggestions          AiSuggestion[]
 
   @@index([tracking_code])
   @@index([user_id])
@@ -447,4 +448,19 @@ model RefreshToken {
   @@index([user_id])
   @@index([token_hash])
   @@map("refresh_tokens")
+}
+
+model AiSuggestion {
+  id                          String      @id @default(uuid())
+  report_id                   String
+  report                      IssueReport @relation(fields: [report_id], references: [id], onDelete: Cascade)
+  kind                        String
+  payload                     Json
+  model_version               String
+  requires_human_verification Boolean     @default(true)
+  created_at                  DateTime    @default(now())
+
+  @@index([report_id])
+  @@index([kind])
+  @@map("ai_suggestions")
 }

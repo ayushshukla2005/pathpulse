@@ -1,0 +1,41 @@
+id,text,category,severity
+syn-01,The main elevator in the science block is stuck on the third floor with doors jammed shut,BROKEN_LIFT,HIGH
+syn-02,Passenger lift B is making loud grinding sounds and jerks violently between floors,BROKEN_LIFT,HIGH
+syn-03,Wheelchair lift call button on floor 2 is unresponsive and does not illuminate,BROKEN_LIFT,MEDIUM
+syn-04,Elevator door sensors are misaligned causing the doors to close too quickly on wheelchairs,BROKEN_LIFT,HIGH
+syn-05,The library elevator floor indicator screen is blank but the lift operates normally,BROKEN_LIFT,LOW
+syn-06,Hydraulic lift for the auditorium stage is out of service and powered off,BROKEN_LIFT,HIGH
+syn-07,Elevator interior emergency phone is dead and makes no dial tone,BROKEN_LIFT,HIGH
+syn-08,Lift button 4 inside the cabin is loose and wobbly when pushed,BROKEN_LIFT,LOW
+syn-09,Elevator ride is shaky and stops 2 inches below the floor level,BROKEN_LIFT,MEDIUM
+syn-10,Freight elevator used for mobility access is shut down for scheduled inspection,BROKEN_LIFT,MEDIUM
+syn-11,The concrete access ramp outside the dining hall is completely blocked by wooden shipping pallets,BLOCKED_RAMP,HIGH
+syn-12,Multiple delivery bicycles are chained to the wheelchair ramp railing obstructing passage,BLOCKED_RAMP,MEDIUM
+syn-13,Construction scaffolding has been erected directly across the library entrance ramp,BLOCKED_RAMP,HIGH
+syn-14,A commercial delivery van is parked over the sidewalk curb cut ramp,BLOCKED_RAMP,HIGH
+syn-15,Large commercial garbage dumpsters are obstructing the side wheelchair ramp,BLOCKED_RAMP,HIGH
+syn-16,A sandwich board advertisement sign was placed in the middle of the access ramp walkway,BLOCKED_RAMP,LOW
+syn-17,Wet leaves and mud have accumulated on the ramp making the slope dangerously slippery,BLOCKED_RAMP,MEDIUM
+syn-18,A row of decorative planters narrows the ramp width to less than 70 centimeters,BLOCKED_RAMP,MEDIUM
+syn-19,Temporary water hose is stretched across the ramp creating a 3 inch tripping barrier,BLOCKED_RAMP,MEDIUM
+syn-20,Loose gravel scattered across the ramp surface causes wheelchair wheels to spin and lose traction,BLOCKED_RAMP,LOW
+syn-21,Automatic power doors at the main entrance are switched off and cannot be pushed open,INACCESSIBLE_ENTRANCE,HIGH
+syn-22,The automated wheelchair push paddle switch at the west entrance is detached and broken,INACCESSIBLE_ENTRANCE,HIGH
+syn-23,Front entrance only has four steep concrete stairs with no step-free alternate route,INACCESSIBLE_ENTRANCE,HIGH
+syn-24,Heavy manual double doors have excessive spring tension and cannot be pulled open from a wheelchair,INACCESSIBLE_ENTRANCE,MEDIUM
+syn-25,Revolving door is jammed and the adjacent accessible handicap door is locked from the inside,INACCESSIBLE_ENTRANCE,HIGH
+syn-26,Entrance door threshold has a sharp 4 inch raised edge that wheelchairs cannot roll over,INACCESSIBLE_ENTRANCE,MEDIUM
+syn-27,Turnstile card reader at the accessible entrance gate is installed too high for seated users,INACCESSIBLE_ENTRANCE,MEDIUM
+syn-28,Door intercom button to call reception for accessible entry assistance is disconnected and dead,INACCESSIBLE_ENTRANCE,HIGH
+syn-29,Weather stripping at the entrance door threshold is torn and catches on wheelchair castors,INACCESSIBLE_ENTRANCE,LOW
+syn-30,Magnetic lock on the accessible entry door keeps buzzing and fails to unlock intermittently,INACCESSIBLE_ENTRANCE,MEDIUM
+syn-31,Tactile paving blister pavers are cracked and missing in front of the lobby stairwell,OTHER,MEDIUM
+syn-32,Braille room number sign on the first floor accessible restroom is completely missing,OTHER,LOW
+syn-33,Fluorescent light fixture in the accessible corridor is flickering rapidly causing severe glare,OTHER,LOW
+syn-34,Directional accessibility signage pointing toward the accessible elevator has fallen down,OTHER,LOW
+syn-35,Handrail along the corridor access walkway is loose and wiggles when grasped for support,OTHER,LOW
+syn-36,Water leak from the ceiling has created a large puddle across the main accessible corridor,OTHER,MEDIUM
+syn-37,Acoustic reverberation and loud ventilation rumble makes audio announcements unintelligible,OTHER,LOW
+syn-38,Accessible parking space painted blue symbol is completely faded and illegible,OTHER,LOW
+syn-39,Carpet edge trim in the second floor hallway has lifted creating a 2 inch lip hazard,OTHER,MEDIUM
+syn-40,Emergency strobe light in the accessible bathroom is unplugged and unpowered,OTHER,HIGH

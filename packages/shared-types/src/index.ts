@@ -402,6 +402,25 @@ export interface DuplicateSuggestion {
   similarity: number;
   status: ReportStatus;
   createdAt: string;
+  source?: "ai" | "token";
+}
+
+export type AiSuggestionKind = "CLASSIFICATION" | "DUPLICATE_SCORES" | "SUMMARY";
+
+export interface ClassificationSuggestionPayload {
+  category: ReportCategory;
+  severity: "LOW" | "MEDIUM" | "HIGH";
+  confidence: number;
+}
+
+export interface AiSuggestionItem {
+  id: string;
+  reportId: string;
+  kind: AiSuggestionKind;
+  payload: Record<string, unknown>;
+  modelVersion: string;
+  requiresHumanVerification: true;
+  createdAt: string;
 }
 
 export interface UserNotificationItem {

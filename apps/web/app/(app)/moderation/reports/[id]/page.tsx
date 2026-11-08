@@ -391,6 +391,84 @@ export default function ModeratorReportReviewPage() {
 
           <Card>
             <CardHeader>
+              <CardTitle>AI suggestions (not verified)</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-xs text-[var(--muted-foreground)]">
+                Advisory automated suggestions for moderation review. AI suggestions never decide or
+                alter report status.
+              </p>
+              {((
+                report as unknown as {
+                  aiSuggestions?: Array<{
+                    id: string;
+                    kind: string;
+                    payload?: Record<string, unknown>;
+                    modelVersion: string;
+                  }>;
+                }
+              )?.aiSuggestions?.length ?? 0) === 0 ? (
+                <p className="text-sm text-[var(--muted-foreground)] italic">
+                  No automated suggestions recorded for this barrier report.
+                </p>
+              ) : (
+                <div className="space-y-2" aria-label="AI suggestions advisory list">
+                  {(
+                    report as unknown as {
+                      aiSuggestions?: Array<{
+                        id: string;
+                        kind: string;
+                        payload?: Record<string, unknown>;
+                        modelVersion: string;
+                      }>;
+                    }
+                  )?.aiSuggestions?.map((s) => (
+                    <div
+                      key={s.id}
+                      className="p-3 border-2 border-[var(--border)] rounded-md bg-[var(--card)] text-sm space-y-1.5"
+                    >
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold uppercase tracking-wider">{s.kind}</span>
+                        <span className="text-[var(--muted-foreground)]">
+                          Model: {s.modelVersion}
+                        </span>
+                      </div>
+                      {s.kind === "CLASSIFICATION" && s.payload && (
+                        <div className="text-xs space-y-0.5 text-[var(--foreground)]">
+                          <p>
+                            Suggested Category:{" "}
+                            <span className="font-semibold">
+                              {REPORT_CATEGORY_LABELS[
+                                s.payload.category as keyof typeof REPORT_CATEGORY_LABELS
+                              ] || String(s.payload.category || "")}
+                            </span>
+                          </p>
+                          <p>
+                            Suggested Severity:{" "}
+                            <span className="font-semibold">
+                              {String(s.payload.severity || "")}
+                            </span>
+                          </p>
+                          <p>
+                            Confidence Score:{" "}
+                            <span className="font-semibold">
+                              {Math.round(Number(s.payload.confidence || 0) * 100)}%
+                            </span>
+                          </p>
+                        </div>
+                      )}
+                      <p className="text-[11px] text-amber-700 dark:text-amber-400 font-semibold">
+                        Advisory only - Human moderator verification required
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle>Duplicate Suggestions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -417,6 +495,9 @@ export default function ModeratorReportReviewPage() {
                           </span>
                           <span className="text-xs px-2 py-0.5 rounded bg-[var(--muted)] text-[var(--muted-foreground)]">
                             {dup.status}
+                          </span>
+                          <span className="text-xs px-2 py-0.5 rounded border border-[var(--border)] text-[var(--muted-foreground)]">
+                            {dup.source === "ai" ? "AI Model" : "Token Match"}
                           </span>
                         </div>
                         {dup.title && (
