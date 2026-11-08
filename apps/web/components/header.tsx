@@ -87,6 +87,17 @@ export function Header() {
                     My Reports
                   </Link>
 
+                  {user?.role === "ORGANIZATION_ADMIN" ||
+                  user?.role === "SUPER_ADMIN" ||
+                  (user?.organizationMemberships && user.organizationMemberships.length > 0) ? (
+                    <Link
+                      href="/organization"
+                      className="rounded-md border-2 border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)]"
+                    >
+                      Organization
+                    </Link>
+                  ) : null}
+
                   <Link
                     href="/profile"
                     className="rounded-md border-2 border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)]"

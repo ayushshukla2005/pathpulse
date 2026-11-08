@@ -1,3 +1,4 @@
+import { getQueueToken } from "@nestjs/bullmq";
 import { INestApplication, ValidationPipe } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { Test, TestingModule } from "@nestjs/testing";
@@ -14,6 +15,7 @@ import { AppModule } from "../src/app.module";
 import { RedisService } from "../src/cache/redis.service";
 import { GlobalExceptionFilter } from "../src/common/filters/http-exception.filter";
 import { PrismaService } from "../src/database/prisma.service";
+import { NotificationsProcessor } from "../src/notifications/notifications.processor";
 
 interface StoredBuilding {
   id: string;
@@ -417,6 +419,12 @@ describe("Route API & Invalidation (e2e)", () => {
       .useValue(mockPrisma)
       .overrideProvider(RedisService)
       .useValue(mockRedis)
+      .overrideProvider(getQueueToken("report-notifications"))
+      .useValue({
+        add: jest.fn().mockResolvedValue({ id: "job-1" }),
+      })
+      .overrideProvider(NotificationsProcessor)
+      .useValue({})
       .compile();
 
     app = moduleFixture.createNestApplication();

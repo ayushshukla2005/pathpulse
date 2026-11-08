@@ -74,10 +74,13 @@ describe("FacilitiesService updateFacilityStatus", () => {
     expect(result.graphVersion).toBe(5);
 
     expect(mockRedis.deleteByPattern).toHaveBeenCalledWith("route:v1:bld-1:*");
-    expect(mockEventEmitter.emit).toHaveBeenCalledWith("facility.status.changed", {
-      buildingId: "bld-1",
-      graphVersion: 5,
-    });
+    expect(mockEventEmitter.emit).toHaveBeenCalledWith(
+      "facility.status.changed",
+      expect.objectContaining({
+        buildingId: "bld-1",
+        graphVersion: 5,
+      }),
+    );
   });
 
   it("should not emit event or invalidate cache if the transaction fails", async () => {

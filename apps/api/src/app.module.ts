@@ -17,6 +17,8 @@ import { FacilitiesModule } from "./facilities/facilities.module";
 import { HealthModule } from "./health/health.module";
 import { NavigationModule } from "./navigation/navigation.module";
 import { NotificationsModule } from "./notifications/notifications.module";
+import { OrganizationsModule } from "./organizations/organizations.module";
+import { RealtimeModule } from "./realtime/realtime.module";
 import { ReportsModule } from "./reports/reports.module";
 import { UsersModule } from "./users/users.module";
 import { VenuesModule } from "./venues/venues.module";
@@ -79,6 +81,8 @@ import { VenuesModule } from "./venues/venues.module";
     FacilitiesModule,
     ReportsModule,
     NotificationsModule,
+    OrganizationsModule,
+    RealtimeModule,
   ],
   providers: [
     {

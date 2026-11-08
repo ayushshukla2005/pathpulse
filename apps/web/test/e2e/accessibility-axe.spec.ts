@@ -587,4 +587,174 @@ test.describe("Axe Accessibility Scans", () => {
 
     expect(seriousOrCritical).toEqual([]);
   });
+
+  test("Organization overview page has zero serious or critical accessibility violations", async ({
+    page,
+    context,
+  }) => {
+    await context.addCookies([
+      {
+        name: "pp_refresh",
+        value: "mock-refresh-token",
+        domain: "localhost",
+        path: "/",
+      },
+    ]);
+
+    await page.route(/\/api\/auth\/session$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          authenticated: true,
+          accessToken: "mock-access-token",
+          user: {
+            id: "org-admin-1",
+            email: "admin@campus.edu",
+            name: "Campus Admin",
+            role: "ORGANIZATION_ADMIN",
+            createdAt: new Date().toISOString(),
+            organizationId: "org-1",
+            organizationMemberships: [
+              {
+                organizationId: "org-1",
+                role: "ORGANIZATION_ADMIN",
+                organizationName: "Main University",
+              },
+            ],
+            preferences: null,
+          },
+        }),
+      });
+    });
+
+    await page.route(/\/api\/v1\/organizations\/org-1\/dashboard$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          verifiedRouteCoverage: 91.2,
+          pendingIssues: 4,
+          verifiedFacilities: 18,
+          resolvedReports: 5,
+          generatedAt: new Date().toISOString(),
+        }),
+      });
+    });
+
+    await page.route(/\/api\/v1\/notifications(\?.*)?$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ items: [], unreadCount: 0 }),
+      });
+    });
+
+    await page.goto("/organization");
+    await expect(page.locator("h1")).toContainText("Main University");
+
+    const scanResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+
+    const seriousOrCritical = scanResults.violations.filter(
+      (v) => v.impact === "serious" || v.impact === "critical",
+    );
+
+    expect(seriousOrCritical).toEqual([]);
+  });
+
+  test("Organization facilities page has zero serious or critical accessibility violations", async ({
+    page,
+    context,
+  }) => {
+    await context.addCookies([
+      {
+        name: "pp_refresh",
+        value: "mock-refresh-token",
+        domain: "localhost",
+        path: "/",
+      },
+    ]);
+
+    await page.route(/\/api\/auth\/session$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          authenticated: true,
+          accessToken: "mock-access-token",
+          user: {
+            id: "org-admin-1",
+            email: "admin@campus.edu",
+            name: "Campus Admin",
+            role: "ORGANIZATION_ADMIN",
+            createdAt: new Date().toISOString(),
+            organizationId: "org-1",
+            organizationMemberships: [
+              {
+                organizationId: "org-1",
+                role: "ORGANIZATION_ADMIN",
+                organizationName: "Main University",
+              },
+            ],
+            preferences: null,
+          },
+        }),
+      });
+    });
+
+    await page.route(
+      /\/api\/v1\/organizations\/org-1\/facilities\?buildingId=bld-axe.*$/,
+      async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            items: [
+              {
+                id: "fac-axe-1",
+                venueId: "ven-1",
+                buildingId: "bld-axe",
+                floorId: "flr-1",
+                floorName: "Level 1",
+                nodeId: "node-1",
+                facilityType: "ELEVATOR",
+                name: "Central Lift",
+                operationalStatus: "OPERATIONAL",
+                verificationLevel: "CONFIRMED",
+                lastVerifiedAt: new Date().toISOString(),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              },
+            ],
+            total: 1,
+            page: 1,
+            limit: 100,
+          }),
+        });
+      },
+    );
+
+    await page.route(/\/api\/v1\/notifications(\?.*)?$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ items: [], unreadCount: 0 }),
+      });
+    });
+
+    await page.goto("/organization/buildings/bld-axe/facilities");
+    await expect(page.locator("h2")).toContainText("Facility Status & Controls");
+
+    const scanResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+
+    const seriousOrCritical = scanResults.violations.filter(
+      (v) => v.impact === "serious" || v.impact === "critical",
+    );
+
+    expect(seriousOrCritical).toEqual([]);
+  });
 });

@@ -78,3 +78,23 @@ flowchart TD
   - Independent runtime environments: Node.js handles I/O-intensive navigation queries and WebSockets, while Python manages memory-heavy image and tensor operations.
   - Failure containment: Heavy computer vision jobs or ML failures never block core navigation, authentication, or reporting operations.
   - Strict human verification invariant: The AI service returns suggestions (confidence scores, detected barrier classes); core business logic marks all AI outputs as suggestions requiring human or moderator verification before committing state changes.
+
+### ADR-004: Facility Status Changes, Version Bumping, and Real-Time Invalidation
+
+- **Context**: When an accessibility facility (such as a lift) experiences an outage or status change, visitors navigating in the building must never be served stale routes directing them to that broken facility.
+- **Decision**: Enforce a strict multi-stage transactional and cache-invalidation lifecycle:
+  1. **Row Lock & Transaction Commit**:
+     - `SELECT ... FOR UPDATE` locks the facility row, serializing concurrent status changes.
+     - Facility record is updated (`operational_status`, `verification_level`, and `last_verified_at` if confirmed by organization admin).
+     - Building `graph_version` is incremented inside the database transaction (`UPDATE buildings SET graph_version = graph_version + 1`).
+     - An audit log row is created in the same transaction with actor, entity ID, previous/new status, and previous/new graph version.
+  2. **Graph Version Guarantee**:
+     - Because all route cache keys are keyed by `route:v1:${buildingId}:${graphVersion}:${profile}:${origin}:${dest}`, the database version increment guarantees that any new route queries made immediately after transaction commit will look up the new graph version. Even before cache deletion finishes, stale entries from the previous version can never be matched or served.
+  3. **Cache Invalidation**:
+     - After transaction commit, Redis cache keys matching `route:v1:${buildingId}:*` are purged using Redis `SCAN` / `DEL`. If Redis is temporarily unreachable, the error is logged; route correctness is still maintained by the graph version increment.
+  4. **Internal Event Emission**:
+     - `EventEmitter2` emits `facility.status.changed` with payload containing the new building `graph_version`, facility ID, type, status, and verification level.
+  5. **WebSocket Gateway Broadcast**:
+     - The WebSocket gateway broadcasts `facility.status.changed` to room `building:${buildingId}` on namespace `/realtime`.
+     - Connected clients receive real-time updates and update their client cache without reloading. No report data or sensitive information is broadcast over WebSockets.
+

@@ -13,6 +13,7 @@ export interface AppConfig {
   s3SecretAccessKey: string;
   s3ForcePathStyle: boolean;
   s3PresignedExpirySeconds: number;
+  wsSubscriptionRateLimit: number;
 }
 
 export default (): AppConfig => ({
@@ -34,4 +35,7 @@ export default (): AppConfig => ({
   s3PresignedExpirySeconds: process.env.S3_PRESIGNED_EXPIRY_SECONDS
     ? parseInt(process.env.S3_PRESIGNED_EXPIRY_SECONDS, 10)
     : 900,
+  wsSubscriptionRateLimit: process.env.WS_SUBSCRIPTION_RATE_LIMIT
+    ? parseInt(process.env.WS_SUBSCRIPTION_RATE_LIMIT, 10)
+    : 10,
 });

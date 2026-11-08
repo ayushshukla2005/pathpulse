@@ -381,7 +381,7 @@ describe("Report Verification Workflow, Audit Log, and Notifications (e2e)", () 
         title: updated.title,
         message: updated.message,
         link: updated.link,
-        readAt: updated.read_at.toISOString(),
+        readAt: updated.read_at?.toISOString() ?? null,
         createdAt: updated.created_at.toISOString(),
       };
     }),

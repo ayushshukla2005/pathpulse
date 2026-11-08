@@ -77,6 +77,11 @@ export class EnvironmentVariables {
   @IsNumber()
   @Min(1)
   S3_PRESIGNED_EXPIRY_SECONDS: number = 900;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  WS_SUBSCRIPTION_RATE_LIMIT: number = 10;
 }
 
 export function validateEnv(config: Record<string, unknown>): EnvironmentVariables {
@@ -103,6 +108,10 @@ export function validateEnv(config: Record<string, unknown>): EnvironmentVariabl
       config.S3_PRESIGNED_EXPIRY_SECONDS !== undefined
         ? Number(config.S3_PRESIGNED_EXPIRY_SECONDS)
         : 900,
+    WS_SUBSCRIPTION_RATE_LIMIT:
+      config.WS_SUBSCRIPTION_RATE_LIMIT !== undefined
+        ? Number(config.WS_SUBSCRIPTION_RATE_LIMIT)
+        : 10,
   });
 
   const errors = validateSync(validatedConfig, {

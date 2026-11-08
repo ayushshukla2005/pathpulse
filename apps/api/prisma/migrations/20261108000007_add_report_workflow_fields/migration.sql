@@ -38,3 +38,4 @@ EXCEPTION
 END $$;
 
 CREATE INDEX IF NOT EXISTS "notifications_report_id_idx" ON "notifications"("report_id");
+

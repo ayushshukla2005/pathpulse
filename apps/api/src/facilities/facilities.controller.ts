@@ -30,6 +30,6 @@ export class FacilitiesController {
     @Body() dto: UpdateFacilityStatusDto,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<UpdatedFacilityResponse> {
-    return this.facilitiesService.updateFacilityStatus(id, dto, user.id);
+    return this.facilitiesService.updateFacilityStatus(id, dto, user.id, user.role);
   }
 }

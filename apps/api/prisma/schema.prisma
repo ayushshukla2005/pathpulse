@@ -291,6 +291,7 @@ model Facility {
 
   @@index([venue_id])
   @@index([building_id])
+  @@index([building_id, operational_status])
   @@index([facility_type])
   @@index([operational_status])
   @@map("facilities")
@@ -328,6 +329,7 @@ model IssueReport {
   @@index([tracking_code])
   @@index([user_id])
   @@index([venue_id])
+  @@index([venue_id, status])
   @@index([facility_id])
   @@index([status])
   @@index([assigned_to_user_id])

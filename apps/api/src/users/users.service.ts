@@ -10,6 +10,12 @@ export interface CurrentUserProfile {
   role: UserRole;
   createdAt: Date;
   preferences: UserPreference | null;
+  organizationMemberships?: Array<{
+    organizationId: string;
+    role: UserRole;
+    organizationName?: string;
+    organizationSlug?: string;
+  }>;
 }
 
 @Injectable()
@@ -19,12 +25,32 @@ export class UsersService {
   async getCurrentUser(userId: string): Promise<CurrentUserProfile> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      include: { preferences: true },
+      include: {
+        preferences: true,
+        organization_memberships: {
+          include: {
+            organization: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!user) {
       throw new NotFoundException("User not found");
     }
+
+    const organizationMemberships = (user.organization_memberships ?? []).map((m) => ({
+      organizationId: m.organization_id,
+      role: m.role,
+      organizationName: m.organization?.name,
+      organizationSlug: m.organization?.slug,
+    }));
 
     return {
       id: user.id,
@@ -33,6 +59,7 @@ export class UsersService {
       role: user.role,
       createdAt: user.created_at,
       preferences: user.preferences,
+      organizationMemberships,
     };
   }
 

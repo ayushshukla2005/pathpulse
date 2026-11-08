@@ -71,6 +71,13 @@ export interface UpdatePreferencesRequest {
   textScale?: number;
 }
 
+export interface OrganizationMembershipSummary {
+  organizationId: string;
+  role: UserRole;
+  organizationName?: string;
+  organizationSlug?: string;
+}
+
 export interface CurrentUserProfile {
   id: string;
   email: string;
@@ -78,6 +85,8 @@ export interface CurrentUserProfile {
   role: UserRole;
   createdAt: Date | string;
   preferences: UserPreferences | null;
+  organizationMemberships?: OrganizationMembershipSummary[];
+  organizationId?: string | null;
 }
 
 export interface ApiErrorResponse {
@@ -91,7 +100,7 @@ export interface ApiErrorResponse {
 
 export type VerificationLevel = "CONFIRMED" | "UNVERIFIED" | "UNAVAILABLE";
 
-export type OperationalStatus = "OPERATIONAL" | "DEGRADED" | "OUT_OF_SERVICE";
+export type OperationalStatus = "OPERATIONAL" | "DEGRADED" | "OUT_OF_SERVICE" | "UNKNOWN";
 
 export type FacilityType =
   | "ELEVATOR"
@@ -409,4 +418,95 @@ export interface UserNotificationItem {
 export interface NotificationsListResponse {
   items: UserNotificationItem[];
   unreadCount: number;
+}
+
+export interface OrganizationDashboardMetrics {
+  verifiedRouteCoverage: number;
+  pendingIssues: number;
+  verifiedFacilities: number;
+  resolvedReports: number;
+  generatedAt: string;
+}
+
+export interface OrganizationBuildingItem {
+  id: string;
+  name: string;
+  buildingCode: string | null;
+  graphVersion: number;
+  venueId: string;
+  venueName: string;
+  floorCount: number;
+  facilityCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrganizationBuildingsResponse {
+  items: OrganizationBuildingItem[];
+  total: number;
+}
+
+export interface OrganizationFacilityItem {
+  id: string;
+  venueId: string;
+  venueName?: string;
+  buildingId: string | null;
+  buildingName?: string | null;
+  floorId: string | null;
+  floorName?: string | null;
+  nodeId: string | null;
+  facilityType: FacilityType;
+  name: string;
+  operationalStatus: OperationalStatus;
+  verificationLevel: VerificationLevel;
+  lastVerifiedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrganizationFacilitiesResponse {
+  items: OrganizationFacilityItem[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface OrganizationMaintenanceTaskItem {
+  id: string;
+  reportId: string;
+  reportTrackingCode?: string;
+  reportTitle?: string | null;
+  reportCategory?: ReportCategory;
+  organizationId: string;
+  assignedToId: string | null;
+  assignedToName: string | null;
+  status: string;
+  priority: string;
+  resolutionNotes: string | null;
+  resolvedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrganizationMaintenanceTasksResponse {
+  items: OrganizationMaintenanceTaskItem[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface FacilityStatusBroadcast {
+  facilityId: string;
+  facilityType: string;
+  name: string;
+  buildingId: string;
+  status: OperationalStatus;
+  verificationLevel: VerificationLevel;
+  lastVerifiedAt: string | null;
+  graphVersion: number;
+}
+
+export interface UpdateFacilityStatusRequest {
+  status: OperationalStatus;
+  verificationLevel?: VerificationLevel;
 }
