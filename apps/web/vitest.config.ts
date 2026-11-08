@@ -6,6 +6,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   root: __dirname,
+  esbuild: {
+    jsx: "automatic",
+  },
   test: {
     root: __dirname,
     environment: "jsdom",

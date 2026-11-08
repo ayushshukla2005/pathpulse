@@ -13,8 +13,14 @@ export default async function ProtectedAppLayout({ children }: { children: React
     "/profile";
   const safePath = rawPath.startsWith("/") ? rawPath : "/profile";
 
-  if (!refreshToken) {
+  const isPublicDiscoveryRoute = safePath.startsWith("/explore") || safePath.startsWith("/venues");
+
+  if (!refreshToken && !isPublicDiscoveryRoute) {
     redirect(`/login?next=${encodeURIComponent(safePath)}`);
+  }
+
+  if (!refreshToken && isPublicDiscoveryRoute) {
+    return <div className="flex-1 flex flex-col">{children}</div>;
   }
 
   if (refreshToken === "e2e-test-token") {

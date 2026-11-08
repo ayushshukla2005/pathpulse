@@ -434,41 +434,111 @@ export async function runSeed(customPrisma?: PrismaClient): Promise<void> {
     surface: "TILE",
   });
 
-  const existingFacility = await client.facility.findFirst({
-    where: {
-      venue_id: venue.id,
-      name: "Accessible Restroom (Demo)",
-    },
-  });
-
-  if (existingFacility) {
-    await client.facility.update({
-      where: { id: existingFacility.id },
-      data: {
-        building_id: building.id,
-        floor_id: floor0.id,
-        node_id: nodeRestroom0.id,
-        facility_type: FacilityType.ACCESSIBLE_RESTROOM,
-        operational_status: OperationalStatus.OPERATIONAL,
-        verification_level: VerificationLevel.UNVERIFIED,
-        last_verified_at: new Date(),
+  async function upsertFacility(params: {
+    name: string;
+    facilityType: FacilityType;
+    operationalStatus: OperationalStatus;
+    verificationLevel: VerificationLevel;
+    lastVerifiedAt: Date | null;
+    floorId?: string;
+    nodeId?: string;
+  }) {
+    const existing = await client.facility.findFirst({
+      where: {
+        venue_id: venue!.id,
+        name: params.name,
       },
     });
-  } else {
-    await client.facility.create({
+
+    if (existing) {
+      return client.facility.update({
+        where: { id: existing.id },
+        data: {
+          building_id: building!.id,
+          floor_id: params.floorId ?? floor0.id,
+          node_id: params.nodeId,
+          facility_type: params.facilityType,
+          operational_status: params.operationalStatus,
+          verification_level: params.verificationLevel,
+          last_verified_at: params.lastVerifiedAt,
+        },
+      });
+    }
+
+    return client.facility.create({
       data: {
-        venue_id: venue.id,
-        building_id: building.id,
-        floor_id: floor0.id,
-        node_id: nodeRestroom0.id,
-        facility_type: FacilityType.ACCESSIBLE_RESTROOM,
-        name: "Accessible Restroom (Demo)",
-        operational_status: OperationalStatus.OPERATIONAL,
-        verification_level: VerificationLevel.UNVERIFIED,
-        last_verified_at: new Date(),
+        venue_id: venue!.id,
+        building_id: building!.id,
+        floor_id: params.floorId ?? floor0.id,
+        node_id: params.nodeId,
+        facility_type: params.facilityType,
+        name: params.name,
+        operational_status: params.operationalStatus,
+        verification_level: params.verificationLevel,
+        last_verified_at: params.lastVerifiedAt,
       },
     });
   }
+
+  await upsertFacility({
+    name: "Main Entrance (Step-Free)",
+    facilityType: FacilityType.ENTRANCE,
+    operationalStatus: OperationalStatus.OPERATIONAL,
+    verificationLevel: VerificationLevel.CONFIRMED,
+    lastVerifiedAt: new Date("2026-10-15T10:00:00Z"),
+    nodeId: nodeEntrance.id,
+  });
+
+  await upsertFacility({
+    name: "Central Building Lift A",
+    facilityType: FacilityType.LIFT,
+    operationalStatus: OperationalStatus.OPERATIONAL,
+    verificationLevel: VerificationLevel.CONFIRMED,
+    lastVerifiedAt: new Date("2026-11-01T08:30:00Z"),
+    nodeId: nodeLobby0.id,
+  });
+
+  await upsertFacility({
+    name: "Ground Entrance Access Ramp",
+    facilityType: FacilityType.RAMP,
+    operationalStatus: OperationalStatus.OPERATIONAL,
+    verificationLevel: VerificationLevel.CONFIRMED,
+    lastVerifiedAt: new Date("2026-09-20T14:15:00Z"),
+    nodeId: nodeRampStart.id,
+  });
+
+  await upsertFacility({
+    name: "Accessible Restroom (Ground Floor)",
+    facilityType: FacilityType.ACCESSIBLE_RESTROOM,
+    operationalStatus: OperationalStatus.OPERATIONAL,
+    verificationLevel: VerificationLevel.UNVERIFIED,
+    lastVerifiedAt: null,
+    nodeId: nodeRestroom0.id,
+  });
+
+  await upsertFacility({
+    name: "Welcome & Information Desk",
+    facilityType: FacilityType.RECEPTION,
+    operationalStatus: OperationalStatus.OPERATIONAL,
+    verificationLevel: VerificationLevel.CONFIRMED,
+    lastVerifiedAt: new Date("2026-10-05T09:00:00Z"),
+  });
+
+  await upsertFacility({
+    name: "West Service Lift",
+    facilityType: FacilityType.LIFT,
+    operationalStatus: OperationalStatus.OUT_OF_SERVICE,
+    verificationLevel: VerificationLevel.UNAVAILABLE,
+    lastVerifiedAt: new Date("2026-11-05T12:00:00Z"),
+  });
+
+  await upsertFacility({
+    name: "Campus Tactile Pathway",
+    facilityType: FacilityType.TACTILE_PAVING,
+    operationalStatus: OperationalStatus.OPERATIONAL,
+    verificationLevel: VerificationLevel.UNVERIFIED,
+    lastVerifiedAt: new Date("2026-11-06T16:00:00Z"),
+  });
 }
 
 async function main() {

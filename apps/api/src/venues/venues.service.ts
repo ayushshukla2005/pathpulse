@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { Venue } from "@prisma/client";
+import { Facility, Venue } from "@prisma/client";
 import { PrismaService } from "../database/prisma.service";
 import { CreateVenueDto } from "./dto/create-venue.dto";
 import { FindVenuesQueryDto } from "./dto/find-venues-query.dto";
 
 export interface VenueWithDistance extends Venue {
   distanceMeters?: number;
+  facilities?: Facility[];
 }
 
 function calculateHaversineDistanceMeters(
@@ -40,13 +41,46 @@ export class VenuesService {
     return { radius, limit };
   }
 
+  private async attachFacilities(venues: VenueWithDistance[]): Promise<VenueWithDistance[]> {
+    const venueIds = venues.map((v) => v.id);
+    if (venueIds.length === 0) {
+      return venues;
+    }
+
+    try {
+      const facilities = await this.prisma.facility.findMany({
+        where: { venue_id: { in: venueIds } },
+        orderBy: [{ facility_type: "asc" }, { name: "asc" }],
+      });
+
+      const facilityMap = new Map<string, Facility[]>();
+      for (const facility of facilities) {
+        const list = facilityMap.get(facility.venue_id) ?? [];
+        list.push(facility);
+        facilityMap.set(facility.venue_id, list);
+      }
+
+      for (const venue of venues) {
+        venue.facilities = facilityMap.get(venue.id) ?? [];
+      }
+    } catch {
+      for (const venue of venues) {
+        venue.facilities = venue.facilities ?? [];
+      }
+    }
+
+    return venues;
+  }
+
   async findVenues(query: FindVenuesQueryDto): Promise<VenueWithDistance[]> {
     const { radius, limit } = this.clampQueryParams(query);
+
+    let venues: VenueWithDistance[];
 
     if (query.lat !== undefined && query.lng !== undefined) {
       try {
         if (query.category) {
-          return await this.prisma.$queryRaw<VenueWithDistance[]>`
+          venues = await this.prisma.$queryRaw<VenueWithDistance[]>`
             SELECT id, organization_id, name, category, address, latitude, longitude,
                    created_at, updated_at,
                    ROUND(ST_Distance(location, ST_SetSRID(ST_MakePoint(${query.lng}, ${query.lat}), 4326)::geography))::int AS "distanceMeters"
@@ -56,17 +90,17 @@ export class VenuesService {
             ORDER BY "distanceMeters" ASC
             LIMIT ${limit};
           `;
+        } else {
+          venues = await this.prisma.$queryRaw<VenueWithDistance[]>`
+            SELECT id, organization_id, name, category, address, latitude, longitude,
+                   created_at, updated_at,
+                   ROUND(ST_Distance(location, ST_SetSRID(ST_MakePoint(${query.lng}, ${query.lat}), 4326)::geography))::int AS "distanceMeters"
+            FROM "venues"
+            WHERE ST_DWithin(location, ST_SetSRID(ST_MakePoint(${query.lng}, ${query.lat}), 4326)::geography, ${radius})
+            ORDER BY "distanceMeters" ASC
+            LIMIT ${limit};
+          `;
         }
-
-        return await this.prisma.$queryRaw<VenueWithDistance[]>`
-          SELECT id, organization_id, name, category, address, latitude, longitude,
-                 created_at, updated_at,
-                 ROUND(ST_Distance(location, ST_SetSRID(ST_MakePoint(${query.lng}, ${query.lat}), 4326)::geography))::int AS "distanceMeters"
-          FROM "venues"
-          WHERE ST_DWithin(location, ST_SetSRID(ST_MakePoint(${query.lng}, ${query.lat}), 4326)::geography, ${radius})
-          ORDER BY "distanceMeters" ASC
-          LIMIT ${limit};
-        `;
       } catch {
         const allVenues = await this.prisma.venue.findMany({
           where: query.category ? { category: query.category } : {},
@@ -86,21 +120,30 @@ export class VenuesService {
         }
 
         withDistance.sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0));
-        return withDistance.slice(0, limit);
+        venues = withDistance.slice(0, limit);
       }
+    } else {
+      venues = await this.prisma.venue.findMany({
+        where: query.category ? { category: query.category } : {},
+        take: limit,
+        orderBy: { name: "asc" },
+      });
     }
 
-    return this.prisma.venue.findMany({
-      where: query.category ? { category: query.category } : {},
-      take: limit,
-      orderBy: { name: "asc" },
-    });
+    return this.attachFacilities(venues);
   }
 
   async getVenueById(id: string): Promise<Venue> {
     const venue = await this.prisma.venue.findUnique({
       where: { id },
-      include: { buildings: true },
+      include: {
+        buildings: {
+          orderBy: { name: "asc" },
+        },
+        facilities: {
+          orderBy: [{ facility_type: "asc" }, { name: "asc" }],
+        },
+      },
     });
 
     if (!venue) {

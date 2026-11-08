@@ -25,6 +25,12 @@ export function Header() {
             >
               PathPulse
             </Link>
+            <Link
+              href="/explore"
+              className="rounded-md border-2 border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+            >
+              Explore
+            </Link>
           </div>
 
           <div className="flex items-center space-x-4">
