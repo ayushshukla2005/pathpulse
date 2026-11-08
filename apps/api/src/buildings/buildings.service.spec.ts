@@ -89,6 +89,41 @@ describe("BuildingsService", () => {
     });
   });
 
+  describe("getFloorDetails", () => {
+    it("should return floor with building, nodes, and facilities", async () => {
+      mockPrisma.floor.findUnique.mockResolvedValue({
+        id: "fl-0",
+        building_id: "bld-1",
+        floor_number: 0,
+        name: "Ground Floor",
+        level_index: 0,
+        created_at: new Date(),
+        updated_at: new Date(),
+        building: {
+          id: "bld-1",
+          name: "Science Building",
+        },
+        map_nodes: [{ id: "n-1", name: "Entrance", node_type: "ENTRANCE" }],
+        facilities: [{ id: "f-1", name: "Main Entrance", facility_type: "ENTRANCE" }],
+      });
+
+      const result = await service.getFloorDetails("bld-1", "fl-0");
+
+      expect(result.floor.id).toBe("fl-0");
+      expect(result.building.id).toBe("bld-1");
+      expect(result.nodes).toHaveLength(1);
+      expect(result.facilities).toHaveLength(1);
+    });
+
+    it("should throw NotFoundException if floor does not match building or does not exist", async () => {
+      mockPrisma.floor.findUnique.mockResolvedValue(null);
+
+      await expect(service.getFloorDetails("bld-1", "fl-unknown")).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+
   describe("createFloor", () => {
     it("should throw UnprocessableEntityException if floor number is duplicate within building", async () => {
       mockPrisma.building.findUnique.mockResolvedValue({ id: "bld-1" });

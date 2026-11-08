@@ -31,6 +31,12 @@ export function Header() {
             >
               Explore
             </Link>
+            <Link
+              href="/navigation"
+              className="rounded-md border-2 border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+            >
+              Route Planner
+            </Link>
           </div>
 
           <div className="flex items-center space-x-4">
@@ -63,7 +69,7 @@ export function Header() {
                   </Link>
                   <Link
                     href="/register"
-                    className="rounded-md bg-[var(--primary)] px-4 py-1.5 text-sm font-semibold text-[var(--primary-foreground)] hover:opacity-90 shadow-sm"
+                    className="rounded-md border-2 border-[var(--primary)] bg-[var(--primary)] px-3 py-1.5 text-sm font-semibold text-[var(--primary-foreground)] hover:opacity-90"
                   >
                     Register
                   </Link>

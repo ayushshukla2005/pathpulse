@@ -2,10 +2,14 @@ export type UserRole = "USER" | "CONTRIBUTOR" | "MODERATOR" | "ORGANIZATION_ADMI
 
 export type MobilityProfile =
   | "WHEELCHAIR"
+  | "LIMITED_MOBILITY"
+  | "VISUALLY_IMPAIRED"
+  | "HEARING_IMPAIRED"
+  | "STROLLER"
+  | "CUSTOM"
   | "POWERED_WHEELCHAIR"
   | "MOTORIZED"
   | "CANE_OR_CRUTCHES"
-  | "STROLLER"
   | "VISUAL_IMPAIRMENT"
   | "ELDERLY"
   | "DEFAULT";
@@ -170,4 +174,96 @@ export interface VerificationSummaryCounts {
   unavailable: number;
   total: number;
   hasStepFreeEntrance: boolean;
+}
+
+export type ConnectionType = "CORRIDOR" | "RAMP" | "STAIRS" | "ELEVATOR" | "DOOR";
+
+export type Confidence = "CONFIRMED" | "UNVERIFIED" | "UNAVAILABLE";
+
+export type RouteAccessibility = "STEP_FREE" | "MIXED" | "UNVERIFIED";
+
+export interface RouteSegment {
+  fromNodeId: string;
+  toNodeId: string;
+  edgeId: string;
+  connectionType: ConnectionType;
+  distanceMeters: number;
+  confidence: Confidence;
+  instruction: string;
+}
+
+export interface FindRouteRequest {
+  buildingId: string;
+  originNodeId: string;
+  destinationNodeId: string;
+  profile: MobilityProfile;
+}
+
+export interface RouteSuccessResponse {
+  status: "FOUND";
+  steps: RouteSegment[];
+  totalDistanceMeters: number;
+  accessibility: RouteAccessibility;
+  warnings: string[];
+  cache?: "HIT" | "MISS";
+}
+
+export interface RouteFailureResponse {
+  status: "NO_CONFIRMED_ROUTE" | "UNREACHABLE" | "INVALID_INPUT" | "NOT_FOUND" | "BAD_REQUEST";
+  reason: string;
+}
+
+export type RoutePlanResult = RouteSuccessResponse | RouteFailureResponse;
+
+export interface MapNodeSummary {
+  id: string;
+  building_id: string;
+  floor_id: string;
+  node_type: string;
+  name: string | null;
+  x_coordinate: number;
+  y_coordinate: number;
+  latitude: number | null;
+  longitude: number | null;
+  is_accessible: boolean;
+  created_at: Date | string;
+  updated_at: Date | string;
+}
+
+export interface MapEdgeSummary {
+  id: string;
+  building_id: string;
+  from_node_id: string;
+  to_node_id: string;
+  connection_type: ConnectionType;
+  distance_meters: number;
+  step_free: boolean;
+  width_cm: number | null;
+  slope_percent: number | null;
+  surface: string | null;
+  operational_status: OperationalStatus;
+  verification_level: VerificationLevel;
+  created_at: Date | string;
+  updated_at: Date | string;
+}
+
+export interface BuildingNavigationGraph {
+  building: BuildingSummary;
+  floors: FloorSummary[];
+  nodes: MapNodeSummary[];
+  edges: MapEdgeSummary[];
+}
+
+export interface FloorDetail {
+  floor: FloorSummary;
+  building: BuildingSummary;
+  nodes: MapNodeSummary[];
+  facilities: FacilityItem[];
+}
+
+export interface FloorStepGroup {
+  floorId: string;
+  floorNumber: number;
+  floorName: string;
+  steps: RouteSegment[];
 }

@@ -1,6 +1,10 @@
 import type {
   FacilityItem,
+  FindRouteRequest,
   FindVenuesParams,
+  FloorStepGroup,
+  MobilityProfile,
+  RouteSegment,
   VerificationSummaryCounts,
 } from "@pathpulse/shared-types";
 
@@ -269,4 +273,115 @@ export function formatVerificationSummary(counts: VerificationSummaryCounts): st
   }
 
   return parts.join(", ");
+}
+
+export const VALID_MOBILITY_PROFILES: readonly MobilityProfile[] = [
+  "WHEELCHAIR",
+  "LIMITED_MOBILITY",
+  "VISUALLY_IMPAIRED",
+  "HEARING_IMPAIRED",
+  "STROLLER",
+  "CUSTOM",
+  "POWERED_WHEELCHAIR",
+  "MOTORIZED",
+  "CANE_OR_CRUTCHES",
+  "VISUAL_IMPAIRMENT",
+  "ELDERLY",
+  "DEFAULT",
+] as const;
+
+export interface RouteValidationResult {
+  isValid: boolean;
+  errors: Record<string, string>;
+}
+
+export function validateRouteRequest(input: Partial<FindRouteRequest>): RouteValidationResult {
+  const errors: Record<string, string> = {};
+
+  if (
+    !input.buildingId ||
+    typeof input.buildingId !== "string" ||
+    input.buildingId.trim().length === 0
+  ) {
+    errors.buildingId = "Building selection is required.";
+  }
+
+  if (
+    !input.originNodeId ||
+    typeof input.originNodeId !== "string" ||
+    input.originNodeId.trim().length === 0
+  ) {
+    errors.originNodeId = "Origin node is required.";
+  }
+
+  if (
+    !input.destinationNodeId ||
+    typeof input.destinationNodeId !== "string" ||
+    input.destinationNodeId.trim().length === 0
+  ) {
+    errors.destinationNodeId = "Destination node is required.";
+  }
+
+  if (
+    input.originNodeId &&
+    input.destinationNodeId &&
+    input.originNodeId.trim() === input.destinationNodeId.trim()
+  ) {
+    errors.destinationNodeId = "Origin and destination cannot be the same node.";
+  }
+
+  if (!input.profile || typeof input.profile !== "string") {
+    errors.profile = "Mobility profile is required.";
+  } else if (!VALID_MOBILITY_PROFILES.includes(input.profile as MobilityProfile)) {
+    errors.profile = "Selected mobility profile is invalid.";
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+  };
+}
+
+export interface NodeFloorMeta {
+  floorId: string;
+  floorNumber: number;
+  floorName?: string;
+}
+
+export function groupStepsByFloor(
+  steps: RouteSegment[],
+  nodesMap: Map<string, NodeFloorMeta>,
+): FloorStepGroup[] {
+  if (!steps || steps.length === 0) {
+    return [];
+  }
+
+  const groups: FloorStepGroup[] = [];
+  let currentGroup: FloorStepGroup | null = null;
+
+  for (const step of steps) {
+    const fromMeta = nodesMap.get(step.fromNodeId);
+    const toMeta = nodesMap.get(step.toNodeId);
+
+    const floorId = fromMeta?.floorId ?? toMeta?.floorId ?? "unknown";
+    const floorNumber = fromMeta?.floorNumber ?? toMeta?.floorNumber ?? 0;
+    const floorName =
+      fromMeta?.floorName ??
+      toMeta?.floorName ??
+      (floorNumber === 0 ? "Ground Floor" : `Floor ${floorNumber}`);
+
+    if (!currentGroup || currentGroup.floorId !== floorId) {
+      currentGroup = {
+        floorId,
+        floorNumber,
+        floorName,
+        steps: [step],
+      };
+      groups.push(currentGroup);
+    } else {
+      currentGroup.steps.push(step);
+    }
+  }
+
+  return groups;
 }

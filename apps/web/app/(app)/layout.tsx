@@ -13,7 +13,11 @@ export default async function ProtectedAppLayout({ children }: { children: React
     "/profile";
   const safePath = rawPath.startsWith("/") ? rawPath : "/profile";
 
-  const isPublicDiscoveryRoute = safePath.startsWith("/explore") || safePath.startsWith("/venues");
+  const isPublicDiscoveryRoute =
+    safePath.startsWith("/explore") ||
+    safePath.startsWith("/venues") ||
+    safePath.startsWith("/navigation") ||
+    safePath.startsWith("/buildings");
 
   if (!refreshToken && !isPublicDiscoveryRoute) {
     redirect(`/login?next=${encodeURIComponent(safePath)}`);

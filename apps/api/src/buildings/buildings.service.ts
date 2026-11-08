@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, UnprocessableEntityException } from "@nestjs/common";
-import { Building, Floor, MapEdge, MapNode } from "@prisma/client";
+import { Building, Facility, Floor, MapEdge, MapNode } from "@prisma/client";
 import { PrismaService } from "../database/prisma.service";
 import { CreateBuildingDto } from "./dto/create-building.dto";
 import { CreateFloorDto } from "./dto/create-floor.dto";
@@ -10,6 +10,13 @@ export interface BuildingNavigationGraph {
   floors: Floor[];
   nodes: MapNode[];
   edges: MapEdge[];
+}
+
+export interface FloorDetailResponse {
+  floor: Floor;
+  building: Building;
+  nodes: MapNode[];
+  facilities: Facility[];
 }
 
 @Injectable()
@@ -47,6 +54,30 @@ export class BuildingsService {
       floors,
       nodes,
       edges,
+    };
+  }
+
+  async getFloorDetails(buildingId: string, floorId: string): Promise<FloorDetailResponse> {
+    const floor = await this.prisma.floor.findUnique({
+      where: { id: floorId },
+      include: {
+        building: true,
+        map_nodes: true,
+        facilities: true,
+      },
+    });
+
+    if (!floor || floor.building_id !== buildingId) {
+      throw new NotFoundException("Floor not found in specified building");
+    }
+
+    const { building, map_nodes, facilities, ...floorData } = floor;
+
+    return {
+      floor: floorData as Floor,
+      building,
+      nodes: map_nodes,
+      facilities,
     };
   }
 
