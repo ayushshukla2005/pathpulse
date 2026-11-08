@@ -4,14 +4,7 @@ import { use, useEffect } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { getBuildingFloors, getBuildingMap } from "@/lib/api/routes";
-import {
-  AlertCircle,
-  ArrowLeft,
-  Building2,
-  Layers,
-  Navigation,
-  RefreshCw,
-} from "lucide-react";
+import { AlertCircle, ArrowLeft, Building2, Layers, Navigation, RefreshCw } from "lucide-react";
 
 interface BuildingFloorsPageProps {
   params: Promise<{ id: string }>;

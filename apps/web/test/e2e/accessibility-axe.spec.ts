@@ -285,4 +285,106 @@ test.describe("Axe Accessibility Scans", () => {
 
     expect(seriousOrCritical).toEqual([]);
   });
+
+  test("New report page has zero serious or critical accessibility violations", async ({
+    page,
+    context,
+  }) => {
+    await context.addCookies([
+      {
+        name: "pp_refresh",
+        value: "e2e-test-token",
+        domain: "localhost",
+        path: "/",
+      },
+    ]);
+
+    await page.route(/\/api\/v1\/venues(\?.*)?$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify([
+          {
+            id: "venue-central",
+            name: "Central Campus Center",
+            category: "CAMPUS",
+            facilities: [],
+          },
+        ]),
+      });
+    });
+
+    await page.goto("/reports/new");
+    await expect(page.locator("h1")).toContainText("Report an Accessibility Barrier");
+
+    const scanResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+
+    const seriousOrCritical = scanResults.violations.filter(
+      (v) => v.impact === "serious" || v.impact === "critical",
+    );
+
+    expect(seriousOrCritical).toEqual([]);
+  });
+
+  test("My reports page has zero serious or critical accessibility violations", async ({
+    page,
+    context,
+  }) => {
+    await context.addCookies([
+      {
+        name: "pp_refresh",
+        value: "e2e-test-token",
+        domain: "localhost",
+        path: "/",
+      },
+    ]);
+
+    await page.route(/\/api\/v1\/reports\/mine(\?.*)?$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          data: [
+            {
+              id: "report-1",
+              tracking_code: "PP-2026-AXETST",
+              user_id: "user-1",
+              venue_id: "venue-central",
+              facility_id: null,
+              category: "BROKEN_LIFT",
+              title: null,
+              description: "The main passenger elevator is out of service.",
+              status: "SUBMITTED",
+              latitude: 12.9716,
+              longitude: 77.5946,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              evidence: [],
+              venue: { id: "venue-central", name: "Central Campus Center" },
+              facility: null,
+            },
+          ],
+          total: 1,
+          page: 1,
+          limit: 20,
+          totalPages: 1,
+        }),
+      });
+    });
+
+    await page.goto("/reports");
+    await expect(page.locator("h1")).toContainText("My Barrier Reports");
+
+    const scanResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+
+    const seriousOrCritical = scanResults.violations.filter(
+      (v) => v.impact === "serious" || v.impact === "critical",
+    );
+
+    expect(seriousOrCritical).toEqual([]);
+  });
 });

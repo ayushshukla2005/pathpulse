@@ -37,6 +37,12 @@ export function Header() {
             >
               Route Planner
             </Link>
+            <Link
+              href="/reports/new"
+              className="rounded-md border-2 border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+            >
+              Report Barrier
+            </Link>
           </div>
 
           <div className="flex items-center space-x-4">
@@ -45,6 +51,12 @@ export function Header() {
             <nav aria-label="Main navigation" className="flex items-center space-x-3">
               {isAuthenticated ? (
                 <>
+                  <Link
+                    href="/reports"
+                    className="rounded-md border-2 border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)]"
+                  >
+                    My Reports
+                  </Link>
                   <Link
                     href="/profile"
                     className="rounded-md border-2 border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)]"

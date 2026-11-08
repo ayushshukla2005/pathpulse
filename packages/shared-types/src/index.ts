@@ -267,3 +267,81 @@ export interface FloorStepGroup {
   floorName: string;
   steps: RouteSegment[];
 }
+
+export type ReportCategory = "BROKEN_LIFT" | "BLOCKED_RAMP" | "INACCESSIBLE_ENTRANCE" | "OTHER";
+
+export type ReportStatus =
+  | "SUBMITTED"
+  | "UNDER_REVIEW"
+  | "VERIFIED"
+  | "ASSIGNED"
+  | "RESOLUTION_SUBMITTED"
+  | "CLOSED"
+  | "REJECTED"
+  | "REOPENED";
+
+export type EvidenceStatus = "PENDING_UPLOAD" | "RECEIVED" | "REJECTED";
+
+export interface EvidenceItem {
+  id: string;
+  report_id: string;
+  content_type: string;
+  size_bytes: number;
+  status: EvidenceStatus;
+  created_at: Date | string;
+  updated_at: Date | string;
+  presigned_url?: string;
+}
+
+export interface IssueReportItem {
+  id: string;
+  tracking_code: string;
+  user_id: string;
+  venue_id: string | null;
+  facility_id: string | null;
+  category: ReportCategory;
+  title: string | null;
+  description: string;
+  status: ReportStatus;
+  latitude: number | null;
+  longitude: number | null;
+  created_at: Date | string;
+  updated_at: Date | string;
+  evidence?: EvidenceItem[];
+  venue?: { id: string; name: string } | null;
+  facility?: { id: string; name: string } | null;
+}
+
+export interface CreateReportRequest {
+  category: ReportCategory;
+  description: string;
+  venueId?: string;
+  facilityId?: string;
+  latitude?: number;
+  longitude?: number;
+}
+
+export interface CreateEvidenceRequest {
+  contentType: "image/jpeg" | "image/png" | "image/webp";
+  sizeBytes: number;
+}
+
+export interface CreateEvidenceResponse {
+  evidenceId: string;
+  uploadUrl: string;
+  expiresInSeconds: number;
+}
+
+export interface CompleteEvidenceResponse {
+  evidenceId: string;
+  status: EvidenceStatus;
+  verified: boolean;
+}
+
+export interface PaginatedReportsResponse {
+  data: IssueReportItem[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}

@@ -1,5 +1,6 @@
 import { plainToInstance } from "class-transformer";
 import {
+  IsBoolean,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -47,6 +48,35 @@ export class EnvironmentVariables {
   @IsOptional()
   @IsNumber()
   ROUTE_CACHE_TTL_SECONDS: number = 900;
+
+  @IsString()
+  @IsNotEmpty()
+  S3_ENDPOINT: string = "http://localhost:9000";
+
+  @IsString()
+  @IsNotEmpty()
+  S3_REGION: string = "us-east-1";
+
+  @IsString()
+  @IsNotEmpty()
+  S3_BUCKET: string = "pathpulse-evidence";
+
+  @IsString()
+  @IsNotEmpty()
+  S3_ACCESS_KEY_ID: string = "pathpulse_admin";
+
+  @IsString()
+  @IsNotEmpty()
+  S3_SECRET_ACCESS_KEY: string = "pathpulse_secret_key";
+
+  @IsOptional()
+  @IsBoolean()
+  S3_FORCE_PATH_STYLE: boolean = true;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  S3_PRESIGNED_EXPIRY_SECONDS: number = 900;
 }
 
 export function validateEnv(config: Record<string, unknown>): EnvironmentVariables {
@@ -55,6 +85,24 @@ export function validateEnv(config: Record<string, unknown>): EnvironmentVariabl
     API_PORT: config.API_PORT !== undefined ? Number(config.API_PORT) : 4000,
     ROUTE_CACHE_TTL_SECONDS:
       config.ROUTE_CACHE_TTL_SECONDS !== undefined ? Number(config.ROUTE_CACHE_TTL_SECONDS) : 900,
+    S3_ENDPOINT:
+      config.S3_ENDPOINT !== undefined ? String(config.S3_ENDPOINT) : "http://localhost:9000",
+    S3_REGION: config.S3_REGION !== undefined ? String(config.S3_REGION) : "us-east-1",
+    S3_BUCKET: config.S3_BUCKET !== undefined ? String(config.S3_BUCKET) : "pathpulse-evidence",
+    S3_ACCESS_KEY_ID:
+      config.S3_ACCESS_KEY_ID !== undefined ? String(config.S3_ACCESS_KEY_ID) : "pathpulse_admin",
+    S3_SECRET_ACCESS_KEY:
+      config.S3_SECRET_ACCESS_KEY !== undefined
+        ? String(config.S3_SECRET_ACCESS_KEY)
+        : "pathpulse_secret_key",
+    S3_FORCE_PATH_STYLE:
+      config.S3_FORCE_PATH_STYLE !== undefined
+        ? String(config.S3_FORCE_PATH_STYLE) !== "false"
+        : true,
+    S3_PRESIGNED_EXPIRY_SECONDS:
+      config.S3_PRESIGNED_EXPIRY_SECONDS !== undefined
+        ? Number(config.S3_PRESIGNED_EXPIRY_SECONDS)
+        : 900,
   });
 
   const errors = validateSync(validatedConfig, {

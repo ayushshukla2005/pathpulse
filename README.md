@@ -40,6 +40,13 @@ The backend API validates environment variables at startup and fails fast if any
 - `NEXT_PUBLIC_API_URL`: Client-side base URL for API requests (e.g. `http://localhost:3000`).
 - `API_BASE_URL`: Backend NestJS API URL used by Next.js server route handlers (e.g. `http://localhost:4000`).
 - `COOKIE_SECRET`: Secret key for session cookie signing (minimum 32 characters; default placeholder strings are rejected).
+- `S3_ENDPOINT`: Object storage service endpoint (e.g. `http://localhost:9000`).
+- `S3_REGION`: Storage region (defaults to `us-east-1`).
+- `S3_BUCKET`: Evidence bucket name (defaults to `pathpulse-evidence`).
+- `S3_ACCESS_KEY_ID`: Access key for S3/MinIO (defaults to `pathpulse_admin`).
+- `S3_SECRET_ACCESS_KEY`: Secret access key for S3/MinIO (defaults to `pathpulse_secret_key`).
+- `S3_FORCE_PATH_STYLE`: Enable path-style S3 URLs (defaults to `true` for MinIO compatibility).
+- `S3_PRESIGNED_EXPIRY_SECONDS`: Lifetime of presigned URLs in seconds (defaults to `900`).
 
 ### 2. Install Dependencies
 

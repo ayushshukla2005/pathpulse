@@ -1,9 +1,12 @@
 import type {
+  EvidenceStatus,
   FacilityItem,
   FindRouteRequest,
   FindVenuesParams,
   FloorStepGroup,
   MobilityProfile,
+  ReportCategory,
+  ReportStatus,
   RouteSegment,
   VerificationSummaryCounts,
 } from "@pathpulse/shared-types";
@@ -384,4 +387,152 @@ export function groupStepsByFloor(
   }
 
   return groups;
+}
+
+export const REPORT_CATEGORIES: readonly ReportCategory[] = [
+  "BROKEN_LIFT",
+  "BLOCKED_RAMP",
+  "INACCESSIBLE_ENTRANCE",
+  "OTHER",
+] as const;
+
+export const REPORT_CATEGORY_LABELS: Record<ReportCategory, string> = {
+  BROKEN_LIFT: "Broken lift or elevator",
+  BLOCKED_RAMP: "Blocked ramp or pathway",
+  INACCESSIBLE_ENTRANCE: "Inaccessible entrance or door",
+  OTHER: "Other accessibility barrier",
+};
+
+export const REPORT_STATUS_LABELS: Record<ReportStatus, { label: string; explanation: string }> = {
+  SUBMITTED: {
+    label: "Submitted",
+    explanation: "Your report has been received and is queued for verification.",
+  },
+  UNDER_REVIEW: {
+    label: "Under Review",
+    explanation: "A moderator is currently reviewing the barrier report and evidence.",
+  },
+  VERIFIED: {
+    label: "Verified",
+    explanation: "The barrier has been confirmed and communicated to facility administrators.",
+  },
+  ASSIGNED: {
+    label: "Assigned",
+    explanation: "A maintenance task has been created for the facility team.",
+  },
+  RESOLUTION_SUBMITTED: {
+    label: "Resolution Submitted",
+    explanation: "The maintenance team has reported the issue as resolved.",
+  },
+  CLOSED: {
+    label: "Closed",
+    explanation: "The issue resolution has been verified and closed.",
+  },
+  REJECTED: {
+    label: "Rejected",
+    explanation: "The report could not be verified or was duplicate.",
+  },
+  REOPENED: {
+    label: "Reopened",
+    explanation: "The issue was reopened for further review.",
+  },
+};
+
+export const EVIDENCE_STATUS_LABELS: Record<EvidenceStatus, string> = {
+  PENDING_UPLOAD: "Pending Upload",
+  RECEIVED: "Received & Verified",
+  REJECTED: "Rejected",
+};
+
+export const ALLOWED_EVIDENCE_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
+
+export type AllowedEvidenceMimeType = (typeof ALLOWED_EVIDENCE_MIME_TYPES)[number];
+
+export const MIN_EVIDENCE_SIZE_BYTES = 1024;
+export const MAX_EVIDENCE_SIZE_BYTES = 5 * 1024 * 1024;
+export const MAX_EVIDENCE_PER_REPORT = 5;
+
+export const MIN_DESCRIPTION_LENGTH = 10;
+export const MAX_DESCRIPTION_LENGTH = 1000;
+
+export function isValidReportCategory(value: unknown): value is ReportCategory {
+  return typeof value === "string" && REPORT_CATEGORIES.includes(value as ReportCategory);
+}
+
+export function validateReportDescription(description: string): {
+  isValid: boolean;
+  message?: string;
+  trimmed: string;
+} {
+  if (!description || typeof description !== "string") {
+    return {
+      isValid: false,
+      message: "Description is required.",
+      trimmed: "",
+    };
+  }
+
+  const trimmed = description.trim();
+  if (trimmed.length < MIN_DESCRIPTION_LENGTH) {
+    return {
+      isValid: false,
+      message: `Description must be at least ${MIN_DESCRIPTION_LENGTH} characters.`,
+      trimmed,
+    };
+  }
+
+  if (trimmed.length > MAX_DESCRIPTION_LENGTH) {
+    return {
+      isValid: false,
+      message: `Description cannot exceed ${MAX_DESCRIPTION_LENGTH} characters.`,
+      trimmed,
+    };
+  }
+
+  return { isValid: true, trimmed };
+}
+
+export function isValidEvidenceMimeType(mimeType: string): mimeType is AllowedEvidenceMimeType {
+  return ALLOWED_EVIDENCE_MIME_TYPES.includes(mimeType as AllowedEvidenceMimeType);
+}
+
+export function validateEvidenceFile(file: { type: string; size: number }): {
+  isValid: boolean;
+  message?: string;
+} {
+  if (!isValidEvidenceMimeType(file.type)) {
+    return {
+      isValid: false,
+      message: `Unsupported file type "${file.type}". Allowed formats: JPEG, PNG, WebP.`,
+    };
+  }
+
+  if (file.size < MIN_EVIDENCE_SIZE_BYTES) {
+    return {
+      isValid: false,
+      message: "File is too small. Minimum size is 1 KB.",
+    };
+  }
+
+  if (file.size > MAX_EVIDENCE_SIZE_BYTES) {
+    return {
+      isValid: false,
+      message: "File exceeds 5 MB limit.",
+    };
+  }
+
+  return { isValid: true };
+}
+
+export function getFileExtensionFromMime(mime: string): string {
+  switch (mime) {
+    case "image/jpeg":
+      return "jpg";
+    case "image/png":
+      return "png";
+    case "image/webp":
+      return "webp";
+    default:
+      return "bin";
+  }
 }
