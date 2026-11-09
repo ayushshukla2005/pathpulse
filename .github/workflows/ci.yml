@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD Pipeline
 
 on:
   push:
@@ -8,21 +8,265 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
-  ci:
+  lint-and-typecheck:
+    name: Lint & Typecheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version-file: ".nvmrc"
+          node-version: 22
           cache: "pnpm"
 
-      - run: pnpm install --frozen-lockfile
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
-      - run: pnpm lint
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
 
-      - run: pnpm typecheck
+      - name: Install Node dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Python dependencies & ruff
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff
+          pip install -r apps/ai-service/requirements.txt
+
+      - name: Check code formatting
+        run: pnpm format:check
+
+      - name: Run Node linters
+        run: pnpm lint
+
+      - name: Run Python linter (ruff)
+        run: |
+          cd apps/ai-service
+          ruff check .
+
+      - name: Run TypeScript typecheck
+        run: pnpm typecheck
+
+  test-unit:
+    name: Unit Tests (Matrix)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+
+      - name: Install Node dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Python test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r apps/ai-service/requirements.txt
+
+      - name: Generate Prisma Client
+        run: pnpm --filter @pathpulse/api exec prisma generate
+
+      - name: Run API Unit Tests
+        run: pnpm --filter @pathpulse/api test
+
+      - name: Run Web Unit Tests
+        run: pnpm --filter @pathpulse/web test
+
+      - name: Run AI Service Tests
+        run: |
+          cd apps/ai-service
+          pytest tests -v
+
+  test-integration:
+    name: Integration & E2E Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_DB: pathpulse_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: testpassword
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+      minio:
+        image: minio/minio:latest
+        env:
+          MINIO_ROOT_USER: minioadmin
+          MINIO_ROOT_PASSWORD: minioadminpassword
+        ports:
+          - 9000:9000
+          - 9001:9001
+        options: >-
+          --health-cmd "curl -f http://localhost:9000/minio/health/live"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+        command: server /data --console-address ":9001"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers with OS dependencies
+        run: pnpm --filter @pathpulse/web exec playwright install --with-deps chromium
+
+      - name: Run Prisma Migrations
+        env:
+          DATABASE_URL: postgresql://postgres:testpassword@localhost:5432/pathpulse_test
+        run: pnpm --filter @pathpulse/api migrate:deploy
+
+      - name: Run API E2E & Integration Tests
+        env:
+          DATABASE_URL: postgresql://postgres:testpassword@localhost:5432/pathpulse_test
+          REDIS_URL: redis://localhost:6379
+          S3_ENDPOINT: http://localhost:9000
+          S3_ACCESS_KEY: minioadmin
+          S3_SECRET_KEY: minioadminpassword
+          S3_BUCKET: pathpulse-evidence
+        run: pnpm --filter @pathpulse/api test:e2e
+
+      - name: Build Web Application
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:4000
+        run: pnpm --filter @pathpulse/web build
+
+      - name: Run Playwright E2E and Axe Scans
+        env:
+          CI: true
+        run: pnpm --filter @pathpulse/web test:e2e
+
+  docker-build:
+    name: Build Production Docker Images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build API Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: apps/api/Dockerfile
+          push: false
+          tags: pathpulse-api:ci
+
+      - name: Build Web Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: apps/web/Dockerfile
+          push: false
+          tags: pathpulse-web:ci
+
+      - name: Build AI Service Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: apps/ai-service
+          file: apps/ai-service/Dockerfile
+          push: false
+          tags: pathpulse-ai-service:ci
+
+  deploy:
+    name: Production Deployment
+    needs: [lint-and-typecheck, test-unit, test-integration, docker-build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Production Database Migration Job
+        if: env.DATABASE_URL != ''
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: pnpm --filter @pathpulse/api migrate:deploy
+
+      - name: Trigger Render Deploy Hook (API)
+        if: env.RENDER_API_DEPLOY_HOOK != ''
+        env:
+          RENDER_API_DEPLOY_HOOK: ${{ secrets.RENDER_API_DEPLOY_HOOK }}
+        run: |
+          curl -f -X POST "${RENDER_API_DEPLOY_HOOK}"
+
+      - name: Trigger Render Deploy Hook (AI Service)
+        if: env.RENDER_AI_DEPLOY_HOOK != ''
+        env:
+          RENDER_AI_DEPLOY_HOOK: ${{ secrets.RENDER_AI_DEPLOY_HOOK }}
+        run: |
+          curl -f -X POST "${RENDER_AI_DEPLOY_HOOK}"
+
+      - name: Trigger Vercel Deploy Hook (Web)
+        if: env.VERCEL_DEPLOY_HOOK != ''
+        env:
+          VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          curl -f -X POST "${VERCEL_DEPLOY_HOOK}"

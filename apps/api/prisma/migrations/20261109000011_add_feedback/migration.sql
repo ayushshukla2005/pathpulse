@@ -17,3 +17,4 @@ CREATE INDEX "feedback_created_at_idx" ON "feedback"("created_at");
 
 -- AddForeignKey
 ALTER TABLE "feedback" ADD CONSTRAINT "feedback_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+

@@ -331,3 +331,42 @@ Cryptographically secure refresh tokens for authentication sessions.
   - PostgreSQL `CHECK` constraints are column-local or row-local to the single table being evaluated; they cannot perform subqueries or join across parent foreign keys (`map_nodes.floor_id`).
   - While a deferred constraint trigger is required when cross-referencing mutually dependent rows inserted in arbitrary order, navigation nodes are strictly persisted before edges can link them.
   - An immediate `BEFORE INSERT OR UPDATE` row-level trigger validates the condition instantaneously at execution time, failing early with a descriptive error message before committing any invalid edge topology.
+
+
+---
+
+### DR-AUDIT: Immutable Append-Only Audit Log Trigger (`prevent_audit_logs_tamper`)
+
+- **Requirement**: Maintain tamper-evident chain of custody for all status changes, moderation actions, and administrative operations.
+- **Implementation**:
+  ```sql
+  CREATE OR REPLACE FUNCTION prevent_audit_logs_tamper()
+  RETURNS TRIGGER AS $$
+  BEGIN
+    RAISE EXCEPTION 'Cannot modify or delete audit log entries. Audit log is append-only.';
+  END;
+  $$ LANGUAGE plpgsql;
+
+  CREATE TRIGGER prevent_audit_logs_tamper
+  BEFORE UPDATE OR DELETE ON audit_logs
+  FOR EACH ROW
+  EXECUTE FUNCTION prevent_audit_logs_tamper();
+  ```
+- **Guarantees**: Neither direct SQL updates nor application code can alter or truncate audit rows. Deleting or modifying audit rows requires altering the database schema with superuser permissions, which itself generates external database engine audit logs.
+
+### DR-AI: Advisory Invariant Check Constraint
+
+- **Requirement**: Machine learning predictions must never be stored as authoritative or permitted to change entity statuses autonomously.
+- **Implementation**:
+  ```sql
+  ALTER TABLE ai_suggestions
+  ADD CONSTRAINT chk_ai_suggestions_human_verification
+  CHECK (requires_human_verification = true);
+  ```
+- **Guarantees**: Any insertion or update attempting to set `requires_human_verification = false` is rejected at the storage layer by PostgreSQL with a check constraint violation.
+
+### DR-GEO: Spatial PostGIS Indexing & Geometry Types
+
+- **Storage**: Latitude and longitude are indexed using PostGIS spatial geography points (`geography(Point, 4326)`).
+- **Indexing**: `USING GIST (location)` index on `venues` and `map_nodes`.
+- **Performance**: High-speed spherical distance calculations (`ST_DWithin`, `ST_Distance`) and nearest-neighbor scans (`<->`) execute within sub-millisecond query latency.

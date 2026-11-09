@@ -1,100 +1,128 @@
-# PathPulse System Architecture
+# PathPulse System Architecture & Technical Specification
 
-## System Overview
+## 1. System Overview and Purpose
 
-PathPulse is an intelligent accessibility and multi-floor navigation platform that connects people with specific mobility requirements to verified indoor and outdoor navigable journeys.
+PathPulse is an enterprise-grade accessibility and multi-floor indoor/outdoor navigation platform designed for high-density institutions (campuses, healthcare facilities, transit hubs, and cultural venues). The platform pairs topological graph routing with verified, crowdsourced barrier intelligence, ensuring that individuals with mobility challenges receive reliable, step-free journeys.
 
 ```mermaid
 flowchart TD
-    subgraph ClientLayer["Client Layer"]
-        Web["Next.js Web App (SSR / CSR / MapLibre GL)"]
+    subgraph ClientLayer["Client Layer (apps/web)"]
+        WebClient["Next.js Web App (SSR / React / MapLibre GL / TanStack Query)"]
     end
 
-    subgraph ApiGateway["API & Application Layer"]
-        NestApi["NestJS Core API (Modular Monolith)"]
-        AuthModule["Auth & RBAC"]
-        NavigationEngine["Graph Routing Engine (Dijkstra / A*)"]
-        FacilityModule["Facility & Real-time State"]
-        ReportingModule["Reporting & Verification Workflow"]
-        OrgModule["Organization & Map Editor"]
+    subgraph CoreBackend["Core Backend API (apps/api - NestJS)"]
+        HttpGuard["Auth & RBAC Guards (JWT / Roles / Org)"]
+        NavModule["Navigation & Routing Engine (Dijkstra / PostGIS)"]
+        FacilityModule["Facility Lifecycle & Cache Invalidation"]
+        ReportWorkflow["Report State Machine & Moderation Engine"]
+        RealtimeGW["WebSocket Gateway (/realtime - Socket.IO)"]
+        AuditService["Tamper-Evident Audit Logger"]
     end
 
-    subgraph AsyncProcessing["Async Processing Layer"]
-        Queue["BullMQ Worker Queues"]
+    subgraph AdvisoryAI["Advisory Intelligence Layer (apps/ai-service)"]
+        FastApiSvc["Python FastAPI (scikit-learn TF-IDF / Heuristics)"]
+        CircuitBreaker["Opossum Circuit Breaker + Timeout (500ms)"]
     end
 
-    subgraph AIService["AI & Computer Vision Layer"]
-        FastAPI["Python FastAPI Service (Vision & NLP)"]
+    subgraph StorageInfra["Data & State Infrastructure"]
+        PostgresDB[("PostgreSQL 16 + PostGIS 3.4")]
+        RedisCache[("Redis 7 (Distributed Cache & BullMQ)")]
+        ObjectStorage[("S3-Compatible Object Store (MinIO / AWS S3)")]
     end
 
-    subgraph DataStorage["Data & Storage Layer"]
-        Postgres["PostgreSQL 16 + PostGIS 3.4"]
-        Redis["Redis 7 (Cache, Sessions, Queues)"]
-        ObjectStorage["S3-Compatible Storage (MinIO)"]
-    end
+    WebClient -->|REST & WebSockets| HttpGuard
+    HttpGuard --> NavModule
+    HttpGuard --> FacilityModule
+    HttpGuard --> ReportWorkflow
 
-    Web -->|HTTPS / REST / WebSocket| NestApi
-    NestApi --> AuthModule
-    NestApi --> NavigationEngine
-    NestApi --> FacilityModule
-    NestApi --> ReportingModule
-    NestApi --> OrgModule
+    NavModule -->|Read Topologies & Compute Nodes| PostgresDB
+    NavModule -->|Route Caching by graphVersion| RedisCache
 
-    NestApi -->|Read / Write & Spatial Queries| Postgres
-    NestApi -->|Cache & State Invalidation| Redis
-    NestApi -->|Enqueue Background Jobs| Queue
-    Queue -->|Async Processing| NestApi
+    FacilityModule -->|Bump graphVersion & Atomic Tx| PostgresDB
+    FacilityModule -->|Purge route:v1:buildingId:*| RedisCache
+    FacilityModule -->|Internal Event Emitter| RealtimeGW
+    RealtimeGW -.->|Broadcast facility.status.changed| WebClient
 
-    NestApi -->|Presigned URL Generation| ObjectStorage
-    Web -->|Direct Upload with Presigned URL| ObjectStorage
-
-    ReportingModule -->|Async Job / Internal REST| FastAPI
-    FastAPI -->|Fetch Evidence Photo| ObjectStorage
-    FastAPI -->|Triage & Obstacle Predictions| ReportingModule
+    ReportWorkflow -->|Presigned PUT URLs| ObjectStorage
+    WebClient -->|Direct Binary Photo Upload| ObjectStorage
+    ReportWorkflow --> CircuitBreaker
+    CircuitBreaker -->|POST /v1/classify & duplicates| FastApiSvc
+    ReportWorkflow -->|Append-Only Audit Record| AuditService
+    AuditService -->|Enforced via PostgreSQL Trigger| PostgresDB
 ```
 
-## Architecture Decision Records (ADR)
+---
 
-### ADR-001: Modular Monolith over Microservices
+## 2. Core Architectural Invariants
 
-- **Context**: PathPulse requires transactional integrity across venues, multi-floor graphs, facilities, crowdsourced reports, and audit trails. Building distributed microservices early introduces network hops, eventual consistency challenges, dual-write complexities, and operational overhead.
-- **Decision**: Adopt a modular monolith built on NestJS inside a unified monorepo. Modules (`auth`, `venues`, `navigation`, `facilities`, `reports`, `audit`) are logically bounded with strict dependency boundaries and shared type contracts.
-- **Consequences**: Fast local development, atomic ACID transactions for route graph and facility state changes, simplified deployments, and clean boundary separation that permits splitting out high-throughput services later if required.
+PathPulse enforces six non-negotiable architectural invariants:
 
-### ADR-002: PostgreSQL with PostGIS over MongoDB
+1. **The Verification Principle**: No route is presented to an end user as "accessible" unless the navigation engine confirms `STEP_FREE` pathing and every intermediate edge segment is in `CONFIRMED` status. Route safety is never computed, filtered, or assumed on the client.
+2. **Direct-to-Storage Evidence Ingestion**: Application servers never handle or stream photographic media bytes. Clients receive short-lived (15-minute), presigned PUT URLs signed with IAM least-privilege credentials. Server verification requires an explicit `HEAD` object probe to validate file size and MIME type.
+3. **Pure Function State Transitions**: The report verification and moderation state machine is implemented as a pure function (`transitionReport`) without external I/O or framework dependencies. Roles, transition tables, self-action prohibitions, and separation of duties are mathematically verified in memory.
+4. **Tamper-Evident Append-Only Auditing**: Every status change and security transition writes an immutable row into `audit_logs`. A PostgreSQL database trigger (`prevent_audit_logs_tamper`) unconditionally rejects any `UPDATE` or `DELETE` statement executed against the audit table.
+5. **Human-in-the-Loop AI Advisory Separation**: The Python AI service produces suggestions only. Every AI response carries `requiresHumanVerification: true` enforced by schema validation and database check constraints. AI output is strictly isolated from report state transitions.
+6. **Graph Version Cache Correctness**: Accessibility facility outages atomically bump `buildings.graph_version` inside the database transaction. Because cache keys incorporate `graphVersion`, stale routes are instantly invalidated without cache race conditions.
 
-- **Context**: Navigation requires relational graph integrity (nodes, edges, floors, buildings, facilities) alongside native spatial geospatial indexing and calculations (geofencing, finding nearest accessible entrances via spherical distance).
-- **Decision**: Use PostgreSQL 16 with the PostGIS 3.4 spatial extension.
-- **Consequences**:
-  - Full relational integrity: Foreign key constraints, unique composite keys, check constraints, and transactional rollbacks.
-  - Native spatial power: PostGIS `geography(Point, 4326)` with spatial GiST indexing enables performant k-nearest-neighbors (`<->`) and distance queries.
-  - Complex graph queries: PostgreSQL recursive CTEs and typed relationships outperform document databases for structured multi-floor topological graphs.
+---
 
-### ADR-003: AI Service Behind an Isolated Service Boundary
+## 3. Monorepo Organization and Boundaries
 
-- **Context**: Barrier classification, duplicate report clustering, and visual obstacle recognition benefit from Python's machine learning and computer vision ecosystem (PyTorch, OpenCV, Transformers).
-- **Decision**: Isolate AI processing within an asynchronous Python FastAPI service. The NestJS core API communicates with it via asynchronous BullMQ queues or isolated internal REST calls.
-- **Consequences**:
-  - Independent runtime environments: Node.js handles I/O-intensive navigation queries and WebSockets, while Python manages memory-heavy image and tensor operations.
-  - Failure containment: Heavy computer vision jobs or ML failures never block core navigation, authentication, or reporting operations.
-  - Strict human verification invariant: The AI service returns suggestions (confidence scores, detected barrier classes); core business logic marks all AI outputs as suggestions requiring human or moderator verification before committing state changes.
+```
+pathpulse/
+├── apps/
+│   ├── api/                    # NestJS Core Backend (REST, WebSockets, Prisma, BullMQ)
+│   │   ├── prisma/             # Schema, migrations, and seed scripts
+│   │   └── src/                # Modular domain features (auth, navigation, reports, etc.)
+│   ├── web/                    # Next.js Frontend (App Router, Tailwind CSS, MapLibre GL)
+│   │   ├── app/                # Route segments (explore, routes, reports, org, public)
+│   │   └── lib/                # API client, React Query hooks, and accessibility utilities
+│   └── ai-service/             # Python FastAPI Service (NLP classification, duplicate scoring)
+│       ├── app/                # Endpoints, schemas, TF-IDF classifier, summarizer
+│       └── tests/              # Pytest test suite and evaluation datasets
+├── packages/
+│   ├── shared-types/           # Shared TypeScript interfaces, DTOs, and domain enums
+│   └── validation/             # Shared validation schemas (zod / class-validator parity)
+├── docs/                       # Architectural specs, API reference, runbooks, and ADRs
+└── docker-compose.prod.yml     # Production-grade multi-container specification
+```
 
-### ADR-004: Facility Status Changes, Version Bumping, and Real-Time Invalidation
+---
 
-- **Context**: When an accessibility facility (such as a lift) experiences an outage or status change, visitors navigating in the building must never be served stale routes directing them to that broken facility.
-- **Decision**: Enforce a strict multi-stage transactional and cache-invalidation lifecycle:
-  1. **Row Lock & Transaction Commit**:
-     - `SELECT ... FOR UPDATE` locks the facility row, serializing concurrent status changes.
-     - Facility record is updated (`operational_status`, `verification_level`, and `last_verified_at` if confirmed by organization admin).
-     - Building `graph_version` is incremented inside the database transaction (`UPDATE buildings SET graph_version = graph_version + 1`).
-     - An audit log row is created in the same transaction with actor, entity ID, previous/new status, and previous/new graph version.
-  2. **Graph Version Guarantee**:
-     - Because all route cache keys are keyed by `route:v1:${buildingId}:${graphVersion}:${profile}:${origin}:${dest}`, the database version increment guarantees that any new route queries made immediately after transaction commit will look up the new graph version. Even before cache deletion finishes, stale entries from the previous version can never be matched or served.
-  3. **Cache Invalidation**:
-     - After transaction commit, Redis cache keys matching `route:v1:${buildingId}:*` are purged using Redis `SCAN` / `DEL`. If Redis is temporarily unreachable, the error is logged; route correctness is still maintained by the graph version increment.
-  4. **Internal Event Emission**:
-     - `EventEmitter2` emits `facility.status.changed` with payload containing the new building `graph_version`, facility ID, type, status, and verification level.
-  5. **WebSocket Gateway Broadcast**:
-     - The WebSocket gateway broadcasts `facility.status.changed` to room `building:${buildingId}` on namespace `/realtime`.
-     - Connected clients receive real-time updates and update their client cache without reloading. No report data or sensitive information is broadcast over WebSockets.
+## 4. Subsystem Deep Dive
 
+### 4.1 Navigation & Route Planning Engine
+- **Graph Topology**: Nodes represent 3D physical coordinates (`x, y, floor, latitude, longitude`). Edges represent navigable corridors, ramps, elevators, and doors.
+- **Mobility Profiles**: Supports `WHEELCHAIR` (strictly step-free, maximum slope constraints, accessible width thresholds), `ASSISTED` (step-free preferred, elevator priority), and `STANDARD`.
+- **Confidence Computation**: Each segment reports an explicit confidence level (`CONFIRMED`, `UNVERIFIED`, `UNAVAILABLE`) derived from physical facility states and recent barrier reports.
+- **Caching Strategy**: Routes are keyed by `route:v1:${buildingId}:${graphVersion}:${profile}:${originId}:${destId}` with a 24-hour TTL in Redis.
+
+### 4.2 Facility State & Graph Version Invalidation
+When an institution updates the status of an elevator or door:
+1. `SELECT ... FOR UPDATE` acquires an exclusive lock on the facility.
+2. The facility's operational status and verification level are updated.
+3. The parent building's `graph_version` is atomically incremented (`UPDATE buildings SET graph_version = graph_version + 1`).
+4. An immutable row is inserted into `audit_logs`.
+5. The database transaction commits.
+6. Asynchronous Redis purge cleans keys matching `route:v1:${buildingId}:*`.
+7. An internal `facility.status.changed` event triggers the Socket.IO gateway to broadcast updates to the `building:${buildingId}` room.
+
+### 4.3 Crowdsourced Barrier Reporting & Moderation
+- Reports originate in `SUBMITTED` status with tracking IDs.
+- Transitions follow an explicit state machine:
+  - `SUBMITTED` &rarr; `TRIAGED` (Organization Admin / Moderator)
+  - `TRIAGED` &rarr; `IN_PROGRESS` (Assigned personnel)
+  - `IN_PROGRESS` &rarr; `RESOLVED` (Resolution proposed)
+  - `RESOLVED` &rarr; `CONFIRMED_RESOLVED` (Confirmed by distinct moderator; separation of duties enforced)
+- Self-action checks: Reporters cannot triage, assign, or verify their own reports.
+
+### 4.4 Advisory AI Service & Resilience Pattern
+- Isolated Python FastAPI service with non-root user execution in Docker.
+- **Classification**: Lightweight TF-IDF vectorizer + Logistic Regression with rule-based heuristics fallback.
+- **Duplicate Scoring**: Jaccard and n-gram similarity scoring.
+- **Resilience**: The NestJS API invokes the AI service through an Opossum circuit breaker (500ms timeout, 50% error threshold over 10 requests, 10s reset sleep). If the AI service is unavailable, report submission continues uninterrupted with advisory suggestions omitted.
+
+### 4.5 Observability & Security Scrubbing
+- **Structured Logging**: JSON logs generated via Pino with standardized fields (`requestId`, `method`, `route`, `statusCode`, `latencyMs`).
+- **PII Scrubbing**: Built-in regex redactor strips `authorization`, `cookie`, `password`, `token`, `email`, `description`, and geospatial coordinates from logs and Sentry error reports.
+- **Deep Readiness**: `GET /api/v1/health/ready` validates database connectivity and queries `_prisma_migrations` against local disk checksums, returning 503 if unapplied migrations exist.

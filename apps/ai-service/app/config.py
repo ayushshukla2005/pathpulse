@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
@@ -7,6 +8,7 @@ class Settings(BaseSettings):
     DUPLICATE_THRESHOLD: float = 0.65
     HOST: str = "0.0.0.0"
     PORT: int = 8000
+    SENTRY_DSN: Optional[str] = os.getenv("SENTRY_DSN", None)
 
     model_config = {
         "env_file": ".env",
@@ -15,4 +17,3 @@ class Settings(BaseSettings):
     }
 
 settings = Settings()
-

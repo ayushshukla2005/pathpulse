@@ -1,160 +1,143 @@
 # PathPulse
 
-Navigate Without Barriers — An intelligent accessibility and navigation platform that helps people discover, plan, and navigate routes through buildings and public places based on their actual mobility and accessibility requirements.
+**Navigate Without Barriers** — An accessibility-first multi-floor indoor and outdoor navigation platform that empowers people with diverse mobility requirements to discover, plan, and follow verified accessible journeys through complex institutional venues.
 
-## Repository Architecture
+[![CI/CD Pipeline](https://github.com/pathpulse/pathpulse/actions/workflows/ci.yml/badge.svg)](https://github.com/pathpulse/pathpulse/actions/workflows/ci.yml)
+[![WCAG 2.2 AA](https://img.shields.io/badge/accessibility-WCAG%202.2%20AA-005a9c.svg)](docs/adr/ADR-0006-accessibility-wcag22-and-direct-s3-upload-pattern.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-This repository is structured as a pnpm monorepo:
+---
 
-- `apps/web`: Next.js web application and interactive portals.
-- `apps/api`: NestJS REST backend, spatial graph routing, and moderation workflows.
-- `apps/ai-service`: AI and ML service for report classification, OCR, and barrier detection.
-- `packages/shared-types`: Shared TypeScript definitions and API contracts.
-- `packages/validation`: Shared validation schemas and rules.
-- `packages/config`: Common configuration presets.
-- `infrastructure/`: Docker Compose definitions and database migration scripts.
+## 1. Problem Statement & Philosophy
 
-## Local development
+Traditional navigation applications stop at the building exterior door, leaving visitors who use wheelchairs, canes, strollers, or have low vision to navigate unmapped stairwells, heavy manual doors, and broken elevators.
 
-### 1. Environment Configuration
+PathPulse bridges this gap through four foundational principles:
+1. **The Verification Principle**: No route is presented as accessible unless every intermediate segment is confirmed step-free across all elevators and pathways. The client UI never computes or infers safety on its own.
+2. **Direct-to-S3 Photographic Evidence**: User barrier reports include photographic proof uploaded directly to object storage via presigned URLs, keeping application servers free of media buffering.
+3. **Pure Function Moderation Machine**: All barrier lifecycle transitions follow an immutable state machine enforcing strict separation of duties and self-action prohibitions.
+4. **Advisory-Only Machine Intelligence**: AI assists human moderators with category suggestions and duplicate detection, but is mathematically prevented from mutating report statuses or route availability autonomously.
 
-Copy the example environment file to create your local `.env`:
+---
 
+## 2. Architecture & Monorepo Structure
+
+```
+pathpulse/
+├── apps/
+│   ├── web/                    # Next.js 15 Standalone Web App (React 19, MapLibre GL, TanStack Query)
+│   ├── api/                    # NestJS Core Backend (Prisma, BullMQ, Socket.IO, Pino, Sentry)
+│   └── ai-service/             # Python 3.13 FastAPI Service (scikit-learn TF-IDF, Uvicorn)
+├── packages/
+│   ├── shared-types/           # Shared TypeScript interfaces, enums, and API contracts
+│   └── validation/             # Shared validation schemas (zod / class-validator parity)
+├── docs/                       # Architecture, API specifications, ADRs, and runbooks
+│   ├── architecture.md         # Full system architecture & data flow diagrams
+│   ├── api.md                  # Complete REST & WebSocket API specification
+│   ├── database.md             # Schema, PostGIS indices, triggers, and constraints
+│   ├── deployment.md           # Production deployment guide (Render & Vercel)
+│   ├── runbook-migrations.md   # Production database migration and rollback runbook
+│   ├── demo-script.md          # 3-minute interactive walkthrough demo script
+│   └── adr/                    # Architecture Decision Records (ADR-0001 to ADR-0006)
+├── docker-compose.prod.yml     # Multi-container production compose specification
+└── .github/workflows/ci.yml    # Comprehensive CI/CD test, lint, e2e, build, and deploy pipeline
+```
+
+---
+
+## 3. Quick Start & Local Development
+
+### 3.1 Prerequisites
+- **Node.js**: `v22.x` (managed via `.nvmrc`)
+- **pnpm**: `v9.x` (`corepack enable pnpm`)
+- **Python**: `3.13.x` (for `apps/ai-service`)
+- **Docker & Docker Compose**: (for PostgreSQL with PostGIS, Redis, and MinIO)
+
+### 3.2 Environment Setup
+Copy the development environment templates:
 ```bash
 cp .env.example .env
+cp apps/api/.env.example apps/api/.env
 ```
 
-#### Required Environment Variables
-
-The backend API validates environment variables at startup and fails fast if any required setting is missing or uses insecure default placeholders:
-
-- `DATABASE_URL`: Full PostgreSQL connection string (e.g. `postgresql://user:password@localhost:5432/pathpulse`).
-- `WEB_ORIGIN`: Allowed frontend origin for CORS (e.g. `http://localhost:3000`).
-- `API_PORT`: Port on which the API listens (defaults to `4000`).
-- `JWT_ACCESS_SECRET`: Secret key for signing access tokens (minimum 32 characters; default placeholder strings are rejected).
-- `JWT_REFRESH_SECRET`: Secret key for signing refresh tokens (minimum 32 characters; default placeholder strings are rejected).
-- `REDIS_URL`: Redis connection URL for queues and caching (e.g. `redis://localhost:6379`).
-- `TEST_REDIS_URL`: Redis connection URL with an isolated database index for integration tests (e.g. `redis://localhost:6379/1`).
-- `ROUTE_CACHE_TTL_SECONDS`: Route calculation cache time-to-live in seconds (defaults to `900` / 15 minutes).
-- `SEED_ADMIN_PASSWORD`: Password for the demo organization admin (`demo-admin@pathpulse.local`) when running database seed scripts.
-- `NEXT_PUBLIC_API_URL`: Client-side base URL for API requests (e.g. `http://localhost:3000`).
-- `API_BASE_URL`: Backend NestJS API URL used by Next.js server route handlers (e.g. `http://localhost:4000`).
-- `COOKIE_SECRET`: Secret key for session cookie signing (minimum 32 characters; default placeholder strings are rejected).
-- `S3_ENDPOINT`: Object storage service endpoint (e.g. `http://localhost:9000`).
-- `S3_REGION`: Storage region (defaults to `us-east-1`).
-- `S3_BUCKET`: Evidence bucket name (defaults to `pathpulse-evidence`).
-- `S3_ACCESS_KEY_ID`: Access key for S3/MinIO (defaults to `pathpulse_admin`).
-- `S3_SECRET_ACCESS_KEY`: Secret access key for S3/MinIO (defaults to `pathpulse_secret_key`).
-- `S3_FORCE_PATH_STYLE`: Enable path-style S3 URLs (defaults to `true` for MinIO compatibility).
-- `S3_PRESIGNED_EXPIRY_SECONDS`: Lifetime of presigned URLs in seconds (defaults to `900`).
-
-### 2. Install Dependencies
-
-Install all monorepo dependencies:
-
+### 3.3 Install Dependencies
 ```bash
+# Install Node dependencies
 pnpm install
-```
 
-### 3. Build Shared Packages
-
-Build the TypeScript shared packages before running apps:
-
-```bash
-pnpm --filter @pathpulse/shared-types build
-pnpm --filter @pathpulse/validation build
-```
-
-### 4. Start Local Infrastructure Services
-
-Start PostgreSQL with PostGIS, Redis, and MinIO in the background:
-
-```bash
-docker compose up -d
-```
-
-### 5. Verify Services
-
-Check that all containerized services are running and healthy:
-
-```bash
-docker compose ps
-```
-
-Verify that PostgreSQL and the PostGIS spatial extension are operating correctly:
-
-```bash
-docker compose exec postgres psql -U pathpulse -d pathpulse -c "SELECT PostGIS_Version();"
-```
-
-### 6. Database Migrations and Seeding
-
-Run Prisma migrations and seed the sample campus data:
-
-```bash
-cd apps/api
-pnpm exec prisma migrate deploy
-pnpm db:seed
+# Setup Python virtualenv for AI service
+cd apps/ai-service
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\Activate.ps1
+pip install -r requirements.txt
 cd ../..
 ```
 
-### 7. Run the Applications (Startup Order)
-
-Start the services in the following order:
-
-1. **Infrastructure**: `docker compose up -d` (PostgreSQL, Redis, MinIO)
-2. **API Backend**:
-   ```bash
-   pnpm --filter @pathpulse/api start:dev
-   ```
-   Listens on `http://localhost:4000` with Swagger docs at `http://localhost:4000/docs`.
-3. **Web Frontend**:
-   ```bash
-   pnpm --filter @pathpulse/web dev
-   ```
-   Listens on `http://localhost:3000`.
-
-### 8. Testing
-
-Run backend tests:
-
+### 3.4 Start Local Infrastructure
 ```bash
-cd apps/api
-pnpm test
-pnpm test:e2e
-cd ../..
+docker compose up -d postgres redis minio
 ```
 
-Run frontend unit, component, and accessibility E2E tests:
-
+### 3.5 Database Migrations & Seed
 ```bash
-cd apps/web
-pnpm test
-pnpm test:e2e
-cd ../..
+pnpm --filter @pathpulse/api exec prisma migrate deploy
+pnpm --filter @pathpulse/api db:seed
 ```
 
-### 9. Production Builds
-
-Build all packages and applications:
-
+### 3.6 Run Development Servers
 ```bash
-pnpm --filter @pathpulse/shared-types build
-pnpm --filter @pathpulse/validation build
-pnpm --filter @pathpulse/api build
-pnpm --filter @pathpulse/web build
+# Start all services concurrently:
+pnpm dev
+
+# Or start individually:
+pnpm --filter @pathpulse/api start:dev    # http://localhost:4000
+pnpm --filter @pathpulse/web dev          # http://localhost:3000
+# AI service:
+cd apps/ai-service && .venv/bin/uvicorn app.main:app --port 8000 --reload
 ```
 
-### 10. Code Quality Checks
+---
 
-Run linting across all workspaces:
+## 4. Testing & Quality Verification
 
-```bash
-pnpm lint
-```
+| Scope | Command | Description |
+| :--- | :--- | :--- |
+| **Linting (Node)** | `pnpm lint` | ESLint across web, api, and shared packages |
+| **Linting (Python)** | `cd apps/ai-service && ruff check .` | Ruff linter for AI service |
+| **Typecheck** | `pnpm typecheck` | Strict TypeScript checks across all workspaces |
+| **API Unit Tests** | `pnpm --filter @pathpulse/api test` | Jest test suite including redactor, Sentry, state machine |
+| **Web Unit Tests** | `pnpm --filter @pathpulse/web test` | Vitest component, hook, and accessibility unit tests |
+| **AI Service Tests** | `cd apps/ai-service && pytest tests -v` | Pytest suite for classifier, summarizer, and duplicates |
+| **API Integration** | `pnpm --filter @pathpulse/api test:e2e` | Supertest E2E tests against PostgreSQL & Redis |
+| **Playwright & Axe**| `pnpm --filter @pathpulse/web test:e2e` | Playwright E2E with automated axe-core WCAG 2.2 scans |
 
-Run TypeScript compilation checks across all workspaces:
+---
 
-```bash
-pnpm typecheck
-```
+## 5. Production Deployment Summary
+
+PathPulse is built for cloud deployment using **Render** (API, AI service, managed PostgreSQL with PostGIS, and managed Redis) and **Vercel** (Next.js standalone frontend):
+
+- **Docker Images**: Pre-configured multi-stage, non-root Dockerfiles available in `apps/api/Dockerfile`, `apps/web/Dockerfile`, and `apps/ai-service/Dockerfile`.
+- **Production Compose**: Run `docker compose -f docker-compose.prod.yml up -d` to spin up the entire cluster locally or on an EC2/VM host.
+- **Migration Strategy**: Migrations are strictly decoupled from container startup; execute via `pnpm --filter @pathpulse/api migrate:deploy` during CI/CD release phases.
+- **Detailed Guide**: See [docs/deployment.md](docs/deployment.md) and [docs/runbook-migrations.md](docs/runbook-migrations.md).
+
+---
+
+## 6. Architecture Decision Records (ADRs)
+
+- [ADR-0001: PostGIS Spatial Indexing and Relational Graph Storage](docs/adr/ADR-0001-postgis-spatial-and-graph-storage.md)
+- [ADR-0002: Pure Function Report State Machine and Separation of Duties](docs/adr/ADR-0002-pure-function-report-state-machine.md)
+- [ADR-0003: Append-Only Audit Log with PostgreSQL Tamper-Evident Trigger](docs/adr/ADR-0003-append-only-audit-log-tamper-trigger.md)
+- [ADR-0004: Advisory-Only AI Architecture and Circuit Breaker Resilience](docs/adr/ADR-0004-advisory-only-ai-architecture-and-circuit-breaker.md)
+- [ADR-0005: Graph Versioning and Distributed Cache Invalidation](docs/adr/ADR-0005-graph-versioning-and-distributed-cache-invalidation.md)
+- [ADR-0006: WCAG 2.2 Accessibility Compliance and Direct S3 Evidence Upload](docs/adr/ADR-0006-accessibility-wcag22-and-direct-s3-upload-pattern.md)
+
+---
+
+## 7. Accessibility Statement & Compliance
+
+PathPulse is committed to digital and physical accessibility:
+- Public Accessibility Statement: [/accessibility](http://localhost:3000/accessibility)
+- Standards: W3C WCAG 2.2 Level AA, India Rights of Persons with Disabilities (RPwD) Act 2016, and Accessible India Campaign guidelines.
+- Contact Accessibility Team: [accessibility@pathpulse.org](mailto:accessibility@pathpulse.org)

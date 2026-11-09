@@ -10,6 +10,7 @@ import { CacheModule } from "./cache/cache.module";
 import { JwtAuthGuard } from "./common/guards/jwt-auth.guard";
 import { RolesGuard } from "./common/guards/roles.guard";
 import { UserThrottlerGuard } from "./common/guards/user-throttler.guard";
+import { HttpLoggerMiddleware } from "./common/logger/http-logger.middleware";
 import { RequestIdMiddleware } from "./common/middleware/request-id.middleware";
 import { AppConfigModule } from "./config/config.module";
 import { DatabaseModule } from "./database/database.module";
@@ -105,6 +106,6 @@ import { VenuesModule } from "./venues/venues.module";
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
-    consumer.apply(RequestIdMiddleware).forRoutes("*");
+    consumer.apply(RequestIdMiddleware, HttpLoggerMiddleware).forRoutes("*");
   }
 }

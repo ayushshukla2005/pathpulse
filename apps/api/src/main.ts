@@ -4,8 +4,10 @@ import { NestFactory } from "@nestjs/core";
 import helmet from "helmet";
 import { AppModule } from "./app.module";
 import { GlobalExceptionFilter } from "./common/filters/http-exception.filter";
+import { initSentry } from "./common/sentry/sentry.init";
 
 async function bootstrap(): Promise<void> {
+  initSentry();
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 

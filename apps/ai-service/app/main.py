@@ -18,6 +18,15 @@ from app.schemas import (
 from app.classifier import classifier
 from app.summarizer import summarize_reports
 from app.duplicates import compute_duplicate_scores
+from app.sentry_scrubber import scrub_sentry_event
+
+if settings.SENTRY_DSN:
+    import sentry_sdk
+    sentry_sdk.init(
+        dsn=settings.SENTRY_DSN,
+        traces_sample_rate=0.1,
+        before_send=scrub_sentry_event,
+    )
 
 logger = logging.getLogger("ai_service")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
