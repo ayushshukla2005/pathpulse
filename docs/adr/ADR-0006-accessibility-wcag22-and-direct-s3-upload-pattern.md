@@ -27,3 +27,4 @@ Simultaneously, users submit photographic evidence of physical obstacles. Stream
 
 ### Negative / Trade-offs
 - Evidence submission requires two client round-trips: first to obtain the presigned URL, and second to submit the report referencing the confirmed object key.
+

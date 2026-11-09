@@ -10,3 +10,4 @@ if (dsn && dsn.trim().length > 0) {
     beforeSend: scrubWebSentryEvent as (event: Sentry.ErrorEvent) => Sentry.ErrorEvent | null,
   });
 }
+

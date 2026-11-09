@@ -73,3 +73,4 @@ describe("Web Sentry Scrubber", () => {
     expect(sanitized.breadcrumbs?.[0]?.data?.path).toBe("/reports");
   });
 });
+

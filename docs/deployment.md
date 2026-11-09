@@ -180,3 +180,4 @@ Because automated hosting deployment requires external account access and live c
      - `RENDER_AI_DEPLOY_HOOK`: Deploy hook URL from Render AI service
      - `VERCEL_DEPLOY_HOOK`: Deploy hook URL from Vercel Web project
 4. **Trigger Initial Release**: Push a commit or trigger the `CI/CD Pipeline` manually in GitHub Actions to run the full verification matrix, execute migrations, and deploy containers.
+

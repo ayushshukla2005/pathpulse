@@ -26,3 +26,4 @@ Adopt **PostgreSQL 16 with the PostGIS 3.4 spatial extension** as the single aut
 
 ### Negative / Trade-offs
 - Deep graph pathfinding across hundreds of nodes is computed in application memory (Dijkstra / A*) rather than native Cypher graph query syntax.
+

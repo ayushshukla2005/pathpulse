@@ -33,3 +33,4 @@ Enforce audit log immutability directly at the database engine layer:
 
 ### Negative / Trade-offs
 - Audit table rows can never be purged through standard SQL. Retention management must use table partitioning or off-site read-only archival rather than `DELETE`.
+

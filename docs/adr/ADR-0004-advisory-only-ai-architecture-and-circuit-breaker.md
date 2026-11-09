@@ -24,3 +24,4 @@ However, accessibility navigation is safety-critical: incorrect autonomous class
 
 ### Negative / Trade-offs
 - Requires managing and deploying a separate Python container alongside the Node.js API.
+

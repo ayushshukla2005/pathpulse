@@ -24,3 +24,4 @@ Implement a dual-layer consistency strategy combining **monotonic building graph
 
 ### Negative / Trade-offs
 - Cache size in Redis momentarily increases after a version bump until TTL expiration or key eviction completes.
+

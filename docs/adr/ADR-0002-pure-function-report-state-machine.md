@@ -21,3 +21,4 @@ Implement the entire report lifecycle transition engine as a **pure function** (
 
 ### Negative / Trade-offs
 - Calling services must load the relevant report context (reporter ID, previous resolver ID) before calling the pure transition function.
+

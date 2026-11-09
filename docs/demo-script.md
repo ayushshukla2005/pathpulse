@@ -76,3 +76,4 @@ This script provides an interactive demonstration walkthrough of PathPulse, show
   3. Open the Route Planner in another window: the route immediately re-computes avoiding Elevator A and reroutes via the West Accessible Lift or displays the accessible 'no confirmed route' state.
 - **Narration**:
   > *"The moment an elevator outage is recorded, PathPulse atomically increments the building's graph version and broadcasts a real-time WebSocket event. Cached routes are immediately invalidated, ensuring no user is ever directed to an inoperable lift. PathPulse makes institutional spaces navigable, verifiable, and inclusive."*
+

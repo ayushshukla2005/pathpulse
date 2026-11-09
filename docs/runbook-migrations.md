@@ -111,3 +111,4 @@ pg_restore -h "${DATABASE_HOST}" -p "${DATABASE_PORT}" -U "${DATABASE_USER}" \
 3. Update the `_prisma_migrations` tracking table if manual schema adjustments were made.
 4. Run `pnpm --filter @pathpulse/api exec prisma migrate status` to confirm synchronization.
 5. Re-run `/api/v1/health/ready` check and restore ingress traffic.
+

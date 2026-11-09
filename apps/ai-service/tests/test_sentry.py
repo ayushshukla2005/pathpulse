@@ -77,3 +77,4 @@ def test_sentry_scrubber_redacts_sensitive_fields():
     crumb = sanitized["breadcrumbs"]["values"][0]
     assert crumb["data"]["token"] == REDACTED_VALUE
     assert crumb["data"]["status"] == "active"
+

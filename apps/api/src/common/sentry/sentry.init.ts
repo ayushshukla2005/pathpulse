@@ -14,3 +14,4 @@ export function initSentry(): void {
     beforeSend: scrubSentryEvent,
   });
 }
+

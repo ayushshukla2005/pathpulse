@@ -89,3 +89,4 @@ def scrub_sentry_event(event: Dict[str, Any], hint: Any = None) -> Dict[str, Any
                 crumb["data"] = redact_sensitive_data(crumb["data"])
 
     return event
+
