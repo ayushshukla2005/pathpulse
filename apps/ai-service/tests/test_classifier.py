@@ -32,3 +32,4 @@ def test_classifier_severity_assignment():
 
     _, sev_low, _ = clf.classify("Corridor handrail has a minor loose mounting screw that wiggles")
     assert sev_low == "LOW"
+

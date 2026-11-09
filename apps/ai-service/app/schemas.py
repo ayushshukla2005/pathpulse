@@ -47,3 +47,4 @@ class DuplicateScoresResponse(BaseModel):
 class HealthResponse(BaseModel):
     status: str
     version: str
+

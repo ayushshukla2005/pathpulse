@@ -61,3 +61,4 @@ def summarize_reports(reports: list[ReportDict], max_sentences: int = 3) -> tupl
 
     summary = " ".join(selected_sentences[:max_sentences])
     return summary, sorted(list(covered_ids))
+

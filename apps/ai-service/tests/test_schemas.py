@@ -62,3 +62,4 @@ def test_duplicate_scores_request_validation():
     with pytest.raises(ValidationError):
         reports = [{"id": f"id-{i}", "description": f"desc {i}"} for i in range(101)]
         DuplicateScoresRequest(candidateDescription="test", comparisonReports=reports)
+

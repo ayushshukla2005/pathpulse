@@ -757,4 +757,104 @@ test.describe("Axe Accessibility Scans", () => {
 
     expect(seriousOrCritical).toEqual([]);
   });
+
+  test("About page has zero serious or critical accessibility violations", async ({ page }) => {
+    await page.goto("/about");
+    await expect(page.locator("h1")).toContainText("About PathPulse");
+
+    const scanResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+
+    const seriousOrCritical = scanResults.violations.filter(
+      (v) => v.impact === "serious" || v.impact === "critical",
+    );
+
+    expect(seriousOrCritical).toEqual([]);
+  });
+
+  test("Accessibility statement page has zero serious or critical accessibility violations", async ({
+    page,
+  }) => {
+    await page.goto("/accessibility");
+    await expect(page.locator("h1")).toContainText("Accessibility Statement");
+
+    const scanResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+
+    const seriousOrCritical = scanResults.violations.filter(
+      (v) => v.impact === "serious" || v.impact === "critical",
+    );
+
+    expect(seriousOrCritical).toEqual([]);
+  });
+
+  test("Privacy notice page has zero serious or critical accessibility violations", async ({
+    page,
+  }) => {
+    await page.goto("/privacy");
+    await expect(page.locator("h1")).toContainText("Privacy Notice");
+
+    const scanResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+
+    const seriousOrCritical = scanResults.violations.filter(
+      (v) => v.impact === "serious" || v.impact === "critical",
+    );
+
+    expect(seriousOrCritical).toEqual([]);
+  });
+
+  test("Terms of use page has zero serious or critical accessibility violations", async ({
+    page,
+  }) => {
+    await page.goto("/terms");
+    await expect(page.locator("h1")).toContainText("Terms of Use");
+
+    const scanResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+
+    const seriousOrCritical = scanResults.violations.filter(
+      (v) => v.impact === "serious" || v.impact === "critical",
+    );
+
+    expect(seriousOrCritical).toEqual([]);
+  });
+
+  test("Contact & feedback page has zero serious or critical accessibility violations", async ({
+    page,
+  }) => {
+    await page.goto("/contact");
+    await expect(page.locator("h1")).toContainText("Contact & Feedback");
+
+    const scanResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+
+    const seriousOrCritical = scanResults.violations.filter(
+      (v) => v.impact === "serious" || v.impact === "critical",
+    );
+
+    expect(seriousOrCritical).toEqual([]);
+  });
+
+  test("Not found (404) page has zero serious or critical accessibility violations", async ({
+    page,
+  }) => {
+    await page.goto("/does-not-exist-page-for-axe");
+    await expect(page.locator("h1")).toContainText("Page Not Found");
+
+    const scanResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+
+    const seriousOrCritical = scanResults.violations.filter(
+      (v) => v.impact === "serious" || v.impact === "critical",
+    );
+
+    expect(seriousOrCritical).toEqual([]);
+  });
 });

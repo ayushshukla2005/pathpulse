@@ -29,3 +29,4 @@ def test_categories_match_shared_types_exactly():
     ai_categories = set(get_args(CategoryLiteral))
 
     assert ai_categories == shared_categories
+

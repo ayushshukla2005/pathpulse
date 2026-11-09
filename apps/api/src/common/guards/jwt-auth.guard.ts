@@ -26,12 +26,27 @@ export class JwtAuthGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    if (isPublic) {
-      return true;
-    }
-
     const request = context.switchToHttp().getRequest<Request & { user?: AuthenticatedUser }>();
     const authHeader = request.headers.authorization;
+
+    if (isPublic) {
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        const token = authHeader.substring(7).trim();
+        try {
+          const secret = this.configService.get<string>("jwtAccessSecret");
+          const payload = await this.jwtService.verifyAsync<AccessTokenPayload>(token, {
+            secret,
+          });
+          request.user = {
+            id: payload.sub,
+            role: payload.role,
+          };
+        } catch {
+          request.user = undefined;
+        }
+      }
+      return true;
+    }
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       throw new UnauthorizedException("Authentication required");

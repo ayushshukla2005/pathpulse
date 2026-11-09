@@ -25,3 +25,4 @@ def test_summarizer_empty_input():
     summary, covered_ids = summarize_reports([])
     assert summary == ""
     assert covered_ids == []
+

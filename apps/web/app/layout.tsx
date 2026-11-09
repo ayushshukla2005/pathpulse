@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth/auth-context";
 import { A11yProvider } from "@/lib/a11y/a11y-context";
@@ -50,12 +51,45 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <div className="flex-1 flex flex-col">{children}</div>
               <footer
                 role="contentinfo"
-                className="border-t-2 border-[var(--border)] bg-[var(--card)] px-4 py-6 text-center text-sm text-[var(--muted-foreground)]"
+                className="border-t-2 border-[var(--border)] bg-[var(--card)] px-4 py-8 text-center text-sm text-[var(--muted-foreground)]"
               >
-                <div className="mx-auto max-w-7xl">
-                  <p>
-                    PathPulse &copy; 2026. Accessible indoor and outdoor navigation for everyone.
-                  </p>
+                <div className="mx-auto max-w-7xl space-y-4">
+                  <nav
+                    aria-label="Footer navigation"
+                    className="flex flex-wrap items-center justify-center gap-6 text-sm font-medium"
+                  >
+                    <Link
+                      href="/about"
+                      className="text-[var(--foreground)] underline-offset-4 hover:underline"
+                    >
+                      About
+                    </Link>
+                    <Link
+                      href="/accessibility"
+                      className="text-[var(--foreground)] underline-offset-4 hover:underline"
+                    >
+                      Accessibility Statement
+                    </Link>
+                    <Link
+                      href="/privacy"
+                      className="text-[var(--foreground)] underline-offset-4 hover:underline"
+                    >
+                      Privacy Notice
+                    </Link>
+                    <Link
+                      href="/terms"
+                      className="text-[var(--foreground)] underline-offset-4 hover:underline"
+                    >
+                      Terms of Use
+                    </Link>
+                    <Link
+                      href="/contact"
+                      className="text-[var(--foreground)] underline-offset-4 hover:underline"
+                    >
+                      Contact & Feedback
+                    </Link>
+                  </nav>
+                  <p>PathPulse &copy; 2026. Accessible indoor and multi-floor navigation.</p>
                 </div>
               </footer>
             </A11yProvider>

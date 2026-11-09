@@ -46,3 +46,4 @@ def compute_duplicate_scores(
 
     scored_items.sort(key=lambda x: x["similarityScore"], reverse=True)
     return scored_items, effective_threshold
+

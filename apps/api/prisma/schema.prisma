@@ -106,6 +106,7 @@ model User {
   maintenance_tasks         MaintenanceTask[]
   notifications             Notification[]
   audit_logs                AuditLog[]
+  feedbacks                 Feedback[]
 
   @@index([organization_id])
   @@index([role])
@@ -463,4 +464,17 @@ model AiSuggestion {
   @@index([report_id])
   @@index([kind])
   @@map("ai_suggestions")
+}
+
+model Feedback {
+  id         String   @id @default(uuid())
+  user_id    String?
+  user       User?    @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  category   String   @default("GENERAL")
+  message    String
+  created_at DateTime @default(now())
+
+  @@index([user_id])
+  @@index([created_at])
+  @@map("feedback")
 }

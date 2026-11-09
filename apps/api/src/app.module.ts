@@ -20,6 +20,7 @@ import { NotificationsModule } from "./notifications/notifications.module";
 import { OrganizationsModule } from "./organizations/organizations.module";
 import { RealtimeModule } from "./realtime/realtime.module";
 import { AiModule } from "./ai/ai.module";
+import { FeedbackModule } from "./feedback/feedback.module";
 import { ReportsModule } from "./reports/reports.module";
 import { UsersModule } from "./users/users.module";
 import { VenuesModule } from "./venues/venues.module";
@@ -85,6 +86,7 @@ import { VenuesModule } from "./venues/venues.module";
     OrganizationsModule,
     RealtimeModule,
     AiModule,
+    FeedbackModule,
   ],
   providers: [
     {
