@@ -42,14 +42,21 @@ export interface RequestOptions extends RequestInit {
   skipAuth?: boolean;
 }
 
+export function resolveApiUrl(endpoint: string): string {
+  if (endpoint.startsWith("http://") || endpoint.startsWith("https://")) {
+    return endpoint;
+  }
+  const normalized = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  if (normalized === "/api/v1" || normalized.startsWith("/api/v1/")) {
+    return normalized;
+  }
+  return `/api/v1${normalized}`;
+}
+
 export async function apiClient<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   const { skipAuth = false, headers: customHeaders, ...rest } = options;
 
-  const url = endpoint.startsWith("http")
-    ? endpoint
-    : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1"}${
-        endpoint.startsWith("/") ? endpoint : `/${endpoint}`
-      }`;
+  const url = resolveApiUrl(endpoint);
 
   const headers = new Headers(customHeaders);
   if (!headers.has("Content-Type") && rest.body) {

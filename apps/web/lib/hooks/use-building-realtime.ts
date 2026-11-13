@@ -51,7 +51,6 @@ export function useBuildingRealtime(
     const token = getAccessToken();
     const apiUrl =
       process.env.NEXT_PUBLIC_SOCKET_URL ||
-      process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/v1\/?$/, "") ||
       "http://localhost:4000";
 
     const socket = io(`${apiUrl}/realtime`, {

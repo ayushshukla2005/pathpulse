@@ -3,8 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     const refreshToken = request.cookies.get("pp_refresh")?.value;
-    const apiUrl =
-      process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1";
+    const apiUrl = process.env.API_INTERNAL_URL
+      ? `${process.env.API_INTERNAL_URL}/api/v1`
+      : process.env.API_BASE_URL || "http://localhost:4000/api/v1";
 
     if (refreshToken) {
       try {

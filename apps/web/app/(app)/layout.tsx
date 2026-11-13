@@ -31,8 +31,9 @@ export default async function ProtectedAppLayout({ children }: { children: React
     return <div className="flex-1 flex flex-col">{children}</div>;
   }
 
-  const apiUrl =
-    process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1";
+  const apiUrl = process.env.API_INTERNAL_URL
+    ? `${process.env.API_INTERNAL_URL}/api/v1`
+    : process.env.API_BASE_URL || "http://localhost:4000/api/v1";
 
   try {
     const res = await fetch(`${apiUrl}/auth/refresh`, {

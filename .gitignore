@@ -19,4 +19,4 @@ venv
 ENV
 .DS_Store
 Thumbs.db
-
+.serve-logs/

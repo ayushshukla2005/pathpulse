@@ -4,8 +4,9 @@ import type { AuthResponse, RegisterRequest } from "@pathpulse/shared-types";
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as RegisterRequest;
-    const apiUrl =
-      process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1";
+    const apiUrl = process.env.API_INTERNAL_URL
+      ? `${process.env.API_INTERNAL_URL}/api/v1`
+      : process.env.API_BASE_URL || "http://localhost:4000/api/v1";
 
     const apiRes = await fetch(`${apiUrl}/auth/register`, {
       method: "POST",

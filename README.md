@@ -96,6 +96,42 @@ pnpm --filter @pathpulse/web dev          # http://localhost:3000
 cd apps/ai-service && .venv/bin/uvicorn app.main:app --port 8000 --reload
 ```
 
+### 3.7 Shareable Dev Link
+
+PathPulse can be previewed externally via a secure Cloudflare quick tunnel without deploying to production or exposing local ports:
+
+#### Installing `cloudflared`
+- **Windows**:
+  ```powershell
+  winget install --id Cloudflare.cloudflared
+  # Or via Chocolatey:
+  choco install cloudflared
+  ```
+- **macOS**:
+  ```bash
+  brew install cloudflared
+  ```
+
+#### Launching the Tunnel
+Run the launcher script:
+```bash
+./scripts/serve.sh
+```
+This script:
+1. Starts backing infrastructure with `docker compose up -d --wait`.
+2. Starts the NestJS API (`pnpm --filter @pathpulse/api start:dev`) and Next.js web application (`pnpm --filter @pathpulse/web dev`) in the background.
+3. Redirects background output logs to `.serve-logs/`.
+4. Spawns `cloudflared tunnel --url http://localhost:3000` and displays the generated `https://<subdomain>.trycloudflare.com` URL once ready.
+
+#### Architecture & Environmental Notes
+- **API Proxying via Next.js Rewrites**: The browser communicates strictly with the tunnel URL origin. All client API calls under `/api/v1/*` are proxied by Next.js server-side rewrites to `API_INTERNAL_URL` (defaulting to `http://localhost:4000`).
+- **Configuration**:
+  - `API_INTERNAL_URL`: Points to the internal NestJS API endpoint (`http://localhost:4000`).
+  - `WEB_ORIGIN`: Remains `http://localhost:3000` for local sessions; no CORS reconfiguration is needed for the tunnel because all calls route through the web host rewrite proxy.
+- **Link Lifetime**: Quick tunnels generate ephemeral `*.trycloudflare.com` domains that remain active as long as the launcher script and `cloudflared` process stay running. Once terminated, the URL expires.
+- **WebSocket Limitation**: Real-time facility update subscriptions (Step 13 Socket.IO gateway) listen directly on port 4000. Under the quick tunnel, HTTP navigation, barrier reporting, moderation, and floor plan exploration work out of the box through port 3000, but live WebSocket broadcasts require an additional tunnel for port 4000 if realtime facility change pushes are tested over the public link.
+- **Stopping Services**: Press `Ctrl+C` in the terminal running `./scripts/serve.sh`. The script trap cleanly terminates the API server, web dev server, and Cloudflare tunnel.
+
 ---
 
 ## 4. Testing & Quality Verification
