@@ -22,6 +22,7 @@ RUN pnpm --filter @pathpulse/config build
 RUN pnpm --filter @pathpulse/shared-types build
 RUN pnpm --filter @pathpulse/validation build
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV BUILD_STANDALONE=1
 RUN pnpm --filter @pathpulse/web build
 
 FROM node:22-alpine AS runner

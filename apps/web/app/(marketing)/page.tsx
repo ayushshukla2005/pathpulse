@@ -1,5 +1,16 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import {
+  ShieldCheck,
+  Compass,
+  Activity,
+  AlertTriangle,
+  ArrowRight,
+  MapPin,
+  CheckCircle2,
+  HelpCircle,
+  XCircle,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   title: "PathPulse — Accessibility-Aware Indoor Navigation",
@@ -10,85 +21,105 @@ export const metadata: Metadata = {
 export default function MarketingPage() {
   return (
     <main id="main-content" className="flex-1">
-      <section className="mx-auto max-w-5xl px-4 py-16 text-center sm:py-24">
-        <h1 className="text-4xl font-extrabold tracking-tight sm:text-6xl text-[var(--foreground)]">
-          Indoor Navigation With Real-World Verification
-        </h1>
-        <p className="mx-auto mt-6 max-w-3xl text-lg sm:text-xl text-[var(--muted-foreground)] leading-relaxed">
-          Navigating modern campuses and multi-floor buildings often breaks down when elevators
-          fail, ramps are obstructed, or accessibility claims go unverified. PathPulse maps indoor
-          and outdoor facilities with transparent verification levels, calculates step-free routes,
-          and tracks maintenance in real time.
-        </p>
+      <section className="relative overflow-hidden px-4 py-20 text-center sm:py-32">
+        <div
+          aria-hidden="true"
+          className="pulse-ambient pointer-events-none absolute -top-40 left-1/2 -z-10 h-96 w-96 -translate-x-1/2 rounded-full bg-gradient-to-tr from-cyan-500/20 via-sky-500/15 to-indigo-500/20 blur-3xl"
+        />
 
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <Link
-            href="/explore"
-            className="rounded-md bg-[var(--primary)] px-8 py-3 text-lg font-bold text-[var(--primary-foreground)] shadow-md hover:opacity-90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--ring)]"
-          >
-            Explore Venues
-          </Link>
-          <Link
-            href="/register"
-            className="rounded-md border-2 border-[var(--border)] bg-transparent px-8 py-3 text-lg font-bold text-[var(--foreground)] hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--ring)]"
-          >
-            Create Free Account
-          </Link>
+        <div className="mx-auto max-w-5xl">
+          <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-cyan-300 mb-6">
+            <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" aria-hidden="true" />
+            <span>Accessibility-Aware Campus Navigation</span>
+          </div>
+
+          <h1 className="text-4xl font-extrabold tracking-tight sm:text-6xl text-[var(--foreground)] font-display">
+            Indoor Navigation With{" "}
+            <span className="bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400 bg-clip-text text-transparent">
+              Real-World Verification
+            </span>
+          </h1>
+
+          <p className="mx-auto mt-6 max-w-3xl text-lg sm:text-xl text-[var(--muted-foreground)] leading-relaxed">
+            Navigating modern campuses and multi-floor buildings often breaks down when elevators
+            fail, ramps are obstructed, or accessibility claims go unverified. PathPulse maps indoor
+            and outdoor facilities with transparent verification levels, calculates step-free routes,
+            and tracks maintenance in real time.
+          </p>
+
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            <Link
+              href="/explore"
+              className="inline-flex items-center gap-2 rounded-xl bg-[var(--primary)] px-8 py-3.5 text-base sm:text-lg font-bold text-[var(--primary-foreground)] shadow-lg hover:opacity-90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--ring)] transition-transform active:scale-95"
+            >
+              <Compass className="h-5 w-5" aria-hidden="true" />
+              <span>Explore Venues</span>
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+            <Link
+              href="/register"
+              className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] px-8 py-3.5 text-base sm:text-lg font-bold text-[var(--foreground)] hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--ring)] transition-colors"
+            >
+              <span>Create Free Account</span>
+            </Link>
+          </div>
         </div>
       </section>
 
-      <section className="border-t-2 border-[var(--border)] bg-[var(--card)] px-4 py-16">
-        <div className="mx-auto max-w-5xl">
-          <h2 className="text-3xl font-bold text-center text-[var(--foreground)] mb-12">
-            How PathPulse Works
-          </h2>
+      <section className="border-t border-[var(--border)] bg-[var(--card)] px-4 py-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 rounded-full border border-sky-500/20 bg-sky-500/10 px-3.5 py-1 text-xs font-semibold text-sky-300 mb-3">
+              <span>Transparent Architecture</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[var(--foreground)] font-display tracking-tight">
+              How PathPulse Works
+            </h2>
+          </div>
 
           <div className="grid gap-8 md:grid-cols-3">
-            <div className="rounded-lg border-2 border-[var(--border)] p-6 bg-[var(--background)] flex flex-col justify-between">
+            <div className="rounded-2xl border border-[var(--border)] p-7 bg-[var(--background)] glass-panel flex flex-col justify-between shadow-xs hover:border-cyan-500/40 transition-colors">
               <div>
-                <h3 className="text-xl font-bold mb-3 text-[var(--foreground)]">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/15 text-cyan-400 mb-5">
+                  <ShieldCheck className="h-6 w-6" aria-hidden="true" />
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-[var(--foreground)] font-display">
                   1. Verified Facilities
                 </h3>
-                <p className="text-[var(--muted-foreground)] text-sm leading-relaxed mb-4">
+                <p className="text-[var(--muted-foreground)] text-sm leading-relaxed mb-6">
                   Every facility—including elevators, accessible entrances, restrooms, and
                   ramps—displays its operational state and verification level:
                 </p>
-                <ul className="space-y-2 text-xs font-semibold">
-                  <li className="flex items-center text-green-800 dark:text-green-300">
-                    <span
-                      className="w-2.5 h-2.5 rounded-full bg-green-600 mr-2"
-                      aria-hidden="true"
-                    ></span>
-                    Confirmed: Verified by facility managers
+                <ul className="space-y-3 text-xs font-semibold">
+                  <li className="flex items-center gap-2 rounded-lg border border-green-500/20 bg-green-500/10 px-3 py-2 text-green-300">
+                    <CheckCircle2 className="h-4 w-4 text-green-400 shrink-0" aria-hidden="true" />
+                    <span>Confirmed: Verified by facility managers</span>
                   </li>
-                  <li className="flex items-center text-amber-800 dark:text-amber-300">
-                    <span
-                      className="w-2.5 h-2.5 rounded-full bg-amber-600 mr-2"
-                      aria-hidden="true"
-                    ></span>
-                    Unverified: Community reported, awaiting inspection
+                  <li className="flex items-center gap-2 rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-amber-300">
+                    <HelpCircle className="h-4 w-4 text-amber-400 shrink-0" aria-hidden="true" />
+                    <span>Unverified: Community reported, awaiting inspection</span>
                   </li>
-                  <li className="flex items-center text-red-800 dark:text-red-300">
-                    <span
-                      className="w-2.5 h-2.5 rounded-full bg-red-600 mr-2"
-                      aria-hidden="true"
-                    ></span>
-                    Unavailable: Out of service or obstructed
+                  <li className="flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-red-300">
+                    <XCircle className="h-4 w-4 text-red-400 shrink-0" aria-hidden="true" />
+                    <span>Unavailable: Out of service or obstructed</span>
                   </li>
                 </ul>
               </div>
             </div>
 
-            <div className="rounded-lg border-2 border-[var(--border)] p-6 bg-[var(--background)] flex flex-col justify-between">
+            <div className="rounded-2xl border border-[var(--border)] p-7 bg-[var(--background)] glass-panel flex flex-col justify-between shadow-xs hover:border-sky-500/40 transition-colors">
               <div>
-                <h3 className="text-xl font-bold mb-3 text-[var(--foreground)]">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-sky-500/15 text-sky-400 mb-5">
+                  <Compass className="h-6 w-6" aria-hidden="true" />
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-[var(--foreground)] font-display">
                   2. Confidence-Labeled Routes
                 </h3>
                 <p className="text-[var(--muted-foreground)] text-sm leading-relaxed mb-4">
                   Multi-floor route planning calculates paths tailored to mobility profiles. When a
                   user requests a step-free route, stairs are strictly omitted.
                 </p>
-                <p className="text-[var(--muted-foreground)] text-xs leading-relaxed">
+                <p className="text-[var(--muted-foreground)] text-xs leading-relaxed rounded-lg border border-[var(--border)] bg-[var(--card)] p-3">
                   Every path segment displays an explicit text confidence label (Confirmed or
                   Unverified). The interface never labels a route as accessible unless the server
                   certifies every segment as confirmed and step-free.
@@ -96,16 +127,19 @@ export default function MarketingPage() {
               </div>
             </div>
 
-            <div className="rounded-lg border-2 border-[var(--border)] p-6 bg-[var(--background)] flex flex-col justify-between">
+            <div className="rounded-2xl border border-[var(--border)] p-7 bg-[var(--background)] glass-panel flex flex-col justify-between shadow-xs hover:border-indigo-500/40 transition-colors">
               <div>
-                <h3 className="text-xl font-bold mb-3 text-[var(--foreground)]">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-400 mb-5">
+                  <Activity className="h-6 w-6" aria-hidden="true" />
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-[var(--foreground)] font-display">
                   3. Moderated Reporting
                 </h3>
                 <p className="text-[var(--muted-foreground)] text-sm leading-relaxed mb-4">
                   When a physical barrier arises—such as a broken lift or blocked corridor—users
                   submit reports with location details and direct evidence uploads.
                 </p>
-                <p className="text-[var(--muted-foreground)] text-xs leading-relaxed">
+                <p className="text-[var(--muted-foreground)] text-xs leading-relaxed rounded-lg border border-[var(--border)] bg-[var(--card)] p-3">
                   Reports progress through an append-only audit trail and human moderation. When
                   facility status changes, graph versions increment and routes recalculate
                   automatically.
@@ -116,21 +150,26 @@ export default function MarketingPage() {
         </div>
       </section>
 
-      <section className="border-t-2 border-[var(--border)] bg-[var(--background)] px-4 py-16">
+      <section className="border-t border-[var(--border)] bg-[var(--background)] px-4 py-20">
         <div className="mx-auto max-w-4xl">
-          <h2 className="text-3xl font-bold text-center text-[var(--foreground)] mb-6">
-            What PathPulse Does Not Do
-          </h2>
-          <p className="text-center text-[var(--muted-foreground)] mb-10 text-base max-w-2xl mx-auto">
-            Transparency and safety require setting clear boundaries. PathPulse provides
-            navigational assistance and facility tracking, not guarantees.
-          </p>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-extrabold text-[var(--foreground)] font-display tracking-tight mb-4">
+              What PathPulse Does Not Do
+            </h2>
+            <p className="text-[var(--muted-foreground)] text-base max-w-2xl mx-auto leading-relaxed">
+              Transparency and safety require setting clear boundaries. PathPulse provides
+              navigational assistance and facility tracking, not guarantees.
+            </p>
+          </div>
 
           <div className="space-y-6">
-            <div className="rounded-md border-l-4 border-amber-600 bg-[var(--card)] p-4">
-              <h3 className="text-lg font-bold text-[var(--foreground)] mb-1">
-                Does Not Certify Compliance
-              </h3>
+            <div className="rounded-xl border-l-4 border-amber-500 bg-[var(--card)] p-5 border border-[var(--border)] shadow-xs">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="h-5 w-5 text-amber-400 shrink-0" aria-hidden="true" />
+                <h3 className="text-lg font-bold text-[var(--foreground)] font-display">
+                  Does Not Certify Compliance
+                </h3>
+              </div>
               <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
                 PathPulse does not certify that any venue or building complies with local building
                 codes, statutory accessibility standards, or the Rights of Persons with Disabilities
@@ -139,10 +178,13 @@ export default function MarketingPage() {
               </p>
             </div>
 
-            <div className="rounded-md border-l-4 border-amber-600 bg-[var(--card)] p-4">
-              <h3 className="text-lg font-bold text-[var(--foreground)] mb-1">
-                Does Not Guarantee Absolute Route Safety
-              </h3>
+            <div className="rounded-xl border-l-4 border-amber-500 bg-[var(--card)] p-5 border border-[var(--border)] shadow-xs">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="h-5 w-5 text-amber-400 shrink-0" aria-hidden="true" />
+                <h3 className="text-lg font-bold text-[var(--foreground)] font-display">
+                  Does Not Guarantee Absolute Route Safety
+                </h3>
+              </div>
               <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
                 Physical environments change rapidly. An elevator may malfunction between updates,
                 or a temporary delivery may block a ramp. PathPulse calculates routes using the
@@ -151,10 +193,13 @@ export default function MarketingPage() {
               </p>
             </div>
 
-            <div className="rounded-md border-l-4 border-amber-600 bg-[var(--card)] p-4">
-              <h3 className="text-lg font-bold text-[var(--foreground)] mb-1">
-                AI Never Decides or Certifies Anything
-              </h3>
+            <div className="rounded-xl border-l-4 border-amber-500 bg-[var(--card)] p-5 border border-[var(--border)] shadow-xs">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="h-5 w-5 text-amber-400 shrink-0" aria-hidden="true" />
+                <h3 className="text-lg font-bold text-[var(--foreground)] font-display">
+                  AI Never Decides or Certifies Anything
+                </h3>
+              </div>
               <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
                 PathPulse uses an internal offline classifier (benchmarked at 91.7% accuracy across
                 hand-labelled barrier reports) solely to suggest categories and detect duplicate
@@ -168,9 +213,10 @@ export default function MarketingPage() {
           <div className="mt-12 text-center">
             <Link
               href="/explore"
-              className="inline-block rounded-md bg-[var(--primary)] px-6 py-3 font-semibold text-[var(--primary-foreground)] shadow hover:opacity-90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--ring)]"
+              className="inline-flex items-center gap-2 rounded-xl bg-[var(--primary)] px-8 py-3.5 font-bold text-[var(--primary-foreground)] shadow-lg hover:opacity-90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--ring)] transition-transform active:scale-95"
             >
-              Start Exploring Campus Venues
+              <MapPin className="h-5 w-5" aria-hidden="true" />
+              <span>Start Exploring Campus Venues</span>
             </Link>
           </div>
         </div>

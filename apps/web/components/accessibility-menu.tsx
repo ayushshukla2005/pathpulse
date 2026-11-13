@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Accessibility } from "lucide-react";
 import { useA11y, TextScaleOption } from "@/lib/a11y/a11y-context";
 
 export function AccessibilityMenu() {
@@ -36,11 +37,9 @@ export function AccessibilityMenu() {
         aria-expanded={isOpen}
         aria-controls="a11y-menu-panel"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="inline-flex items-center justify-center rounded-md border-2 border-[var(--border)] bg-[var(--background)] px-3 py-2 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)]"
+        className="inline-flex items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] cursor-pointer shadow-xs"
       >
-        <span aria-hidden="true" className="mr-2">
-          ♿
-        </span>
+        <Accessibility className="mr-2 h-4 w-4 text-[var(--primary)]" aria-hidden="true" />
         <span>Accessibility</span>
       </button>
 
@@ -49,7 +48,7 @@ export function AccessibilityMenu() {
           id="a11y-menu-panel"
           role="region"
           aria-label="Accessibility settings"
-          className="absolute right-0 z-50 mt-2 w-72 rounded-lg border-2 border-[var(--border)] bg-[var(--card)] p-4 shadow-lg text-[var(--card-foreground)]"
+          className="absolute right-0 z-50 mt-2 w-72 rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 shadow-xl text-[var(--card-foreground)] glass-panel"
         >
           <div className="space-y-4">
             <div>
@@ -60,7 +59,7 @@ export function AccessibilityMenu() {
                 id="a11y-text-size-select"
                 value={currentScaleOption}
                 onChange={(e) => setTextScale(e.target.value as TextScaleOption)}
-                className="w-full h-10 rounded-md border-2 border-[var(--input)] bg-[var(--background)] px-2 text-sm text-[var(--foreground)]"
+                className="w-full h-10 rounded-md border border-[var(--input)] bg-[var(--background)] px-2 text-sm text-[var(--foreground)]"
               >
                 <option value="0.875">Small (87.5%)</option>
                 <option value="1">Default (100%)</option>
@@ -81,7 +80,7 @@ export function AccessibilityMenu() {
                 type="checkbox"
                 checked={preferences.highContrast}
                 onChange={(e) => setHighContrast(e.target.checked)}
-                className="h-5 w-5 rounded border-2 border-[var(--border)] cursor-pointer"
+                className="h-5 w-5 rounded border border-[var(--border)] cursor-pointer accent-[var(--primary)]"
               />
             </div>
 
@@ -97,18 +96,8 @@ export function AccessibilityMenu() {
                 type="checkbox"
                 checked={preferences.reducedMotion}
                 onChange={(e) => setReducedMotion(e.target.checked)}
-                className="h-5 w-5 rounded border-2 border-[var(--border)] cursor-pointer"
+                className="h-5 w-5 rounded border border-[var(--border)] cursor-pointer accent-[var(--primary)]"
               />
-            </div>
-
-            <div className="pt-2 border-t border-[var(--border)] flex justify-end">
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                className="rounded-md border border-[var(--border)] px-3 py-1 text-xs font-semibold hover:bg-[var(--muted)]"
-              >
-                Close
-              </button>
             </div>
           </div>
         </div>

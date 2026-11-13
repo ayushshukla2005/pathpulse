@@ -1,10 +1,23 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth/auth-context";
 import { A11yProvider } from "@/lib/a11y/a11y-context";
 import { Header } from "@/components/header";
 import { QueryProvider } from "@/lib/providers/query-provider";
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-display",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-sans",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -27,23 +40,36 @@ const prePaintA11yScript = `
         }
         if (prefs.highContrast) {
           document.documentElement.setAttribute('data-theme', 'high-contrast');
+          return;
         }
         if (prefs.reducedMotion) {
           document.documentElement.setAttribute('data-reduced-motion', 'true');
         }
+        if (prefs.theme === 'light') {
+          document.documentElement.setAttribute('data-theme', 'light');
+          document.documentElement.classList.remove('dark');
+          return;
+        }
       }
     }
   } catch(e) {}
+  document.documentElement.setAttribute('data-theme', 'dark');
+  document.documentElement.classList.add('dark');
 })();
 `;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${inter.variable} ${spaceGrotesk.variable} dark`}
+      data-theme="dark"
+      suppressHydrationWarning
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: prePaintA11yScript }} />
       </head>
-      <body className="flex min-h-screen flex-col bg-[var(--background)] text-[var(--foreground)] antialiased">
+      <body className="flex min-h-screen flex-col bg-[var(--background)] text-[var(--foreground)] antialiased font-sans">
         <QueryProvider>
           <AuthProvider>
             <A11yProvider>
@@ -51,7 +77,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <div className="flex-1 flex flex-col">{children}</div>
               <footer
                 role="contentinfo"
-                className="border-t-2 border-[var(--border)] bg-[var(--card)] px-4 py-8 text-center text-sm text-[var(--muted-foreground)]"
+                className="border-t border-[var(--border)] bg-[var(--card)] px-4 py-8 text-center text-sm text-[var(--muted-foreground)]"
               >
                 <div className="mx-auto max-w-7xl space-y-4">
                   <nav
