@@ -8,9 +8,12 @@ interface AuthContextValue {
   user: CurrentUserProfile | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  error: string | null;
   login: (credentials: LoginRequest) => Promise<void>;
   register: (data: RegisterRequest) => Promise<void>;
   logout: () => Promise<void>;
+  reloadSession: () => Promise<void>;
+  retrySession: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
 
@@ -19,26 +22,33 @@ const AuthContext = React.createContext<AuthContextValue | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = React.useState<CurrentUserProfile | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
   const fetchSession = React.useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
     try {
       const res = await fetch("/api/auth/session");
+      if (res.status === 503) {
+        setError("Authentication service is temporarily unavailable.");
+        return;
+      }
       if (res.ok) {
         const data = await res.json();
         if (data.authenticated && data.user) {
           setUser(data.user);
           setAccessToken(data.accessToken);
+          setError(null);
         } else {
           setUser(null);
           setAccessToken(null);
+          setError(null);
         }
       } else {
-        setUser(null);
-        setAccessToken(null);
+        setError("Failed to verify authentication status.");
       }
     } catch {
-      setUser(null);
-      setAccessToken(null);
+      setError("Network connection issue while verifying session.");
     } finally {
       setIsLoading(false);
     }
@@ -67,6 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     setAccessToken(data.accessToken);
     setUser(data.user);
+    setError(null);
   };
 
   const register = async (data: RegisterRequest) => {
@@ -88,6 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     setAccessToken(resData.accessToken);
     setUser(resData.user);
+    setError(null);
   };
 
   const logout = async () => {
@@ -98,12 +110,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setAccessToken(null);
       setUser(null);
+      setError(null);
       window.location.href = "/";
     }
-  };
-
-  const refreshUser = async () => {
-    await fetchSession();
   };
 
   return (
@@ -112,10 +121,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         isLoading,
         isAuthenticated: !!user,
+        error,
         login,
         register,
         logout,
-        refreshUser,
+        reloadSession: fetchSession,
+        retrySession: fetchSession,
+        refreshUser: fetchSession,
       }}
     >
       {children}

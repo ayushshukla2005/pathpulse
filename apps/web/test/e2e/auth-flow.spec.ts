@@ -82,7 +82,7 @@ test.describe("Authentication and Route Protection", () => {
     await context.addCookies([
       {
         name: "pp_refresh",
-        value: "e2e-test-token",
+        value: "mock-e2e-refresh-token",
         domain: "localhost",
         path: "/",
         httpOnly: true,
@@ -162,7 +162,7 @@ test.describe("Authentication and Route Protection", () => {
     await context.addCookies([
       {
         name: "pp_refresh",
-        value: "e2e-test-token",
+        value: "mock-e2e-refresh-token",
         domain: "localhost",
         path: "/",
         httpOnly: true,

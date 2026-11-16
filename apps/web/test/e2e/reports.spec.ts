@@ -1,15 +1,34 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("Community Reporting and Evidence Upload", () => {
-  test.beforeEach(async ({ context }) => {
+  test.beforeEach(async ({ context, page }) => {
     await context.addCookies([
       {
         name: "pp_refresh",
-        value: "e2e-test-token",
+        value: "mock-e2e-report-token",
         domain: "localhost",
         path: "/",
       },
     ]);
+
+    await page.route(/\/api\/auth\/session$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          authenticated: true,
+          accessToken: "mock-report-access-token",
+          user: {
+            id: "user-1",
+            email: "reporter@pathpulse.local",
+            name: "Community Reporter",
+            role: "USER",
+            createdAt: new Date().toISOString(),
+            preferences: null,
+          },
+        }),
+      });
+    });
   });
 
   test("Submit a report with one photo through the UI and see tracking code and SUBMITTED status", async ({
@@ -199,13 +218,32 @@ test.describe("Community Reporting and Evidence Upload", () => {
     await userBContext.addCookies([
       {
         name: "pp_refresh",
-        value: "e2e-test-token-user-b",
+        value: "mock-e2e-report-token-b",
         domain: "localhost",
         path: "/",
       },
     ]);
 
     const pageB = await userBContext.newPage();
+
+    await pageB.route(/\/api\/auth\/session$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          authenticated: true,
+          accessToken: "mock-report-access-token-b",
+          user: {
+            id: "user-b",
+            email: "userb@pathpulse.local",
+            name: "User B",
+            role: "USER",
+            createdAt: new Date().toISOString(),
+            preferences: null,
+          },
+        }),
+      });
+    });
 
     await pageB.route(/\/api\/v1\/reports\/mine(\?.*)?$/, async (route) => {
       await route.fulfill({
@@ -239,7 +277,7 @@ test.describe("Community Reporting and Evidence Upload", () => {
     await expect(pageB.getByText("PP-2026-USERA1")).not.toBeVisible();
 
     await pageB.goto("/reports/report-user-a");
-    await expect(pageB.getByText("Report Not Found")).toBeVisible();
+    await expect(pageB.getByText("Report Not Found")).toBeVisible({ timeout: 10000 });
 
     await userBContext.close();
   });

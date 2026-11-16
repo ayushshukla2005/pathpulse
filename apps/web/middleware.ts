@@ -2,16 +2,23 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("x-pathname", request.nextUrl.pathname);
+  const refreshToken = request.cookies.get("pp_refresh")?.value;
 
-  return NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  });
+  if (!refreshToken) {
+    const loginUrl = new URL("/login", request.url);
+    const target = request.nextUrl.pathname + request.nextUrl.search;
+    loginUrl.searchParams.set("next", target);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/profile/:path*",
+    "/reports/:path*",
+    "/moderation/:path*",
+    "/organization/:path*",
+  ],
 };

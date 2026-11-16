@@ -5,7 +5,7 @@ test.describe("Moderator Review Workflow (e2e)", () => {
     await context.addCookies([
       {
         name: "pp_refresh",
-        value: "e2e-test-token",
+        value: "mock-e2e-mod-token",
         domain: "localhost",
         path: "/",
       },

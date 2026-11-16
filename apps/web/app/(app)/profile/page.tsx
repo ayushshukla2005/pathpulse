@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import type { MobilityProfile } from "@pathpulse/shared-types";
 import { useAuth } from "@/lib/auth/auth-context";
 import { useA11y, TextScaleOption } from "@/lib/a11y/a11y-context";
@@ -12,7 +13,8 @@ import { Select } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function ProfilePage() {
-  const { user, refreshUser } = useAuth();
+  const router = useRouter();
+  const { user, isLoading, error, reloadSession } = useAuth();
   const { setTextScale, setHighContrast } = useA11y();
 
   const [mobilityProfile, setMobilityProfile] = React.useState<MobilityProfile>("DEFAULT");
@@ -24,6 +26,12 @@ export default function ProfilePage() {
   const [isSaving, setIsSaving] = React.useState(false);
   const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (!isLoading && !user && !error) {
+      router.replace("/login?next=/profile");
+    }
+  }, [isLoading, user, error, router]);
 
   React.useEffect(() => {
     if (user?.preferences) {
@@ -55,7 +63,7 @@ export default function ProfilePage() {
 
       await setHighContrast(highContrastVal);
       await setTextScale(String(textScaleVal) as TextScaleOption);
-      await refreshUser();
+      await reloadSession();
       setSuccessMessage("Your preferences have been saved successfully.");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to save preferences.";
@@ -64,6 +72,46 @@ export default function ProfilePage() {
       setIsSaving(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <main id="main-content" className="flex-1 p-4 py-8" aria-busy="true">
+        <div className="mx-auto max-w-3xl space-y-8 animate-pulse">
+          <div className="space-y-2">
+            <div className="h-8 w-72 bg-[var(--muted)] rounded-md" />
+            <div className="h-4 w-96 bg-[var(--muted)] rounded-md" />
+          </div>
+          <div className="h-40 bg-[var(--card)] border border-[var(--border)] rounded-xl" />
+          <div className="h-96 bg-[var(--card)] border border-[var(--border)] rounded-xl" />
+        </div>
+      </main>
+    );
+  }
+
+  if (error && !user) {
+    return (
+      <main id="main-content" className="flex-1 p-4 py-8">
+        <div className="mx-auto max-w-3xl space-y-6">
+          <header className="space-y-1">
+            <h1 className="text-3xl font-extrabold tracking-tight text-[var(--foreground)]">
+              Account & Mobility Preferences
+            </h1>
+          </header>
+          <Alert variant="destructive">
+            <AlertTitle>Connection Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+          <Button onClick={() => reloadSession()}>
+            Retry Connection
+          </Button>
+        </div>
+      </main>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <main id="main-content" className="flex-1 p-4 py-8">
@@ -86,17 +134,15 @@ export default function ProfilePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="font-semibold text-[var(--foreground)]">Name: </span>
-                <span className="text-[var(--muted-foreground)]">{user?.name || "Loading..."}</span>
+                <span className="text-[var(--muted-foreground)]">{user.name}</span>
               </div>
               <div>
                 <span className="font-semibold text-[var(--foreground)]">Email: </span>
-                <span className="text-[var(--muted-foreground)]">
-                  {user?.email || "Loading..."}
-                </span>
+                <span className="text-[var(--muted-foreground)]">{user.email}</span>
               </div>
               <div>
                 <span className="font-semibold text-[var(--foreground)]">Role: </span>
-                <span className="text-[var(--muted-foreground)]">{user?.role || "USER"}</span>
+                <span className="text-[var(--muted-foreground)]">{user.role}</span>
               </div>
             </div>
           </CardContent>

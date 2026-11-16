@@ -33,3 +33,5 @@ export function validateSafeNextPath(
 
   return trimmed;
 }
+
+export const validateNextPath = validateSafeNextPath;

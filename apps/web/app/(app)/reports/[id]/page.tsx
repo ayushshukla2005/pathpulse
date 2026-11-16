@@ -29,6 +29,7 @@ export default function ReportDetailPage() {
     queryKey: ["report-detail", id],
     queryFn: () => getReportById(id as string),
     enabled: !!id,
+    retry: false,
   });
 
   const handleCopyCode = async (code: string) => {

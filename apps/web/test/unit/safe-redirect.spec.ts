@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { validateSafeNextPath } from "@/lib/auth/safe-redirect";
+import { validateSafeNextPath, validateNextPath } from "@/lib/auth/safe-redirect";
 
 describe("validateSafeNextPath", () => {
   it("allows valid relative root-relative paths", () => {
     expect(validateSafeNextPath("/profile")).toBe("/profile");
+    expect(validateNextPath("/profile")).toBe("/profile");
     expect(validateSafeNextPath("/venues/123")).toBe("/venues/123");
     expect(validateSafeNextPath("/profile?tab=preferences&active=true")).toBe(
       "/profile?tab=preferences&active=true",

@@ -41,6 +41,58 @@ test.describe("Axe Accessibility Scans", () => {
     expect(seriousOrCritical).toEqual([]);
   });
 
+  test("Profile page has zero serious or critical accessibility violations", async ({
+    page,
+    context,
+  }) => {
+    await context.addCookies([
+      {
+        name: "pp_refresh",
+        value: "mock-e2e-axe-token",
+        domain: "localhost",
+        path: "/",
+      },
+    ]);
+
+    await page.route(/\/api\/auth\/session$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          authenticated: true,
+          accessToken: "mock-access-token",
+          user: {
+            id: "user-1",
+            email: "user@pathpulse.local",
+            name: "Accessible User",
+            role: "USER",
+            createdAt: new Date().toISOString(),
+            preferences: {
+              mobility_profile: "DEFAULT",
+              avoid_stairs: false,
+              prefer_voice_guidance: false,
+              high_contrast: false,
+              text_scale: 1.0,
+            },
+          },
+        }),
+      });
+    });
+
+    await page.goto("/profile");
+    await expect(page.locator("h1")).toContainText("Account & Mobility Preferences");
+
+    const scanResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+
+    const seriousOrCritical = scanResults.violations.filter(
+      (v) => v.impact === "serious" || v.impact === "critical",
+    );
+
+    expect(seriousOrCritical).toEqual([]);
+  });
+
   test("Explore page has zero serious or critical accessibility violations", async ({ page }) => {
     await page.route(/\/api\/v1\/venues(\?.*)?$/, async (route) => {
       await route.fulfill({
@@ -293,11 +345,30 @@ test.describe("Axe Accessibility Scans", () => {
     await context.addCookies([
       {
         name: "pp_refresh",
-        value: "e2e-test-token",
+        value: "mock-e2e-axe-token",
         domain: "localhost",
         path: "/",
       },
     ]);
+
+    await page.route(/\/api\/auth\/session$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          authenticated: true,
+          accessToken: "mock-access-token",
+          user: {
+            id: "user-1",
+            email: "user@pathpulse.local",
+            name: "Accessible User",
+            role: "USER",
+            createdAt: new Date().toISOString(),
+            preferences: null,
+          },
+        }),
+      });
+    });
 
     await page.route(/\/api\/v1\/venues(\?.*)?$/, async (route) => {
       await route.fulfill({
@@ -335,11 +406,30 @@ test.describe("Axe Accessibility Scans", () => {
     await context.addCookies([
       {
         name: "pp_refresh",
-        value: "e2e-test-token",
+        value: "mock-e2e-axe-token",
         domain: "localhost",
         path: "/",
       },
     ]);
+
+    await page.route(/\/api\/auth\/session$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          authenticated: true,
+          accessToken: "mock-access-token",
+          user: {
+            id: "user-1",
+            email: "user@pathpulse.local",
+            name: "Accessible User",
+            role: "USER",
+            createdAt: new Date().toISOString(),
+            preferences: null,
+          },
+        }),
+      });
+    });
 
     await page.route(/\/api\/v1\/reports\/mine(\?.*)?$/, async (route) => {
       await route.fulfill({
@@ -395,7 +485,7 @@ test.describe("Axe Accessibility Scans", () => {
     await context.addCookies([
       {
         name: "pp_refresh",
-        value: "e2e-test-token",
+        value: "mock-e2e-axe-token",
         domain: "localhost",
         path: "/",
       },
@@ -527,7 +617,7 @@ test.describe("Axe Accessibility Scans", () => {
     await context.addCookies([
       {
         name: "pp_refresh",
-        value: "e2e-test-token",
+        value: "mock-e2e-axe-token",
         domain: "localhost",
         path: "/",
       },
