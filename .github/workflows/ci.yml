@@ -20,14 +20,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.18.0
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: "pnpm"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+          cache-dependency-path: "pnpm-lock.yaml"
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -65,14 +68,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.18.0
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: "pnpm"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+          cache-dependency-path: "pnpm-lock.yaml"
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -109,9 +115,9 @@ jobs:
       postgres:
         image: postgis/postgis:16-3.4
         env:
-          POSTGRES_DB: pathpulse_test
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: pathpulse
+          POSTGRES_USER: pathpulse
+          POSTGRES_PASSWORD: pathpulse_dev_password
         ports:
           - 5432:5432
         options: >-
@@ -133,8 +139,8 @@ jobs:
       minio:
         image: minio/minio:latest
         env:
-          MINIO_ROOT_USER: minioadmin
-          MINIO_ROOT_PASSWORD: minioadminpassword
+          MINIO_ROOT_USER: pathpulse_admin
+          MINIO_ROOT_PASSWORD: pathpulse_secret_key
         ports:
           - 9000:9000
           - 9001:9001
@@ -149,14 +155,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Generate CI environment file
+        run: cp .env.example .env
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.18.0
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: "pnpm"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+          cache-dependency-path: "pnpm-lock.yaml"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -166,16 +178,16 @@ jobs:
 
       - name: Run Prisma Migrations
         env:
-          DATABASE_URL: postgresql://postgres:testpassword@localhost:5432/pathpulse_test
+          DATABASE_URL: postgresql://pathpulse:pathpulse_dev_password@localhost:5432/pathpulse
         run: pnpm --filter @pathpulse/api migrate:deploy
 
       - name: Run API E2E & Integration Tests
         env:
-          DATABASE_URL: postgresql://postgres:testpassword@localhost:5432/pathpulse_test
+          DATABASE_URL: postgresql://pathpulse:pathpulse_dev_password@localhost:5432/pathpulse
           REDIS_URL: redis://localhost:6379
           S3_ENDPOINT: http://localhost:9000
-          S3_ACCESS_KEY: minioadmin
-          S3_SECRET_KEY: minioadminpassword
+          S3_ACCESS_KEY: pathpulse_admin
+          S3_SECRET_KEY: pathpulse_secret_key
           S3_BUCKET: pathpulse-evidence
         run: pnpm --filter @pathpulse/api test:e2e
 
@@ -192,9 +204,37 @@ jobs:
   docker-build:
     name: Build Production Docker Images
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_DB: pathpulse
+          POSTGRES_USER: pathpulse
+          POSTGRES_PASSWORD: pathpulse_dev_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Generate CI environment file
+        run: cp .env.example .env
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -232,14 +272,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.18.0
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: "pnpm"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+          cache-dependency-path: "pnpm-lock.yaml"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
