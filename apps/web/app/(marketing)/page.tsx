@@ -43,8 +43,8 @@ export default function MarketingPage() {
           <p className="mx-auto mt-6 max-w-3xl text-lg sm:text-xl text-[var(--muted-foreground)] leading-relaxed">
             Navigating modern campuses and multi-floor buildings often breaks down when elevators
             fail, ramps are obstructed, or accessibility claims go unverified. PathPulse maps indoor
-            and outdoor facilities with transparent verification levels, calculates step-free routes,
-            and tracks maintenance in real time.
+            and outdoor facilities with transparent verification levels, calculates step-free
+            routes, and tracks maintenance in real time.
           </p>
 
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">

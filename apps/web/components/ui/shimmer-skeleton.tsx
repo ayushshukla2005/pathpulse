@@ -4,7 +4,10 @@ interface ShimmerSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
 }
 
-export function ShimmerSkeleton({ className = "h-4 w-full rounded", ...props }: ShimmerSkeletonProps) {
+export function ShimmerSkeleton({
+  className = "h-4 w-full rounded",
+  ...props
+}: ShimmerSkeletonProps) {
   return (
     <div
       role="status"
@@ -16,4 +19,3 @@ export function ShimmerSkeleton({ className = "h-4 w-full rounded", ...props }: 
     </div>
   );
 }
-

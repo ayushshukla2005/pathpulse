@@ -5,11 +5,7 @@ interface PulseLogoProps extends React.SVGProps<SVGSVGElement> {
   size?: number;
 }
 
-export function PulseLogo({
-  className = "w-6 h-6",
-  size = 24,
-  ...props
-}: PulseLogoProps) {
+export function PulseLogo({ className = "w-6 h-6", size = 24, ...props }: PulseLogoProps) {
   return (
     <svg
       width={size}
@@ -21,7 +17,14 @@ export function PulseLogo({
       {...props}
     >
       <defs>
-        <linearGradient id="pp-pulse-gradient" x1="2" y1="16" x2="30" y2="16" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="pp-pulse-gradient"
+          x1="2"
+          y1="16"
+          x2="30"
+          y2="16"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop offset="0%" stopColor="#22d3ee" />
           <stop offset="50%" stopColor="#38bdf8" />
           <stop offset="100%" stopColor="#818cf8" />
@@ -46,4 +49,3 @@ export function PulseLogo({
     </svg>
   );
 }
-

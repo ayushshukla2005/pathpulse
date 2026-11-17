@@ -45,4 +45,3 @@ export class HttpLoggerMiddleware implements NestMiddleware {
     next();
   }
 }
-

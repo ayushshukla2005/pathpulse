@@ -34,8 +34,13 @@ export function Header() {
               href="/"
               className="flex items-center gap-2.5 text-xl font-bold tracking-tight text-[var(--foreground)] hover:opacity-90 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] rounded-md px-1"
             >
-              <PulseLogo className="h-7 w-7 text-[var(--primary)] group-hover:scale-105 transition-transform" aria-hidden="true" />
-              <span className="font-display font-bold text-lg sm:text-xl tracking-tight">PathPulse</span>
+              <PulseLogo
+                className="h-7 w-7 text-[var(--primary)] group-hover:scale-105 transition-transform"
+                aria-hidden="true"
+              />
+              <span className="font-display font-bold text-lg sm:text-xl tracking-tight">
+                PathPulse
+              </span>
             </Link>
             <Link
               href="/explore"

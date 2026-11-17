@@ -6,8 +6,7 @@ import type { NextConfig } from "next";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const isStandalone =
-  process.env.BUILD_STANDALONE === "true" ||
-  process.env.BUILD_STANDALONE === "1";
+  process.env.BUILD_STANDALONE === "true" || process.env.BUILD_STANDALONE === "1";
 
 const apiInternalUrl = process.env.API_INTERNAL_URL || "http://localhost:4000";
 
@@ -27,4 +26,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-

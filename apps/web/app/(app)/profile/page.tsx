@@ -101,9 +101,7 @@ export default function ProfilePage() {
             <AlertTitle>Connection Error</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
           </Alert>
-          <Button onClick={() => reloadSession()}>
-            Retry Connection
-          </Button>
+          <Button onClick={() => reloadSession()}>Retry Connection</Button>
         </div>
       </main>
     );

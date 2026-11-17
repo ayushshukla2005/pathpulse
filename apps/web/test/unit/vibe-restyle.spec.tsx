@@ -42,4 +42,3 @@ describe("Vibe-Coded Visual Restyle Components", () => {
     document.documentElement.removeAttribute("data-reduced-motion");
   });
 });
-

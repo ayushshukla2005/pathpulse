@@ -10,9 +10,7 @@ describe("API Tunnel & Rewrite Configuration", () => {
       const rewritesArray = Array.isArray(rewritesResult)
         ? rewritesResult
         : rewritesResult.beforeFiles || [];
-      const apiRewrite = rewritesArray.find(
-        (r) => r.source === "/api/v1/:path*",
-      );
+      const apiRewrite = rewritesArray.find((r) => r.source === "/api/v1/:path*");
       expect(apiRewrite).toBeDefined();
       expect(apiRewrite?.destination).toContain("/api/v1/:path*");
     }
@@ -38,4 +36,3 @@ describe("API Tunnel & Rewrite Configuration", () => {
     expect(exactPrefix).toBe("/api/v1");
   });
 });
-
