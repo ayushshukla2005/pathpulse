@@ -14,6 +14,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 FROM deps AS builder
 WORKDIR /app
+COPY tsconfig.base.json ./
 COPY packages/config ./packages/config
 COPY packages/shared-types ./packages/shared-types
 COPY packages/validation ./packages/validation
