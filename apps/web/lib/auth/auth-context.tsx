@@ -4,6 +4,73 @@ import * as React from "react";
 import type { CurrentUserProfile, LoginRequest, RegisterRequest } from "@pathpulse/shared-types";
 import { setAccessToken } from "@/lib/api/client";
 
+export interface SessionResult {
+  authenticated: boolean;
+  user: CurrentUserProfile | null;
+  accessToken: string | null;
+  error: string | null;
+}
+
+let inFlightSession: Promise<SessionResult> | null = null;
+
+export async function loadSession(): Promise<SessionResult> {
+  if (inFlightSession) {
+    return inFlightSession;
+  }
+
+  inFlightSession = (async () => {
+    try {
+      const res = await fetch("/api/auth/session");
+      if (res.status === 503) {
+        return {
+          authenticated: false,
+          user: null,
+          accessToken: null,
+          error: "Authentication service is temporarily unavailable.",
+        };
+      }
+      if (res.ok) {
+        const data = (await res.json()) as {
+          authenticated: boolean;
+          user?: CurrentUserProfile | null;
+          accessToken?: string | null;
+        };
+        if (data.authenticated && data.user) {
+          return {
+            authenticated: true,
+            user: data.user,
+            accessToken: data.accessToken ?? null,
+            error: null,
+          };
+        }
+        return {
+          authenticated: false,
+          user: null,
+          accessToken: null,
+          error: null,
+        };
+      }
+      return {
+        authenticated: false,
+        user: null,
+        accessToken: null,
+        error: "Failed to verify authentication status.",
+      };
+    } catch {
+      return {
+        authenticated: false,
+        user: null,
+        accessToken: null,
+        error: "Network connection issue while verifying session.",
+      };
+    } finally {
+      inFlightSession = null;
+    }
+  })();
+
+  return inFlightSession;
+}
+
 interface AuthContextValue {
   user: CurrentUserProfile | null;
   isLoading: boolean;
@@ -27,31 +94,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchSession = React.useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    try {
-      const res = await fetch("/api/auth/session");
-      if (res.status === 503) {
-        setError("Authentication service is temporarily unavailable.");
-        return;
+    const result = await loadSession();
+    if (result.error) {
+      if (!result.authenticated) {
+        setError(result.error);
       }
-      if (res.ok) {
-        const data = await res.json();
-        if (data.authenticated && data.user) {
-          setUser(data.user);
-          setAccessToken(data.accessToken);
-          setError(null);
-        } else {
-          setUser(null);
-          setAccessToken(null);
-          setError(null);
-        }
-      } else {
-        setError("Failed to verify authentication status.");
-      }
-    } catch {
-      setError("Network connection issue while verifying session.");
-    } finally {
-      setIsLoading(false);
+    } else if (result.authenticated && result.user) {
+      setUser(result.user);
+      setAccessToken(result.accessToken);
+      setError(null);
+    } else {
+      setUser(null);
+      setAccessToken(null);
+      setError(null);
     }
+    setIsLoading(false);
   }, []);
 
   React.useEffect(() => {
