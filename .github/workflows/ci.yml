@@ -22,6 +22,8 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: 12.18.0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -74,6 +76,8 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: 12.18.0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -142,21 +146,6 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-      minio:
-        image: minio/minio:latest
-        env:
-          MINIO_ROOT_USER: pathpulse_admin
-          MINIO_ROOT_PASSWORD: pathpulse_secret_key
-        ports:
-          - 9000:9000
-          - 9001:9001
-        options: >-
-          --health-cmd "curl -f http://localhost:9000/minio/health/live"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 5
-        command: server /data --console-address ":9001"
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -174,6 +163,8 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: 12.18.0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -212,10 +203,12 @@ jobs:
           for i in {1..30}; do
             if curl -s -f http://localhost:4000/api/v1/health; then
               echo "API is ready"
-              break
+              exit 0
             fi
             sleep 1
           done
+          echo "API failed to start within 30 seconds"
+          exit 1
 
       - name: Build Web Application
         run: pnpm --filter @pathpulse/web build
@@ -306,8 +299,12 @@ jobs:
     steps:
       - name: Check deployment configuration
         id: check-secrets
+        env:
+          RENDER_API_DEPLOY_HOOK: ${{ secrets.RENDER_API_DEPLOY_HOOK }}
+          VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          if [ -z "${{ secrets.RENDER_API_DEPLOY_HOOK }}" ] && [ -z "${{ secrets.VERCEL_DEPLOY_HOOK }}" ] && [ -z "${{ secrets.DATABASE_URL }}" ]; then
+          if [ -z "$RENDER_API_DEPLOY_HOOK" ] && [ -z "$VERCEL_DEPLOY_HOOK" ] && [ -z "$DATABASE_URL" ]; then
             echo "has_secrets=false" >> $GITHUB_OUTPUT
             echo "Notice: Deployment secrets are not configured in this environment. Skipping deployment."
           else
@@ -321,6 +318,8 @@ jobs:
       - name: Setup pnpm
         if: steps.check-secrets.outputs.has_secrets == 'true'
         uses: pnpm/action-setup@v4
+        with:
+          version: 12.18.0
 
       - name: Setup Node.js
         if: steps.check-secrets.outputs.has_secrets == 'true'
@@ -335,27 +334,27 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run Production Database Migration Job
-        if: steps.check-secrets.outputs.has_secrets == 'true' && secrets.DATABASE_URL != ''
+        if: steps.check-secrets.outputs.has_secrets == 'true' && env.DATABASE_URL != ''
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: pnpm --filter @pathpulse/api migrate:deploy
 
       - name: Trigger Render Deploy Hook (API)
-        if: steps.check-secrets.outputs.has_secrets == 'true' && secrets.RENDER_API_DEPLOY_HOOK != ''
+        if: steps.check-secrets.outputs.has_secrets == 'true' && env.RENDER_API_DEPLOY_HOOK != ''
         env:
           RENDER_API_DEPLOY_HOOK: ${{ secrets.RENDER_API_DEPLOY_HOOK }}
         run: |
           curl -f -X POST "${RENDER_API_DEPLOY_HOOK}"
 
       - name: Trigger Render Deploy Hook (AI Service)
-        if: steps.check-secrets.outputs.has_secrets == 'true' && secrets.RENDER_AI_DEPLOY_HOOK != ''
+        if: steps.check-secrets.outputs.has_secrets == 'true' && env.RENDER_AI_DEPLOY_HOOK != ''
         env:
           RENDER_AI_DEPLOY_HOOK: ${{ secrets.RENDER_AI_DEPLOY_HOOK }}
         run: |
           curl -f -X POST "${RENDER_AI_DEPLOY_HOOK}"
 
       - name: Trigger Vercel Deploy Hook (Web)
-        if: steps.check-secrets.outputs.has_secrets == 'true' && secrets.VERCEL_DEPLOY_HOOK != ''
+        if: steps.check-secrets.outputs.has_secrets == 'true' && env.VERCEL_DEPLOY_HOOK != ''
         env:
           VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
         run: |
