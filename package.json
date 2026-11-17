@@ -3,6 +3,8 @@
   "private": true,
   "packageManager": "pnpm@12.18.0",
   "scripts": {
+    "build": "pnpm build:packages",
+    "build:packages": "pnpm --filter @pathpulse/config build && pnpm --filter @pathpulse/shared-types build && pnpm --filter @pathpulse/validation build",
     "lint": "pnpm --recursive run lint",
     "typecheck": "pnpm --recursive run typecheck",
     "format": "pnpm --recursive run format",
