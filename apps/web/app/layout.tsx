@@ -86,31 +86,31 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   >
                     <Link
                       href="/about"
-                      className="text-[var(--foreground)] underline-offset-4 hover:underline"
+                      className="inline-flex items-center min-h-[24px] py-1 text-[var(--foreground)] underline-offset-4 hover:underline"
                     >
                       About
                     </Link>
                     <Link
                       href="/accessibility"
-                      className="text-[var(--foreground)] underline-offset-4 hover:underline"
+                      className="inline-flex items-center min-h-[24px] py-1 text-[var(--foreground)] underline-offset-4 hover:underline"
                     >
                       Accessibility Statement
                     </Link>
                     <Link
                       href="/privacy"
-                      className="text-[var(--foreground)] underline-offset-4 hover:underline"
+                      className="inline-flex items-center min-h-[24px] py-1 text-[var(--foreground)] underline-offset-4 hover:underline"
                     >
                       Privacy Notice
                     </Link>
                     <Link
                       href="/terms"
-                      className="text-[var(--foreground)] underline-offset-4 hover:underline"
+                      className="inline-flex items-center min-h-[24px] py-1 text-[var(--foreground)] underline-offset-4 hover:underline"
                     >
                       Terms of Use
                     </Link>
                     <Link
                       href="/contact"
-                      className="text-[var(--foreground)] underline-offset-4 hover:underline"
+                      className="inline-flex items-center min-h-[24px] py-1 text-[var(--foreground)] underline-offset-4 hover:underline"
                     >
                       Contact & Feedback
                     </Link>
