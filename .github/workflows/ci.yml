@@ -169,6 +169,8 @@ jobs:
           COOKIE_SEC=$(openssl rand -hex 32)
           AI_TOKEN=ci-token-$(openssl rand -hex 16)
           printf "DATABASE_URL=postgresql://pathpulse:pathpulse_dev_password@localhost:5432/pathpulse\nREDIS_URL=redis://localhost:6379\nWEB_ORIGIN=http://localhost:3000\nAPI_PORT=4000\nAPI_INTERNAL_URL=http://localhost:4000\nJWT_ACCESS_SECRET=%s\nJWT_REFRESH_SECRET=%s\nSEED_ADMIN_PASSWORD=%s\nCOOKIE_SECRET=%s\nS3_ENDPOINT=http://localhost:9000\nS3_REGION=us-east-1\nS3_BUCKET=pathpulse-evidence\nS3_ACCESS_KEY_ID=pathpulse_admin\nS3_SECRET_ACCESS_KEY=pathpulse_secret_key\nS3_FORCE_PATH_STYLE=true\nAI_SERVICE_URL=http://localhost:8000\nAI_SERVICE_TOKEN=%s\n" "$JWT_ACCESS" "$JWT_REFRESH" "$SEED_PASS" "$COOKIE_SEC" "$AI_TOKEN" > .env
+          cp .env apps/api/.env
+          cat .env >> "$GITHUB_ENV"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
