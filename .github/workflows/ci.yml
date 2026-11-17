@@ -301,10 +301,11 @@ jobs:
         id: check-secrets
         env:
           RENDER_API_DEPLOY_HOOK: ${{ secrets.RENDER_API_DEPLOY_HOOK }}
+          RENDER_AI_DEPLOY_HOOK: ${{ secrets.RENDER_AI_DEPLOY_HOOK }}
           VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          if [ -z "$RENDER_API_DEPLOY_HOOK" ] && [ -z "$VERCEL_DEPLOY_HOOK" ] && [ -z "$DATABASE_URL" ]; then
+          if [ -z "$RENDER_API_DEPLOY_HOOK" ] && [ -z "$RENDER_AI_DEPLOY_HOOK" ] && [ -z "$VERCEL_DEPLOY_HOOK" ] && [ -z "$DATABASE_URL" ]; then
             echo "has_secrets=false" >> $GITHUB_OUTPUT
             echo "Notice: Deployment secrets are not configured in this environment. Skipping deployment."
           else
@@ -334,28 +335,37 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run Production Database Migration Job
-        if: steps.check-secrets.outputs.has_secrets == 'true' && env.DATABASE_URL != ''
+        if: steps.check-secrets.outputs.has_secrets == 'true'
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: pnpm --filter @pathpulse/api migrate:deploy
+        run: |
+          if [ -n "$DATABASE_URL" ]; then
+            pnpm --filter @pathpulse/api migrate:deploy
+          fi
 
       - name: Trigger Render Deploy Hook (API)
-        if: steps.check-secrets.outputs.has_secrets == 'true' && env.RENDER_API_DEPLOY_HOOK != ''
+        if: steps.check-secrets.outputs.has_secrets == 'true'
         env:
           RENDER_API_DEPLOY_HOOK: ${{ secrets.RENDER_API_DEPLOY_HOOK }}
         run: |
-          curl -f -X POST "${RENDER_API_DEPLOY_HOOK}"
+          if [ -n "$RENDER_API_DEPLOY_HOOK" ]; then
+            curl -f -X POST "${RENDER_API_DEPLOY_HOOK}"
+          fi
 
       - name: Trigger Render Deploy Hook (AI Service)
-        if: steps.check-secrets.outputs.has_secrets == 'true' && env.RENDER_AI_DEPLOY_HOOK != ''
+        if: steps.check-secrets.outputs.has_secrets == 'true'
         env:
           RENDER_AI_DEPLOY_HOOK: ${{ secrets.RENDER_AI_DEPLOY_HOOK }}
         run: |
-          curl -f -X POST "${RENDER_AI_DEPLOY_HOOK}"
+          if [ -n "$RENDER_AI_DEPLOY_HOOK" ]; then
+            curl -f -X POST "${RENDER_AI_DEPLOY_HOOK}"
+          fi
 
       - name: Trigger Vercel Deploy Hook (Web)
-        if: steps.check-secrets.outputs.has_secrets == 'true' && env.VERCEL_DEPLOY_HOOK != ''
+        if: steps.check-secrets.outputs.has_secrets == 'true'
         env:
           VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
         run: |
-          curl -f -X POST "${VERCEL_DEPLOY_HOOK}"
+          if [ -n "$VERCEL_DEPLOY_HOOK" ]; then
+            curl -f -X POST "${VERCEL_DEPLOY_HOOK}"
+          fi
