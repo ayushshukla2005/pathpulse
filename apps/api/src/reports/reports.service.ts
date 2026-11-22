@@ -259,7 +259,7 @@ export class ReportsService {
   async getReportById(id: string, user: AuthenticatedUser): Promise<SanitizedReport> {
     let whereClause: Prisma.IssueReportWhereInput;
 
-    if (user.role === UserRole.SUPER_ADMIN) {
+    if (user.role === UserRole.SUPER_ADMIN || user.role === UserRole.MODERATOR) {
       whereClause = { id };
     } else if (user.role === UserRole.ORGANIZATION_ADMIN) {
       whereClause = {
@@ -314,6 +314,7 @@ export class ReportsService {
 
     const isOrgAdminOrSuper =
       user.role === UserRole.SUPER_ADMIN ||
+      user.role === UserRole.MODERATOR ||
       (user.role === UserRole.ORGANIZATION_ADMIN && report.user_id !== user.id);
 
     const sanitizedEvidence: SanitizedEvidence[] = await Promise.all(
