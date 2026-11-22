@@ -245,6 +245,14 @@ test.describe("Community Reporting and Evidence Upload", () => {
       });
     });
 
+    await pageB.route(/\/api\/v1\/notifications(\?.*)?$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ items: [], unreadCount: 0 }),
+      });
+    });
+
     await pageB.route(/\/api\/v1\/reports\/mine(\?.*)?$/, async (route) => {
       await route.fulfill({
         status: 200,
