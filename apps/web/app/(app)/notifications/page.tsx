@@ -39,6 +39,20 @@ export default function NotificationsPage() {
   }
 
   if (isError) {
+    const rawMessage = error instanceof Error ? error.message : "";
+    const isProxyOrNetworkError =
+      !rawMessage ||
+      rawMessage.startsWith("<") ||
+      rawMessage.toLowerCase().includes("econnrefused") ||
+      rawMessage.toLowerCase().includes("fetch failed") ||
+      rawMessage.toLowerCase().includes("failed to fetch") ||
+      rawMessage.toLowerCase().includes("networkerror") ||
+      rawMessage.toLowerCase().includes("proxy");
+
+    const displayMessage = isProxyOrNetworkError
+      ? "Unable to reach the notifications service. Please ensure the service is running and try again."
+      : rawMessage;
+
     return (
       <main
         id="main-content"
@@ -51,9 +65,15 @@ export default function NotificationsPage() {
             className="p-5 border-2 border-red-500 rounded-lg bg-red-50 text-red-900 dark:bg-red-950 dark:text-red-200"
           >
             <h1 className="text-xl font-bold">Error Loading Notifications</h1>
-            <p className="mt-1 text-sm">
-              {error instanceof Error ? error.message : "Failed to load notifications."}
-            </p>
+            <p className="mt-1 text-sm">{displayMessage}</p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-3"
+              onClick={() => queryClient.invalidateQueries({ queryKey: ["notifications"] })}
+            >
+              Retry
+            </Button>
           </div>
         </div>
       </main>
