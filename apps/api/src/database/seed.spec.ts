@@ -100,7 +100,7 @@ describe("Database Seed Script", () => {
     await expect(runSeed(mockPrisma as unknown as PrismaClient)).resolves.not.toThrow();
 
     expect(mockPrisma.organization.upsert).toHaveBeenCalledTimes(2);
-    expect(mockPrisma.user.upsert).toHaveBeenCalledTimes(2);
+    expect(mockPrisma.user.upsert).toHaveBeenCalledTimes(4);
     expect(mockPrisma.building.create).not.toHaveBeenCalled();
     expect(mockPrisma.facility.create).not.toHaveBeenCalled();
   });

@@ -72,6 +72,29 @@ export async function runSeed(customPrisma?: PrismaClient): Promise<void> {
     },
   });
 
+  const moderatorUser = await client.user.upsert({
+    where: { email: "demo-moderator@pathpulse.local" },
+    update: {
+      name: "Demo Moderator (Demo Data)",
+      password_hash: passwordHash,
+      role: UserRole.MODERATOR,
+    },
+    create: {
+      email: "demo-moderator@pathpulse.local",
+      name: "Demo Moderator (Demo Data)",
+      password_hash: passwordHash,
+      role: UserRole.MODERATOR,
+    },
+  });
+
+  await client.userPreference.upsert({
+    where: { user_id: moderatorUser.id },
+    update: {},
+    create: {
+      user_id: moderatorUser.id,
+    },
+  });
+
   let venue = await client.venue.findFirst({
     where: {
       organization_id: organization.id,
