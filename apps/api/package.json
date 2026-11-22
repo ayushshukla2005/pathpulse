@@ -13,7 +13,8 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "db:seed": "ts-node prisma/seed.ts"
+    "db:seed": "ts-node prisma/seed.ts",
+    "osm:import": "ts-node src/imports/osm/cli.ts"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
