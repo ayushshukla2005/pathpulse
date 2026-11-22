@@ -9,3 +9,5 @@ coverage
 .turbo
 pnpm-lock.yaml
 apps/ai-service
+**/public/**
+**/test-results/**
