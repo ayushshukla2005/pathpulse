@@ -1,9 +1,20 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Map, Marker, NavigationControl, LngLatBounds, type StyleSpecification } from "maplibre-gl";
+import {
+  Map,
+  Marker,
+  NavigationControl,
+  LngLatBounds,
+  setWorkerUrl,
+  type StyleSpecification,
+} from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { VenueListItem } from "@pathpulse/shared-types";
+
+if (typeof window !== "undefined") {
+  setWorkerUrl("/maplibre-gl-worker.mjs");
+}
 
 interface VenueMapProps {
   venues: VenueListItem[];
