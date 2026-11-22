@@ -111,6 +111,7 @@ export class FacilitiesService {
     dto: UpdateFacilityStatusDto,
     actorId?: string,
     actorRole?: UserRole,
+    operatorKeyPrefix?: string,
   ): Promise<UpdatedFacilityResponse> {
     const { updatedFacility, buildingId, newGraphVersion } = await this.prisma.$transaction(
       async (tx) => {
@@ -244,10 +245,11 @@ export class FacilitiesService {
           }
         }
 
+        const isOperator = Boolean(operatorKeyPrefix);
         await tx.auditLog.create({
           data: {
-            actor_user_id: actorId,
-            user_id: actorId,
+            actor_user_id: isOperator ? `operator:${operatorKeyPrefix}` : actorId,
+            user_id: isOperator ? null : actorId,
             action: "FACILITY_STATUS_CHANGED",
             entity_type: "Facility",
             entity_id: facilityId,
@@ -261,6 +263,7 @@ export class FacilitiesService {
               newVerificationLevel: dto.verificationLevel ?? existing.verification_level,
               previousGraphVersion,
               newGraphVersion: nextGraphVersion,
+              ...(isOperator ? { operatorKeyPrefix } : {}),
             } as Prisma.JsonObject,
           },
         });
