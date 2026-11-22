@@ -115,7 +115,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       Contact & Feedback
                     </Link>
                   </nav>
-                  <p>PathPulse &copy; 2026. Accessible indoor and multi-floor navigation.</p>
+                  <p>
+                    PathPulse &copy; 2026. Accessible indoor and multi-floor navigation. Map data
+                    &copy;{" "}
+                    <a
+                      href="https://www.openstreetmap.org/copyright"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline hover:text-[var(--foreground)]"
+                    >
+                      OpenStreetMap contributors
+                    </a>
+                    .
+                  </p>
                 </div>
               </footer>
             </A11yProvider>

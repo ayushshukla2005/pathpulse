@@ -4,6 +4,7 @@ import { use, useEffect } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { getVenueById } from "@/lib/api/venues";
+import { formatSourceText } from "@/lib/utils";
 import { FacilityGroup } from "@/components/venues/facility-group";
 import { Button } from "@/components/ui/button";
 import {
@@ -104,9 +105,12 @@ export default function VenueDetailPage({ params }: VenuePageProps) {
       </div>
 
       <header className="mb-8 rounded-lg border-2 border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-3">
           <span className="inline-flex rounded border border-[var(--border)] bg-[var(--muted)] px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
             {venue.category}
+          </span>
+          <span className="text-xs font-medium text-[var(--muted-foreground)]">
+            {formatSourceText(venue.source, venue.updated_at)}
           </span>
         </div>
 

@@ -74,6 +74,7 @@ export default function VenueMap({
       zoom,
       maxZoom: 18,
       minZoom: 2,
+      attributionControl: false,
     });
 
     map.addControl(new NavigationControl({ showCompass: true, showZoom: true }), "top-right");
@@ -162,6 +163,17 @@ export default function VenueMap({
         aria-label="Interactive venue map"
       />
       <p className="sr-only">Interactive MapLibre map showing {venues.length} venues.</p>
+      <div className="absolute bottom-1 right-1 z-10 flex min-h-[24px] items-center rounded border border-[var(--border)] bg-[var(--card)]/90 px-2 py-0.5 text-xs text-[var(--muted-foreground)] shadow-xs">
+        &copy;{" "}
+        <a
+          href="https://www.openstreetmap.org/copyright"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ml-1 inline-flex min-h-[24px] items-center text-[var(--foreground)] underline hover:text-[var(--primary)]"
+        >
+          OpenStreetMap contributors
+        </a>
+      </div>
     </div>
   );
 }

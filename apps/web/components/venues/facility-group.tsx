@@ -1,4 +1,5 @@
 import type { FacilityItem } from "@pathpulse/shared-types";
+import { formatSourceText } from "@/lib/utils";
 import { VerificationBadge } from "./verification-badge";
 
 const TYPE_LABELS: Record<string, string> = {
@@ -128,6 +129,14 @@ export function FacilityGroup({ facilities }: FacilityGroupProps) {
                             </strong>
                           </span>
                           <span aria-label={dateText}>{dateText}</span>
+                          <span className="text-xs font-medium text-[var(--muted-foreground)]">
+                            {formatSourceText(facility.source, facility.updated_at)}
+                          </span>
+                          {facility.notes && (
+                            <span className="rounded bg-[var(--muted)] px-1.5 py-0.5 text-xs text-[var(--muted-foreground)]">
+                              {facility.notes}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>

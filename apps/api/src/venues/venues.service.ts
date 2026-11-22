@@ -82,6 +82,7 @@ export class VenuesService {
         if (query.category) {
           venues = await this.prisma.$queryRaw<VenueWithDistance[]>`
             SELECT id, organization_id, name, category, address, latitude, longitude,
+                   source, source_ref AS "sourceRef", source_license AS "sourceLicense",
                    created_at, updated_at,
                    ROUND(ST_Distance(location, ST_SetSRID(ST_MakePoint(${query.lng}, ${query.lat}), 4326)::geography))::int AS "distanceMeters"
             FROM "venues"
@@ -93,6 +94,7 @@ export class VenuesService {
         } else {
           venues = await this.prisma.$queryRaw<VenueWithDistance[]>`
             SELECT id, organization_id, name, category, address, latitude, longitude,
+                   source, source_ref AS "sourceRef", source_license AS "sourceLicense",
                    created_at, updated_at,
                    ROUND(ST_Distance(location, ST_SetSRID(ST_MakePoint(${query.lng}, ${query.lat}), 4326)::geography))::int AS "distanceMeters"
             FROM "venues"
