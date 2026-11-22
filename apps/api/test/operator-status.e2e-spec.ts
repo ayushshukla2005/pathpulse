@@ -13,12 +13,12 @@ import {
   PrismaClient,
   VerificationLevel,
 } from "@prisma/client";
-import { ApiKeyService } from "./api-key.service";
-import { ApiKeyAuthGuard, RequestWithApiKey } from "./guards/api-key-auth.guard";
-import { OperatorFacilitiesController } from "./operator-facilities.controller";
-import { PrismaService } from "../database/prisma.service";
-import { FacilitiesService } from "../facilities/facilities.service";
-import { RedisService } from "../cache/redis.service";
+import { ApiKeyService } from "../src/operator/api-key.service";
+import { ApiKeyAuthGuard, RequestWithApiKey } from "../src/operator/guards/api-key-auth.guard";
+import { OperatorFacilitiesController } from "../src/operator/operator-facilities.controller";
+import { PrismaService } from "../src/database/prisma.service";
+import { FacilitiesService } from "../src/facilities/facilities.service";
+import { RedisService } from "../src/cache/redis.service";
 
 describe("Operator Status Feed Pipeline", () => {
   const prisma = new PrismaClient();

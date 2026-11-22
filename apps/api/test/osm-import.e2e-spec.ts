@@ -8,13 +8,13 @@ import {
   OSM_ATTRIBUTION,
   OsmImporter,
   OverpassResponse,
-} from "./index";
+} from "../src/imports/osm";
 
 describe("OSM Import Pipeline", () => {
   let sampleFixture: OverpassResponse;
 
   beforeAll(() => {
-    const fixturePath = path.resolve(__dirname, "../../../test/fixtures/osm-sample.json");
+    const fixturePath = path.resolve(__dirname, "fixtures/osm-sample.json");
     const raw = fs.readFileSync(fixturePath, "utf-8");
     sampleFixture = JSON.parse(raw) as OverpassResponse;
   });
