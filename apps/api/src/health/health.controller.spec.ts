@@ -97,6 +97,7 @@ describe("HealthController", () => {
           { migration_name: "20261108000009_add_dashboard_and_facility_indexes" },
           { migration_name: "20261108000010_add_ai_suggestions" },
           { migration_name: "20261109000011_add_feedback" },
+          { migration_name: "20261122000012_add_source_tracking_and_api_keys" },
         ]);
 
       await controller.ready(resMock as unknown as Response);

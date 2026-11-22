@@ -102,6 +102,8 @@ export type VerificationLevel = "CONFIRMED" | "UNVERIFIED" | "UNAVAILABLE";
 
 export type OperationalStatus = "OPERATIONAL" | "DEGRADED" | "OUT_OF_SERVICE" | "UNKNOWN";
 
+export type DataSource = "SEED_DEMO" | "OSM" | "OPERATOR" | "COMMUNITY" | "MANUAL";
+
 export type FacilityType =
   | "ELEVATOR"
   | "LIFT"
@@ -123,9 +125,13 @@ export interface FacilityItem {
   node_id: string | null;
   facility_type: FacilityType;
   name: string;
+  notes?: string | null;
   operational_status: OperationalStatus;
   verification_level: VerificationLevel;
   last_verified_at: Date | string | null;
+  source?: DataSource;
+  sourceRef?: string | null;
+  sourceLicense?: string | null;
   created_at: Date | string;
   updated_at: Date | string;
 }
@@ -136,6 +142,9 @@ export interface BuildingSummary {
   name: string;
   building_code: string | null;
   graph_version: number;
+  source?: DataSource;
+  sourceRef?: string | null;
+  sourceLicense?: string | null;
   created_at: Date | string;
   updated_at: Date | string;
 }
@@ -160,6 +169,9 @@ export interface VenueListItem {
   longitude: number;
   distanceMeters?: number;
   facilities?: FacilityItem[];
+  source?: DataSource;
+  sourceRef?: string | null;
+  sourceLicense?: string | null;
   created_at: Date | string;
   updated_at: Date | string;
 }
@@ -528,4 +540,23 @@ export interface FacilityStatusBroadcast {
 export interface UpdateFacilityStatusRequest {
   status: OperationalStatus;
   verificationLevel?: VerificationLevel;
+}
+
+export interface ApiKeyItem {
+  id: string;
+  organizationId: string;
+  keyPrefix: string;
+  scopes: string[];
+  lastUsedAt: Date | string | null;
+  revokedAt: Date | string | null;
+  createdAt: Date | string;
+}
+
+export interface CreateApiKeyResponse {
+  apiKey: ApiKeyItem;
+  secretKey: string;
+}
+
+export interface OperatorFacilityStatusRequest {
+  operationalStatus: OperationalStatus;
 }

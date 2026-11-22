@@ -86,6 +86,14 @@ enum FacilityType {
   OTHER
 }
 
+enum DataSource {
+  SEED_DEMO
+  OSM
+  OPERATOR
+  COMMUNITY
+  MANUAL
+}
+
 model User {
   id                        String                @id @default(uuid())
   email                     String                @unique
@@ -144,6 +152,7 @@ model Organization {
   members                 OrganizationMember[]
   venues                  Venue[]
   maintenance_tasks       MaintenanceTask[]
+  api_keys                ApiKey[]
 
   @@map("organizations")
 }
@@ -174,6 +183,9 @@ model Venue {
   latitude                Float
   longitude               Float
   location                Unsupported("geography(Point, 4326)")?
+  source                  DataSource            @default(SEED_DEMO)
+  sourceRef               String?               @map("source_ref")
+  sourceLicense           String?               @map("source_license")
   created_at              DateTime              @default(now())
   updated_at              DateTime              @updatedAt
   buildings               Building[]
@@ -181,6 +193,7 @@ model Venue {
   issue_reports           IssueReport[]
   audit_logs              AuditLog[]
 
+  @@unique([source, sourceRef])
   @@index([organization_id])
   @@map("venues")
 }
@@ -192,6 +205,9 @@ model Building {
   name                    String
   building_code           String?
   graph_version           Int                   @default(1)
+  source                  DataSource            @default(SEED_DEMO)
+  sourceRef               String?               @map("source_ref")
+  sourceLicense           String?               @map("source_license")
   created_at              DateTime              @default(now())
   updated_at              DateTime              @updatedAt
   floors                  Floor[]
@@ -199,6 +215,7 @@ model Building {
   map_edges               MapEdge[]
   facilities              Facility[]
 
+  @@unique([source, sourceRef])
   @@index([venue_id])
   @@map("buildings")
 }
@@ -283,13 +300,18 @@ model Facility {
   node                    MapNode?              @relation(fields: [node_id], references: [id], onDelete: SetNull)
   facility_type           FacilityType
   name                    String
+  notes                   String?
   operational_status      OperationalStatus     @default(OPERATIONAL)
   verification_level      VerificationLevel     @default(CONFIRMED)
   last_verified_at        DateTime?
+  source                  DataSource            @default(SEED_DEMO)
+  sourceRef               String?               @map("source_ref")
+  sourceLicense           String?               @map("source_license")
   created_at              DateTime              @default(now())
   updated_at              DateTime              @updatedAt
   issue_reports           IssueReport[]
 
+  @@unique([source, sourceRef])
   @@index([venue_id])
   @@index([building_id])
   @@index([building_id, operational_status])
@@ -477,4 +499,20 @@ model Feedback {
   @@index([user_id])
   @@index([created_at])
   @@map("feedback")
+}
+
+model ApiKey {
+  id             String       @id @default(uuid())
+  organizationId String       @map("organization_id")
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  keyPrefix      String       @map("key_prefix")
+  keyHash        String       @unique @map("key_hash")
+  scopes         String[]     @default(["FACILITY_STATUS_WRITE"])
+  lastUsedAt     DateTime?    @map("last_used_at")
+  revokedAt      DateTime?    @map("revoked_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  @@index([organizationId])
+  @@index([keyHash])
+  @@map("api_keys")
 }
