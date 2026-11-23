@@ -30,6 +30,10 @@
   --font-display:
     var(--font-display), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, sans-serif;
+  --glass-surface: rgba(18, 24, 38, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.35);
+  --glass-blur: 16px;
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
 [data-theme="light"] {
@@ -52,6 +56,10 @@
   --border: #cbd5e1;
   --input: #94a3b8;
   --ring: #0284c7;
+  --glass-surface: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(15, 23, 42, 0.5);
+  --glass-blur: 16px;
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.12);
 }
 
 [data-theme="high-contrast"] {
@@ -74,6 +82,10 @@
   --border: #ffffff;
   --input: #ffffff;
   --ring: #ffff00;
+  --glass-surface: var(--card);
+  --glass-border: var(--border);
+  --glass-blur: 0px;
+  --glass-shadow: none;
 }
 
 html {
@@ -113,33 +125,56 @@ h3,
 }
 
 .glass-panel {
-  background-color: rgba(18, 24, 38, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background-color: var(--glass-surface);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
 [data-theme="light"] .glass-panel {
-  background-color: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid #e2e8f0;
+  background-color: var(--glass-surface);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  .glass-panel {
+  :root,
+  [data-theme="light"],
+  [data-theme="dark"] {
+    --glass-surface: var(--card);
+    --glass-border: var(--border);
+    --glass-blur: 0px;
+    --glass-shadow: none;
+  }
+  .glass-fallback,
+  .glass-card,
+  .glass-panel,
+  .glass-button,
+  .glass-input,
+  .glass-badge {
     background-color: var(--card) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    border: 1px solid var(--border) !important;
+    border-color: var(--border) !important;
+    box-shadow: none !important;
   }
 }
 
-[data-theme="high-contrast"] .glass-panel {
-  background-color: #000000 !important;
+.glass-fallback,
+[data-theme="high-contrast"] .glass-fallback,
+[data-theme="high-contrast"] .glass-panel,
+[data-theme="high-contrast"] .glass-card,
+[data-theme="high-contrast"] .glass-button,
+[data-theme="high-contrast"] .glass-input,
+[data-theme="high-contrast"] .glass-badge {
+  background-color: var(--card) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  border: 2px solid #ffffff !important;
+  border-color: var(--border) !important;
+  box-shadow: none !important;
 }
 
 .shimmer-skeleton {
