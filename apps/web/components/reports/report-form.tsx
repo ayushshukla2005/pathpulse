@@ -22,7 +22,7 @@ import {
   createReport,
   uploadPhotoToPresignedUrl,
 } from "@/lib/api/reports";
-import { GlassCard, GlassPanel, GlassButton } from "@/components/ui/glass";
+import { GlassCard, GlassButton } from "@/components/ui/glass";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -432,13 +432,13 @@ export function ReportForm() {
       </div>
 
       {formError && (
-        <GlassPanel
+        <div
           role="alert"
-          className="p-4 rounded-xl border border-red-500/50 bg-red-500/10 text-red-900 dark:text-red-200 space-y-1"
+          className="glass-panel p-4 rounded-xl border border-red-500/50 bg-red-500/10 text-red-900 dark:text-red-200 space-y-1"
         >
           <h3 className="font-bold text-sm">Submission Error</h3>
           <p className="text-sm">{formError}</p>
-        </GlassPanel>
+        </div>
       )}
 
       <form
