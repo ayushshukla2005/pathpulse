@@ -8,7 +8,7 @@ import type { FindRouteRequest, MobilityProfile, RoutePlanResult } from "@pathpu
 import { groupStepsByFloor, validateRouteRequest } from "@pathpulse/validation";
 import { useAuth } from "@/lib/auth/auth-context";
 import { getBuildingMap, postRoute } from "@/lib/api/routes";
-import { GlassCard } from "@/components/ui/glass";
+import { GlassCard, GlassPanel, GlassButton } from "@/components/ui/glass";
 import { RouteSummary } from "@/components/navigation/route-summary";
 import { StepList } from "@/components/navigation/step-list";
 import { FloorSelector } from "@/components/navigation/floor-selector";
@@ -207,10 +207,13 @@ function NavigationPlannerInner() {
   if (mapError || !mapData) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-        <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-slate-900 dark:border-red-900/50 dark:bg-red-950/20 dark:text-slate-100">
+        <GlassPanel
+          role="alert"
+          className="p-6 text-[var(--foreground)] border border-red-500/40 bg-red-500/10 rounded-2xl"
+        >
           <div className="flex items-start gap-3">
             <AlertCircle
-              className="mt-0.5 h-5 w-5 text-red-600 dark:text-red-400"
+              className="mt-0.5 h-5 w-5 text-red-600 dark:text-red-400 shrink-0"
               aria-hidden="true"
             />
             <div>
@@ -225,14 +228,14 @@ function NavigationPlannerInner() {
               <div className="mt-4">
                 <Link
                   href="/explore"
-                  className="inline-flex min-h-[36px] items-center gap-2 rounded-lg bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-800 shadow-sm ring-1 ring-slate-200 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-100 dark:ring-slate-800"
+                  className="inline-flex min-h-[36px] items-center gap-2 rounded-lg border border-[var(--glass-border)] bg-[var(--glass-surface)] px-3.5 py-1.5 text-xs font-semibold text-[var(--foreground)] shadow-sm hover:bg-[var(--muted)]"
                 >
                   <span>Return to Explore</span>
                 </Link>
               </div>
             </div>
           </div>
-        </div>
+        </GlassPanel>
       </main>
     );
   }
@@ -285,157 +288,155 @@ function NavigationPlannerInner() {
         </div>
       </header>
 
-      <form
-        onSubmit={handleSubmit}
-        aria-label="Route Planner Form"
-        className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900"
-      >
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-          <div>
-            <label
-              htmlFor="origin-select"
-              className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300"
-            >
-              Origin Location
-            </label>
-            <select
-              id="origin-select"
-              value={originNodeId}
-              onChange={(e) => {
-                setOriginNodeId(e.target.value);
-                if (validationErrors.originNodeId) {
-                  setValidationErrors((prev) => ({ ...prev, originNodeId: "" }));
+      <GlassPanel className="p-6 rounded-2xl">
+        <form onSubmit={handleSubmit} aria-label="Route Planner Form" className="space-y-6">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+            <div>
+              <label
+                htmlFor="origin-select"
+                className="block text-xs font-bold uppercase tracking-wider text-[var(--foreground)]"
+              >
+                Origin Location
+              </label>
+              <select
+                id="origin-select"
+                value={originNodeId}
+                onChange={(e) => {
+                  setOriginNodeId(e.target.value);
+                  if (validationErrors.originNodeId) {
+                    setValidationErrors((prev) => ({ ...prev, originNodeId: "" }));
+                  }
+                }}
+                aria-invalid={!!validationErrors.originNodeId}
+                aria-describedby={validationErrors.originNodeId ? "origin-error" : undefined}
+                className="mt-1.5 block w-full rounded-lg border border-[var(--glass-border)] bg-[var(--glass-surface)] px-3 py-2 text-sm text-[var(--foreground)] shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)] min-h-[40px]"
+              >
+                <option value="">Select starting node...</option>
+                {sortedNodes.map((n) => {
+                  const floorName = floorMap.get(n.floor_id)?.name || `Floor ${n.floor_id}`;
+                  return (
+                    <option key={n.id} value={n.id}>
+                      {n.name || n.node_type} ({floorName})
+                    </option>
+                  );
+                })}
+              </select>
+              {validationErrors.originNodeId && (
+                <p
+                  id="origin-error"
+                  className="mt-1.5 text-xs font-medium text-red-600 dark:text-red-400"
+                >
+                  {validationErrors.originNodeId}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="destination-select"
+                className="block text-xs font-bold uppercase tracking-wider text-[var(--foreground)]"
+              >
+                Destination Location
+              </label>
+              <select
+                id="destination-select"
+                value={destinationNodeId}
+                onChange={(e) => {
+                  setDestinationNodeId(e.target.value);
+                  if (validationErrors.destinationNodeId) {
+                    setValidationErrors((prev) => ({ ...prev, destinationNodeId: "" }));
+                  }
+                }}
+                aria-invalid={!!validationErrors.destinationNodeId}
+                aria-describedby={
+                  validationErrors.destinationNodeId ? "destination-error" : undefined
                 }
-              }}
-              aria-invalid={!!validationErrors.originNodeId}
-              aria-describedby={validationErrors.originNodeId ? "origin-error" : undefined}
-              className="mt-1.5 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-            >
-              <option value="">Select starting node...</option>
-              {sortedNodes.map((n) => {
-                const floorName = floorMap.get(n.floor_id)?.name || `Floor ${n.floor_id}`;
-                return (
-                  <option key={n.id} value={n.id}>
-                    {n.name || n.node_type} ({floorName})
+                className="mt-1.5 block w-full rounded-lg border border-[var(--glass-border)] bg-[var(--glass-surface)] px-3 py-2 text-sm text-[var(--foreground)] shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)] min-h-[40px]"
+              >
+                <option value="">Select destination node...</option>
+                {sortedNodes.map((n) => {
+                  const floorName = floorMap.get(n.floor_id)?.name || `Floor ${n.floor_id}`;
+                  return (
+                    <option key={n.id} value={n.id}>
+                      {n.name || n.node_type} ({floorName})
+                    </option>
+                  );
+                })}
+              </select>
+              {validationErrors.destinationNodeId && (
+                <p
+                  id="destination-error"
+                  className="mt-1.5 text-xs font-medium text-red-600 dark:text-red-400"
+                >
+                  {validationErrors.destinationNodeId}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="profile-select"
+                className="block text-xs font-bold uppercase tracking-wider text-[var(--foreground)]"
+              >
+                Mobility Profile
+              </label>
+              <select
+                id="profile-select"
+                value={profile}
+                onChange={(e) => handleProfileChange(e.target.value as MobilityProfile)}
+                aria-invalid={!!validationErrors.profile}
+                aria-describedby={validationErrors.profile ? "profile-error" : undefined}
+                className="mt-1.5 block w-full rounded-lg border border-[var(--glass-border)] bg-[var(--glass-surface)] px-3 py-2 text-sm text-[var(--foreground)] shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)] min-h-[40px]"
+              >
+                {PROFILE_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
                   </option>
-                );
-              })}
-            </select>
-            {validationErrors.originNodeId && (
-              <p
-                id="origin-error"
-                className="mt-1.5 text-xs font-medium text-red-600 dark:text-red-400"
-              >
-                {validationErrors.originNodeId}
-              </p>
-            )}
+                ))}
+              </select>
+              {validationErrors.profile && (
+                <p
+                  id="profile-error"
+                  className="mt-1.5 text-xs font-medium text-red-600 dark:text-red-400"
+                >
+                  {validationErrors.profile}
+                </p>
+              )}
+            </div>
           </div>
 
-          <div>
-            <label
-              htmlFor="destination-select"
-              className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300"
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--glass-border)] pt-4">
+            <p className="text-xs text-[var(--muted-foreground)]">
+              Routes exclude confirmed out-of-service elevators and avoid unverified segments for
+              step-free profiles.
+            </p>
+
+            <GlassButton
+              type="submit"
+              disabled={routeMutation.isPending}
+              className="inline-flex min-h-[40px] items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Destination Location
-            </label>
-            <select
-              id="destination-select"
-              value={destinationNodeId}
-              onChange={(e) => {
-                setDestinationNodeId(e.target.value);
-                if (validationErrors.destinationNodeId) {
-                  setValidationErrors((prev) => ({ ...prev, destinationNodeId: "" }));
-                }
-              }}
-              aria-invalid={!!validationErrors.destinationNodeId}
-              aria-describedby={
-                validationErrors.destinationNodeId ? "destination-error" : undefined
-              }
-              className="mt-1.5 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-            >
-              <option value="">Select destination node...</option>
-              {sortedNodes.map((n) => {
-                const floorName = floorMap.get(n.floor_id)?.name || `Floor ${n.floor_id}`;
-                return (
-                  <option key={n.id} value={n.id}>
-                    {n.name || n.node_type} ({floorName})
-                  </option>
-                );
-              })}
-            </select>
-            {validationErrors.destinationNodeId && (
-              <p
-                id="destination-error"
-                className="mt-1.5 text-xs font-medium text-red-600 dark:text-red-400"
-              >
-                {validationErrors.destinationNodeId}
-              </p>
-            )}
+              {routeMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  <span>Finding Route...</span>
+                </>
+              ) : (
+                <>
+                  <Navigation className="h-4 w-4" aria-hidden="true" />
+                  <span>Calculate Route</span>
+                </>
+              )}
+            </GlassButton>
           </div>
-
-          <div>
-            <label
-              htmlFor="profile-select"
-              className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300"
-            >
-              Mobility Profile
-            </label>
-            <select
-              id="profile-select"
-              value={profile}
-              onChange={(e) => handleProfileChange(e.target.value as MobilityProfile)}
-              aria-invalid={!!validationErrors.profile}
-              aria-describedby={validationErrors.profile ? "profile-error" : undefined}
-              className="mt-1.5 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-            >
-              {PROFILE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            {validationErrors.profile && (
-              <p
-                id="profile-error"
-                className="mt-1.5 text-xs font-medium text-red-600 dark:text-red-400"
-              >
-                {validationErrors.profile}
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4 dark:border-slate-800">
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Routes exclude confirmed out-of-service elevators and avoid unverified segments for
-            step-free profiles.
-          </p>
-
-          <button
-            type="submit"
-            disabled={routeMutation.isPending}
-            className="inline-flex min-h-[40px] items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {routeMutation.isPending ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                <span>Finding Route...</span>
-              </>
-            ) : (
-              <>
-                <Navigation className="h-4 w-4" aria-hidden="true" />
-                <span>Calculate Route</span>
-              </>
-            )}
-          </button>
-        </div>
-      </form>
+        </form>
+      </GlassPanel>
 
       {profileChangedNotice && (
         <aside
           role="note"
           aria-label="Profile changed notice"
-          className="mt-6 flex items-center justify-between gap-3 rounded-lg border border-indigo-200 bg-indigo-50/70 p-4 text-xs font-medium text-indigo-900 dark:border-indigo-900/50 dark:bg-indigo-950/20 dark:text-indigo-200"
+          className="glass-panel mt-6 flex items-center justify-between gap-3 rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-4 text-xs font-medium text-[var(--foreground)]"
         >
           <div className="flex items-center gap-2">
             <RefreshCw
@@ -447,26 +448,26 @@ function NavigationPlannerInner() {
               path.
             </span>
           </div>
-          <button
+          <GlassButton
             type="button"
             onClick={handleSubmit}
-            className="rounded bg-indigo-600 px-3 py-1 font-semibold text-white hover:bg-indigo-500"
+            className="rounded bg-indigo-600 px-3 py-1 font-semibold text-white hover:bg-indigo-500 min-h-[24px]"
           >
             Recalculate
-          </button>
+          </GlassButton>
         </aside>
       )}
 
       {routeMutation.isPending && (
-        <div
+        <GlassPanel
           role="status"
-          className="mt-8 flex min-h-[160px] flex-col items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+          className="mt-8 flex min-h-[160px] flex-col items-center justify-center gap-3 p-6 text-center rounded-xl"
         >
           <Loader2 className="h-8 w-8 animate-spin text-indigo-600" aria-hidden="true" />
-          <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+          <p className="text-sm font-semibold text-[var(--foreground)]">
             Evaluating multi-floor accessible path...
           </p>
-        </div>
+        </GlassPanel>
       )}
 
       {isNoConfirmedRoute && (
@@ -490,10 +491,10 @@ function NavigationPlannerInner() {
           />
 
           {result.warnings && result.warnings.length > 0 && (
-            <aside
+            <GlassPanel
               role="alert"
               aria-labelledby="route-warnings-title"
-              className="rounded-xl border border-amber-300 bg-amber-50/80 p-5 dark:border-amber-900/60 dark:bg-amber-950/20"
+              className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-5 dark:border-amber-400/30 dark:bg-amber-950/20"
             >
               <div className="flex items-start gap-3">
                 <AlertCircle
@@ -514,7 +515,7 @@ function NavigationPlannerInner() {
                   </ul>
                 </div>
               </div>
-            </aside>
+            </GlassPanel>
           )}
 
           <div className="flex flex-wrap items-center justify-between gap-3">

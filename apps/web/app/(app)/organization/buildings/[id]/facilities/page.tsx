@@ -7,7 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getOrganizationFacilities, updateFacilityStatus } from "@/lib/api/organizations";
 import { useBuildingRealtime } from "@/lib/hooks/use-building-realtime";
 import { useOrganization } from "../../../organization-context";
-import { GlassBadge, GlassButton, GlassDialog } from "@/components/ui/glass";
+import { GlassBadge, GlassButton, GlassDialog, GlassPanel } from "@/components/ui/glass";
 import {
   FacilityType,
   OperationalStatus,
@@ -253,6 +253,37 @@ export default function BuildingFacilitiesPage() {
     mutation.mutate({ facilityId, status, verificationLevel });
   };
 
+  const [sortCol, setSortCol] = React.useState<
+    "name" | "operationalStatus" | "verificationLevel" | "lastVerifiedAt" | null
+  >(null);
+  const [sortDir, setSortDir] = React.useState<"ascending" | "descending">("ascending");
+
+  const handleSort = (
+    col: "name" | "operationalStatus" | "verificationLevel" | "lastVerifiedAt",
+  ) => {
+    if (sortCol === col) {
+      setSortDir((d) => (d === "ascending" ? "descending" : "ascending"));
+    } else {
+      setSortCol(col);
+      setSortDir("ascending");
+    }
+  };
+
+  const getSortedItems = (items: OrganizationFacilityItem[]) => {
+    if (!sortCol) return items;
+    return [...items].sort((a, b) => {
+      let valA: string | number = a[sortCol] ?? "";
+      let valB: string | number = b[sortCol] ?? "";
+      if (sortCol === "lastVerifiedAt") {
+        valA = a.lastVerifiedAt ? new Date(a.lastVerifiedAt).getTime() : 0;
+        valB = b.lastVerifiedAt ? new Date(b.lastVerifiedAt).getTime() : 0;
+      }
+      if (valA < valB) return sortDir === "ascending" ? -1 : 1;
+      if (valA > valB) return sortDir === "ascending" ? 1 : -1;
+      return 0;
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="flex min-h-[300px] items-center justify-center p-6" role="status">
@@ -266,20 +297,16 @@ export default function BuildingFacilitiesPage() {
   if (isError) {
     const errorMsg = error instanceof Error ? error.message : "Failed to load facilities";
     return (
-      <div
+      <GlassPanel
         role="alert"
-        className="rounded-lg border-2 border-red-600 bg-red-50 p-6 text-red-900 dark:bg-red-950 dark:text-red-100"
+        className="rounded-lg border-2 border-red-600 bg-red-50/80 p-6 text-red-900 dark:bg-red-950/80 dark:text-red-100"
       >
         <h2 className="text-lg font-bold">Error loading facilities</h2>
         <p className="mt-2 text-sm">{errorMsg}</p>
-        <button
-          type="button"
-          onClick={() => refetch()}
-          className="mt-4 rounded-md border-2 border-[var(--border)] bg-[var(--card)] px-4 py-2 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)]"
-        >
+        <GlassButton type="button" onClick={() => refetch()} className="mt-4 min-h-[24px]">
           Try Again
-        </button>
-      </div>
+        </GlassButton>
+      </GlassPanel>
     );
   }
 
@@ -359,10 +386,7 @@ export default function BuildingFacilitiesPage() {
             const typeHeader = type.replace(/_/g, " ");
 
             return (
-              <section
-                key={type}
-                className="rounded-lg border-2 border-[var(--border)] bg-[var(--card)] p-4 shadow-sm"
-              >
+              <GlassPanel key={type} className="p-4 shadow-sm">
                 <h3 className="mb-4 text-base font-bold uppercase tracking-wider text-[var(--foreground)]">
                   {typeHeader} ({items.length})
                 </h3>
@@ -374,17 +398,81 @@ export default function BuildingFacilitiesPage() {
                     </caption>
                     <thead>
                       <tr className="border-b-2 border-[var(--border)] text-xs font-semibold uppercase text-[var(--muted-foreground)]">
-                        <th scope="col" className="px-4 py-2">
-                          Facility Name
+                        <th
+                          scope="col"
+                          className="px-4 py-2"
+                          aria-sort={sortCol === "name" ? sortDir : "none"}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => handleSort("name")}
+                            className="inline-flex min-h-[24px] items-center gap-1 font-semibold uppercase hover:text-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] rounded"
+                          >
+                            <span>Facility Name</span>
+                            <span aria-hidden="true" className="text-xs">
+                              {sortCol === "name" ? (sortDir === "ascending" ? " ▲" : " ▼") : " ↕"}
+                            </span>
+                          </button>
                         </th>
-                        <th scope="col" className="px-4 py-2">
-                          Operational Status
+                        <th
+                          scope="col"
+                          className="px-4 py-2"
+                          aria-sort={sortCol === "operationalStatus" ? sortDir : "none"}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => handleSort("operationalStatus")}
+                            className="inline-flex min-h-[24px] items-center gap-1 font-semibold uppercase hover:text-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] rounded"
+                          >
+                            <span>Operational Status</span>
+                            <span aria-hidden="true" className="text-xs">
+                              {sortCol === "operationalStatus"
+                                ? sortDir === "ascending"
+                                  ? " ▲"
+                                  : " ▼"
+                                : " ↕"}
+                            </span>
+                          </button>
                         </th>
-                        <th scope="col" className="px-4 py-2">
-                          Verification
+                        <th
+                          scope="col"
+                          className="px-4 py-2"
+                          aria-sort={sortCol === "verificationLevel" ? sortDir : "none"}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => handleSort("verificationLevel")}
+                            className="inline-flex min-h-[24px] items-center gap-1 font-semibold uppercase hover:text-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] rounded"
+                          >
+                            <span>Verification</span>
+                            <span aria-hidden="true" className="text-xs">
+                              {sortCol === "verificationLevel"
+                                ? sortDir === "ascending"
+                                  ? " ▲"
+                                  : " ▼"
+                                : " ↕"}
+                            </span>
+                          </button>
                         </th>
-                        <th scope="col" className="px-4 py-2">
-                          Last Verified
+                        <th
+                          scope="col"
+                          className="px-4 py-2"
+                          aria-sort={sortCol === "lastVerifiedAt" ? sortDir : "none"}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => handleSort("lastVerifiedAt")}
+                            className="inline-flex min-h-[24px] items-center gap-1 font-semibold uppercase hover:text-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] rounded"
+                          >
+                            <span>Last Verified</span>
+                            <span aria-hidden="true" className="text-xs">
+                              {sortCol === "lastVerifiedAt"
+                                ? sortDir === "ascending"
+                                  ? " ▲"
+                                  : " ▼"
+                                : " ↕"}
+                            </span>
+                          </button>
                         </th>
                         <th scope="col" className="px-4 py-2 text-right">
                           Update Status
@@ -392,7 +480,7 @@ export default function BuildingFacilitiesPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {items.map((facility) => (
+                      {getSortedItems(items).map((facility) => (
                         <FacilityRow
                           key={facility.id}
                           facility={facility}
@@ -403,7 +491,7 @@ export default function BuildingFacilitiesPage() {
                     </tbody>
                   </table>
                 </div>
-              </section>
+              </GlassPanel>
             );
           })}
         </div>

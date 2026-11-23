@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getOrganizationDashboard } from "@/lib/api/organizations";
+import { GlassCard, GlassPanel, GlassButton } from "@/components/ui/glass";
 import { useOrganization } from "./organization-context";
 
 export default function OrganizationOverviewPage() {
@@ -33,20 +34,16 @@ export default function OrganizationOverviewPage() {
   if (isError) {
     const errorMsg = error instanceof Error ? error.message : "Failed to load dashboard metrics";
     return (
-      <div
+      <GlassPanel
         role="alert"
-        className="rounded-lg border-2 border-red-600 bg-red-50 p-6 text-red-900 dark:bg-red-950 dark:text-red-100"
+        className="rounded-lg border-2 border-red-600 bg-red-50/80 p-6 text-red-900 dark:bg-red-950/80 dark:text-red-100"
       >
         <h2 className="text-lg font-bold">Error loading analytics</h2>
         <p className="mt-2 text-sm">{errorMsg}</p>
-        <button
-          type="button"
-          onClick={() => refetch()}
-          className="mt-4 rounded-md border-2 border-[var(--border)] bg-[var(--card)] px-4 py-2 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)]"
-        >
+        <GlassButton type="button" onClick={() => refetch()} className="mt-4 min-h-[24px]">
           Try Again
-        </button>
-      </div>
+        </GlassButton>
+      </GlassPanel>
     );
   }
 
@@ -68,7 +65,7 @@ export default function OrganizationOverviewPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-lg border-2 border-[var(--border)] bg-[var(--card)] p-5 shadow-sm">
+        <GlassCard className="p-5 shadow-sm">
           <p className="text-sm font-medium text-[var(--muted-foreground)]">
             Verified Route Coverage
           </p>
@@ -81,9 +78,9 @@ export default function OrganizationOverviewPage() {
             Percentage of navigation paths in your buildings that are confirmed operational and
             step-free verified.
           </p>
-        </div>
+        </GlassCard>
 
-        <div className="rounded-lg border-2 border-[var(--border)] bg-[var(--card)] p-5 shadow-sm">
+        <GlassCard className="p-5 shadow-sm">
           <p className="text-sm font-medium text-[var(--muted-foreground)]">Pending Issues</p>
           <p className="mt-2 text-3xl font-bold tracking-tight text-[var(--foreground)]">
             {metrics?.pendingIssues ?? 0}
@@ -92,9 +89,9 @@ export default function OrganizationOverviewPage() {
             Barriers actively requiring review, verification, maintenance assignment, or resolution
             confirmation.
           </p>
-        </div>
+        </GlassCard>
 
-        <div className="rounded-lg border-2 border-[var(--border)] bg-[var(--card)] p-5 shadow-sm">
+        <GlassCard className="p-5 shadow-sm">
           <p className="text-sm font-medium text-[var(--muted-foreground)]">Verified Facilities</p>
           <p className="mt-2 text-3xl font-bold tracking-tight text-[var(--foreground)]">
             {metrics?.verifiedFacilities ?? 0}
@@ -103,9 +100,9 @@ export default function OrganizationOverviewPage() {
             Total accessibility fixtures, elevators, ramps, and restrooms with verified confirmed
             status.
           </p>
-        </div>
+        </GlassCard>
 
-        <div className="rounded-lg border-2 border-[var(--border)] bg-[var(--card)] p-5 shadow-sm">
+        <GlassCard className="p-5 shadow-sm">
           <p className="text-sm font-medium text-[var(--muted-foreground)]">
             Resolved (Last 30 Days)
           </p>
@@ -115,10 +112,10 @@ export default function OrganizationOverviewPage() {
           <p className="mt-3 text-xs leading-relaxed text-[var(--muted-foreground)]">
             Accessibility barrier reports closed and confirmed remediated during the past 30 days.
           </p>
-        </div>
+        </GlassCard>
       </div>
 
-      <div className="rounded-lg border-2 border-[var(--border)] bg-[var(--muted)]/50 p-6">
+      <GlassPanel className="p-6">
         <h3 className="text-base font-semibold text-[var(--foreground)]">
           About Institution Data & Integrity
         </h3>
@@ -145,7 +142,7 @@ export default function OrganizationOverviewPage() {
             </span>
           </li>
         </ul>
-      </div>
+      </GlassPanel>
     </div>
   );
 }

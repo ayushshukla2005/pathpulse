@@ -22,11 +22,9 @@ import {
   createReport,
   uploadPhotoToPresignedUrl,
 } from "@/lib/api/reports";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { GlassCard, GlassPanel, GlassButton } from "@/components/ui/glass";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface SelectedPhoto {
   id: string;
@@ -261,20 +259,53 @@ export function ReportForm() {
     };
 
     return (
-      <Card className="w-full max-w-2xl mx-auto my-8 border-2 border-[var(--border)]">
-        <CardHeader>
-          <CardTitle className="text-2xl text-[var(--foreground)]">
-            Report Submitted Successfully
-          </CardTitle>
-          <CardDescription>
-            Thank you for helping keep PathPulse accurate and accessible for everyone.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
+      <GlassCard className="w-full max-w-2xl mx-auto my-8">
+        <div className="p-6 space-y-6">
+          <div
+            aria-live="polite"
+            className="glass-panel p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-semibold text-[var(--foreground)]"
+          >
+            <div>
+              <span className="text-sm font-bold block text-[var(--foreground)]">
+                Step 3 of 3: Complete
+              </span>
+              <span className="text-emerald-500 text-xs">Submission complete</span>
+            </div>
+            <ol
+              className="flex items-center gap-2 list-none m-0 p-0"
+              aria-label="Submission progress"
+            >
+              <li className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[var(--muted)] text-[var(--foreground)]">
+                1. Details
+              </li>
+              <li aria-hidden="true" className="text-[var(--muted-foreground)]">
+                &rarr;
+              </li>
+              <li className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[var(--muted)] text-[var(--foreground)]">
+                2. Photos
+              </li>
+              <li aria-hidden="true" className="text-[var(--muted-foreground)]">
+                &rarr;
+              </li>
+              <li className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-600 text-white">
+                3. Complete ✓
+              </li>
+            </ol>
+          </div>
+
+          <div className="space-y-1.5">
+            <h2 className="text-2xl font-bold text-[var(--foreground)]">
+              Report Submitted Successfully
+            </h2>
+            <p className="text-sm text-[var(--muted-foreground)]">
+              Thank you for helping keep PathPulse accurate and accessible for everyone.
+            </p>
+          </div>
+
           <div
             role="region"
             aria-label="Report Tracking Details"
-            className="p-5 rounded-lg border-2 border-[var(--border)] bg-[var(--muted)] space-y-3"
+            className="p-5 rounded-lg border border-[var(--glass-border)] bg-[var(--glass-surface)] space-y-3"
           >
             <div>
               <span className="block text-sm font-medium text-[var(--muted-foreground)]">
@@ -287,19 +318,18 @@ export function ReportForm() {
                 >
                   {submittedReport.tracking_code}
                 </span>
-                <Button
+                <GlassButton
                   type="button"
-                  variant="outline"
-                  size="sm"
                   onClick={() => handleCopyTrackingCode(submittedReport.tracking_code)}
                   aria-label="Copy tracking code to clipboard"
+                  className="min-h-[24px]"
                 >
                   {copiedCode ? "Copied!" : "Copy Code"}
-                </Button>
+                </GlassButton>
               </div>
             </div>
 
-            <div className="pt-2 border-t border-[var(--border)]">
+            <div className="pt-2 border-t border-[var(--glass-border)]">
               <span className="block text-sm font-medium text-[var(--muted-foreground)]">
                 Current Status
               </span>
@@ -315,67 +345,111 @@ export function ReportForm() {
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <Link
               href={`/reports/${submittedReport.id}`}
-              className="inline-flex items-center justify-center rounded-md bg-[var(--primary)] text-[var(--primary-foreground)] px-4 py-2 font-semibold hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+              className="inline-flex items-center justify-center rounded-md bg-[var(--primary)] text-[var(--primary-foreground)] px-4 py-2 font-semibold hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] min-h-[40px]"
             >
               View Report Details
             </Link>
             <Link
               href="/reports"
-              className="inline-flex items-center justify-center rounded-md border-2 border-[var(--border)] bg-transparent text-[var(--foreground)] px-4 py-2 font-semibold hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+              className="inline-flex items-center justify-center rounded-md border border-[var(--glass-border)] bg-[var(--glass-surface)] text-[var(--foreground)] px-4 py-2 font-semibold hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] min-h-[40px]"
             >
               View My Reports
             </Link>
-            <Button
+            <GlassButton
               type="button"
-              variant="outline"
               onClick={() => {
                 setSubmittedReport(null);
                 setDescription("");
                 setPhotos([]);
                 setFormError(null);
               }}
+              className="min-h-[40px]"
             >
               Submit Another Report
-            </Button>
+            </GlassButton>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </GlassCard>
     );
   }
 
   const charCount = description.trim().length;
+  const currentStep = photos.length > 0 ? 2 : 1;
 
   return (
-    <Card className="w-full max-w-2xl mx-auto my-8 border-2 border-[var(--border)]">
-      <CardHeader>
-        <CardTitle className="text-2xl text-[var(--foreground)]">
-          Report an Accessibility Barrier
-        </CardTitle>
-        <CardDescription>
-          Provide location details and describe the barrier. You may attach up to 5 photographs
-          directly to storage.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div aria-live="polite" className="sr-only" role="status">
-          {liveAnnouncement}
+    <div className="w-full max-w-2xl mx-auto my-8 space-y-6">
+      <div aria-live="polite" className="sr-only" role="status">
+        {liveAnnouncement}
+      </div>
+
+      <div
+        aria-live="polite"
+        className="glass-panel p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-semibold text-[var(--foreground)]"
+      >
+        <div>
+          <span className="text-sm font-bold block text-[var(--foreground)]">
+            {reportMutation.isPending
+              ? "Submitting report..."
+              : currentStep === 2
+                ? "Step 2 of 3: Photographs Attached"
+                : "Step 1 of 3: Report Details"}
+          </span>
+          <span className="text-[var(--muted-foreground)] text-xs">
+            {currentStep === 2
+              ? "Photos added. Complete description and submit."
+              : "Select venue and describe barrier"}
+          </span>
         </div>
+        <ol className="flex items-center gap-2 list-none m-0 p-0" aria-label="Submission progress">
+          <li
+            className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+              currentStep === 1
+                ? "bg-[var(--primary)] text-[var(--primary-foreground)]"
+                : "bg-[var(--muted)] text-[var(--foreground)]"
+            }`}
+          >
+            1. Details
+          </li>
+          <li aria-hidden="true" className="text-[var(--muted-foreground)]">
+            &rarr;
+          </li>
+          <li
+            className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+              currentStep === 2
+                ? "bg-[var(--primary)] text-[var(--primary-foreground)]"
+                : "bg-[var(--muted)] text-[var(--muted-foreground)]"
+            }`}
+          >
+            2. Photos
+          </li>
+          <li aria-hidden="true" className="text-[var(--muted-foreground)]">
+            &rarr;
+          </li>
+          <li className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[var(--muted)] text-[var(--muted-foreground)]">
+            3. Complete
+          </li>
+        </ol>
+      </div>
 
-        {formError && (
-          <Alert variant="destructive" className="mb-6">
-            <AlertTitle>Submission Error</AlertTitle>
-            <AlertDescription>{formError}</AlertDescription>
-          </Alert>
-        )}
-
-        <form
-          noValidate
-          onSubmit={(e) => {
-            e.preventDefault();
-            reportMutation.mutate();
-          }}
-          className="space-y-6"
+      {formError && (
+        <GlassPanel
+          role="alert"
+          className="p-4 rounded-xl border border-red-500/50 bg-red-500/10 text-red-900 dark:text-red-200 space-y-1"
         >
+          <h3 className="font-bold text-sm">Submission Error</h3>
+          <p className="text-sm">{formError}</p>
+        </GlassPanel>
+      )}
+
+      <form
+        noValidate
+        onSubmit={(e) => {
+          e.preventDefault();
+          reportMutation.mutate();
+        }}
+        className="space-y-6"
+      >
+        <GlassCard className="p-6 space-y-4">
           <div className="space-y-2">
             <Label htmlFor="barrier-category">Barrier Category *</Label>
             <select
@@ -383,7 +457,7 @@ export function ReportForm() {
               name="category"
               value={category}
               onChange={(e) => setCategory(e.target.value as ReportCategory)}
-              className="w-full h-11 px-3 py-2 rounded-md border-2 border-[var(--border)] bg-[var(--background)] text-[var(--foreground)] font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+              className="w-full h-11 px-3 py-2 rounded-md border border-[var(--glass-border)] bg-[var(--glass-surface)] text-[var(--foreground)] font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
             >
               {REPORT_CATEGORIES.map((cat) => (
                 <option key={cat} value={cat}>
@@ -404,7 +478,7 @@ export function ReportForm() {
                 setFacilityId("");
               }}
               disabled={isLoadingVenues}
-              className="w-full h-11 px-3 py-2 rounded-md border-2 border-[var(--border)] bg-[var(--background)] text-[var(--foreground)] font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+              className="w-full h-11 px-3 py-2 rounded-md border border-[var(--glass-border)] bg-[var(--glass-surface)] text-[var(--foreground)] font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
             >
               <option value="">-- Select a Venue --</option>
               {venues.map((v) => (
@@ -423,7 +497,7 @@ export function ReportForm() {
                 name="facilityId"
                 value={facilityId}
                 onChange={(e) => setFacilityId(e.target.value)}
-                className="w-full h-11 px-3 py-2 rounded-md border-2 border-[var(--border)] bg-[var(--background)] text-[var(--foreground)] font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+                className="w-full h-11 px-3 py-2 rounded-md border border-[var(--glass-border)] bg-[var(--glass-surface)] text-[var(--foreground)] font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
               >
                 <option value="">-- Entire venue or general area --</option>
                 {availableFacilities.map((fac) => (
@@ -435,30 +509,7 @@ export function ReportForm() {
             </div>
           )}
 
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <Label htmlFor="report-description">Description of Barrier *</Label>
-              <span
-                id="char-count"
-                aria-live="polite"
-                className="text-sm font-medium text-[var(--muted-foreground)]"
-              >
-                {charCount} / {MAX_DESCRIPTION_LENGTH} (min {MIN_DESCRIPTION_LENGTH})
-              </span>
-            </div>
-            <textarea
-              id="report-description"
-              name="description"
-              rows={4}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe what is broken, blocked, or missing, and how it impacts access..."
-              aria-describedby="char-count"
-              className="w-full p-3 rounded-md border-2 border-[var(--border)] bg-[var(--background)] text-[var(--foreground)] font-normal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
-            />
-          </div>
-
-          <fieldset className="border-2 border-[var(--border)] p-4 rounded-md space-y-4">
+          <fieldset className="border border-[var(--glass-border)] p-4 rounded-xl space-y-4">
             <legend className="px-2 font-semibold text-sm text-[var(--foreground)]">
               Map Coordinates (Optional)
             </legend>
@@ -473,6 +524,7 @@ export function ReportForm() {
                   placeholder="e.g. 12.9716"
                   value={latitude}
                   onChange={(e) => setLatitude(e.target.value)}
+                  className="border-[var(--glass-border)] bg-[var(--glass-surface)]"
                 />
               </div>
               <div className="space-y-1">
@@ -485,74 +537,118 @@ export function ReportForm() {
                   placeholder="e.g. 77.5946"
                   value={longitude}
                   onChange={(e) => setLongitude(e.target.value)}
+                  className="border-[var(--glass-border)] bg-[var(--glass-surface)]"
                 />
               </div>
             </div>
           </fieldset>
+        </GlassCard>
 
-          <div className="space-y-3">
-            <Label htmlFor="photo-input">Photographs (Optional, max 5, up to 5 MB each)</Label>
-            <input
-              ref={fileInputRef}
-              id="photo-input"
-              name="photos"
-              type="file"
-              multiple
-              accept="image/jpeg,image/png,image/webp"
-              onChange={handleFileChange}
-              disabled={reportMutation.isPending || photos.length >= 5}
-              className="w-full text-sm text-[var(--foreground)] file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-2 file:border-[var(--border)] file:text-sm file:font-semibold file:bg-[var(--muted)] file:text-[var(--foreground)] hover:file:bg-[var(--accent)] cursor-pointer"
-            />
-
-            {photos.length > 0 && (
-              <ul className="space-y-2 mt-2" aria-label="Selected photos">
-                {photos.map((photo) => (
-                  <li
-                    key={photo.id}
-                    className="flex items-center justify-between p-3 rounded-md border-2 border-[var(--border)] bg-[var(--muted)]"
-                  >
-                    <div className="flex flex-col pr-3 truncate">
-                      <span className="text-sm font-semibold truncate text-[var(--foreground)]">
-                        {photo.name}
-                      </span>
-                      <span className="text-xs text-[var(--muted-foreground)]">
-                        {(photo.sizeBytes / 1024).toFixed(1)} KB &bull;{" "}
-                        {photo.status === "uploading" && `Uploading: ${photo.uploadProgress}%`}
-                        {photo.status === "verifying" && "Verifying on server..."}
-                        {photo.status === "completed" && "Verified"}
-                        {photo.status === "failed" && `Failed: ${photo.errorMessage || "Error"}`}
-                        {photo.status === "pending" && "Ready to upload"}
-                      </span>
-                    </div>
-                    {!reportMutation.isPending && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removePhoto(photo.id)}
-                        aria-label={`Remove photo ${photo.name}`}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
-                      >
-                        Remove
-                      </Button>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          <div className="pt-2">
-            <Button
-              type="submit"
-              disabled={reportMutation.isPending}
-              className="w-full h-12 text-base font-semibold"
+        <GlassCard className="p-6 space-y-2">
+          <div className="flex justify-between items-center">
+            <Label htmlFor="report-description">Description of Barrier *</Label>
+            <span
+              id="char-count"
+              aria-live="polite"
+              className="text-sm font-medium text-[var(--muted-foreground)]"
             >
-              {reportMutation.isPending ? "Submitting Report..." : "Submit Barrier Report"}
-            </Button>
+              {charCount} / {MAX_DESCRIPTION_LENGTH} (min {MIN_DESCRIPTION_LENGTH})
+            </span>
           </div>
-        </form>
-      </CardContent>
-    </Card>
+          <textarea
+            id="report-description"
+            name="description"
+            rows={4}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Describe what is broken, blocked, or missing, and how it impacts access..."
+            aria-describedby="char-count"
+            className="w-full p-3 rounded-md border border-[var(--glass-border)] bg-[var(--glass-surface)] text-[var(--foreground)] font-normal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+          />
+        </GlassCard>
+
+        <GlassCard className="p-6 space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="photo-input">Photographs (Optional, max 5, up to 5 MB each)</Label>
+            <div className="glass-panel border-2 border-dashed border-[var(--glass-border)] rounded-xl p-6 text-center space-y-3 hover:border-[var(--ring)] transition-colors">
+              <div
+                className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-[var(--muted)] text-[var(--muted-foreground)]"
+                aria-hidden="true"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+              </div>
+              <div className="text-sm text-[var(--muted-foreground)]">
+                <span className="font-semibold text-[var(--foreground)]">Choose photographs</span>{" "}
+                or drag and drop files
+                <p className="text-xs mt-1">JPEG, PNG, or WebP up to 5 MB each</p>
+              </div>
+              <input
+                ref={fileInputRef}
+                id="photo-input"
+                name="photos"
+                type="file"
+                multiple
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleFileChange}
+                disabled={reportMutation.isPending || photos.length >= 5}
+                className="w-full text-sm text-[var(--foreground)] file:mr-4 file:py-2 file:px-4 file:rounded-md file:border file:border-[var(--glass-border)] file:text-sm file:font-semibold file:bg-[var(--glass-surface)] file:text-[var(--foreground)] hover:file:bg-[var(--muted)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] min-h-[44px]"
+              />
+            </div>
+          </div>
+
+          {photos.length > 0 && (
+            <ul className="space-y-2" aria-label="Selected photos">
+              {photos.map((photo) => (
+                <li
+                  key={photo.id}
+                  className="flex items-center justify-between p-3 rounded-lg border border-[var(--glass-border)] bg-[var(--glass-surface)]"
+                >
+                  <div className="flex flex-col pr-3 truncate">
+                    <span className="text-sm font-semibold truncate text-[var(--foreground)]">
+                      {photo.name}
+                    </span>
+                    <span className="text-xs text-[var(--muted-foreground)]">
+                      {(photo.sizeBytes / 1024).toFixed(1)} KB &bull;{" "}
+                      {photo.status === "uploading" && `Uploading: ${photo.uploadProgress}%`}
+                      {photo.status === "verifying" && "Verifying on server..."}
+                      {photo.status === "completed" && "Verified"}
+                      {photo.status === "failed" && `Failed: ${photo.errorMessage || "Error"}`}
+                      {photo.status === "pending" && "Ready to upload"}
+                    </span>
+                  </div>
+                  {!reportMutation.isPending && (
+                    <GlassButton
+                      type="button"
+                      onClick={() => removePhoto(photo.id)}
+                      aria-label={`Remove photo ${photo.name}`}
+                      className="text-red-600 hover:text-red-700 dark:text-red-400 min-h-[24px] min-w-[24px]"
+                    >
+                      Remove
+                    </GlassButton>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </GlassCard>
+
+        <div className="pt-2">
+          <GlassButton
+            type="submit"
+            disabled={reportMutation.isPending}
+            className="w-full h-12 text-base font-semibold bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 min-h-[48px]"
+          >
+            {reportMutation.isPending ? "Submitting Report..." : "Submit Barrier Report"}
+          </GlassButton>
+        </div>
+      </form>
+    </div>
   );
 }

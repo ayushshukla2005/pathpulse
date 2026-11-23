@@ -17,6 +17,7 @@ import {
   WorkflowAction,
 } from "@pathpulse/shared-types";
 import { Button } from "@/components/ui/button";
+import { GlassPanel } from "@/components/ui/glass";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   confirmResolution,
@@ -164,15 +165,15 @@ export default function ModeratorReportReviewPage() {
         className="container mx-auto px-4 py-8 focus:outline-none"
       >
         <div className="max-w-2xl mx-auto space-y-4">
-          <div
+          <GlassPanel
             role="alert"
-            className="p-5 border-2 border-red-500 rounded-lg bg-red-50 text-red-900 dark:bg-red-950 dark:text-red-200"
+            className="p-5 border-2 border-red-500 rounded-lg bg-red-50/80 text-red-900 dark:bg-red-950/80 dark:text-red-200"
           >
             <h1 className="text-xl font-bold">Access Restricted</h1>
             <p className="mt-1 text-sm">
               Moderator privileges are required to inspect and act on this report.
             </p>
-          </div>
+          </GlassPanel>
           <Link
             href="/explore"
             className="inline-flex items-center text-sm font-semibold text-[var(--primary)] hover:underline"
@@ -518,57 +519,55 @@ export default function ModeratorReportReviewPage() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Append-Only Audit History</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {auditHistory.length === 0 ? (
-                <p className="text-sm text-[var(--muted-foreground)]">
-                  No previous state transitions recorded.
-                </p>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm" aria-label="Report audit timeline">
-                    <thead>
-                      <tr className="border-b text-xs uppercase text-[var(--muted-foreground)]">
-                        <th className="py-2 pr-3">Timestamp</th>
-                        <th className="py-2 pr-3">Actor</th>
-                        <th className="py-2 pr-3">Action</th>
-                        <th className="py-2 pr-3">Transition</th>
-                        <th className="py-2">Reason</th>
+          <GlassPanel className="p-6">
+            <h2 className="text-lg font-bold text-[var(--foreground)] mb-4">
+              Append-Only Audit History
+            </h2>
+            {auditHistory.length === 0 ? (
+              <p className="text-sm text-[var(--muted-foreground)]">
+                No previous state transitions recorded.
+              </p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm" aria-label="Report audit timeline">
+                  <thead>
+                    <tr className="border-b text-xs uppercase text-[var(--muted-foreground)]">
+                      <th className="py-2 pr-3">Timestamp</th>
+                      <th className="py-2 pr-3">Actor</th>
+                      <th className="py-2 pr-3">Action</th>
+                      <th className="py-2 pr-3">Transition</th>
+                      <th className="py-2">Reason</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[var(--border)]">
+                    {auditHistory.map((item) => (
+                      <tr key={item.id} className="text-xs">
+                        <td className="py-2 pr-3 whitespace-nowrap text-[var(--muted-foreground)]">
+                          {new Date(item.createdAt).toLocaleString()}
+                        </td>
+                        <td className="py-2 pr-3 font-semibold text-[var(--foreground)]">
+                          {item.actorName || "System"}
+                        </td>
+                        <td className="py-2 pr-3 font-mono">{item.action}</td>
+                        <td className="py-2 pr-3 whitespace-nowrap">
+                          <span className="text-[var(--muted-foreground)]">
+                            {item.fromStatus || "—"}
+                          </span>
+                          {" → "}
+                          <span className="font-bold text-[var(--foreground)]">
+                            {item.toStatus}
+                          </span>
+                        </td>
+                        <td className="py-2 text-[var(--muted-foreground)]">
+                          {item.reason || "—"}
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[var(--border)]">
-                      {auditHistory.map((item) => (
-                        <tr key={item.id} className="text-xs">
-                          <td className="py-2 pr-3 whitespace-nowrap text-[var(--muted-foreground)]">
-                            {new Date(item.createdAt).toLocaleString()}
-                          </td>
-                          <td className="py-2 pr-3 font-semibold text-[var(--foreground)]">
-                            {item.actorName || "System"}
-                          </td>
-                          <td className="py-2 pr-3 font-mono">{item.action}</td>
-                          <td className="py-2 pr-3 whitespace-nowrap">
-                            <span className="text-[var(--muted-foreground)]">
-                              {item.fromStatus || "—"}
-                            </span>
-                            {" &rarr; "}
-                            <span className="font-bold text-[var(--foreground)]">
-                              {item.toStatus}
-                            </span>
-                          </td>
-                          <td className="py-2 text-[var(--muted-foreground)]">
-                            {item.reason || "—"}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </GlassPanel>
         </div>
 
         <div className="space-y-6">
