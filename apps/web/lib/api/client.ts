@@ -76,27 +76,39 @@ export async function apiClient<T>(endpoint: string, options: RequestOptions = {
   if (response.status === 401 && !skipAuth) {
     const refreshedToken = await refreshAccessToken();
     if (refreshedToken) {
-      headers.set("Authorization", `Bearer ${refreshedToken}`);
+      const retryHeaders = new Headers(headers);
+      retryHeaders.set("Authorization", `Bearer ${refreshedToken}`);
       response = await fetch(url, {
         ...rest,
-        headers,
+        headers: retryHeaders,
       });
     }
-  }
-
-  if (!response.ok) {
-    let errorData: unknown = null;
-    try {
-      errorData = await response.json();
-    } catch {
-      errorData = await response.text();
-    }
-    throw parseApiError(response.status, errorData);
   }
 
   if (response.status === 204) {
     return {} as T;
   }
 
-  return (await response.json()) as T;
+  let rawText = "";
+  if (typeof response.text === "function") {
+    rawText = await response.text();
+  } else if (typeof response.json === "function") {
+    const jsonVal = await response.json();
+    rawText = typeof jsonVal === "string" ? jsonVal : JSON.stringify(jsonVal);
+  }
+
+  let parsedBody: unknown = null;
+  if (rawText) {
+    try {
+      parsedBody = JSON.parse(rawText);
+    } catch {
+      parsedBody = rawText;
+    }
+  }
+
+  if (!response.ok) {
+    throw parseApiError(response.status, parsedBody);
+  }
+
+  return (parsedBody ?? ({} as T)) as T;
 }

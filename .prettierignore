@@ -11,3 +11,5 @@ pnpm-lock.yaml
 apps/ai-service
 **/public/**
 **/test-results/**
+.osm-cache
+**/.osm-cache/**

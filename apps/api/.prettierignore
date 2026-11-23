@@ -4,4 +4,6 @@ dist
 coverage
 .turbo
 pnpm-lock.yaml
+.osm-cache
+**/.osm-cache/**
 

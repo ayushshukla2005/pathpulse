@@ -3,6 +3,9 @@
   "private": true,
   "packageManager": "pnpm@12.18.0",
   "scripts": {
+    "dev": "pnpm build:packages && pnpm --parallel --filter @pathpulse/api --filter @pathpulse/web run dev",
+    "dev:web": "pnpm build:packages && pnpm --filter @pathpulse/web dev",
+    "dev:api": "pnpm build:packages && pnpm --filter @pathpulse/api dev",
     "build": "pnpm build:packages",
     "build:packages": "pnpm --filter @pathpulse/config build && pnpm --filter @pathpulse/shared-types build && pnpm --filter @pathpulse/validation build",
     "lint": "pnpm --recursive run lint",
