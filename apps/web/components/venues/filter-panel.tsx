@@ -1,5 +1,6 @@
 import { RADIUS_OPTIONS } from "@pathpulse/validation";
 import { Filter } from "lucide-react";
+import { GlassPanel } from "@/components/ui/glass";
 
 interface FilterPanelProps {
   category: string;
@@ -33,10 +34,7 @@ export function FilterPanel({
   totalResults,
 }: FilterPanelProps) {
   return (
-    <section
-      aria-labelledby="filter-panel-heading"
-      className="rounded-lg border-2 border-[var(--border)] bg-[var(--card)] p-4 shadow-sm"
-    >
+    <GlassPanel role="region" aria-labelledby="filter-panel-heading" className="p-4 shadow-sm">
       <div className="mb-4 flex items-center justify-between border-b-2 border-[var(--border)] pb-3">
         <div className="flex items-center gap-2">
           <Filter className="h-5 w-5 text-[var(--primary)]" aria-hidden="true" />
@@ -114,6 +112,6 @@ export function FilterPanel({
           </label>
         </div>
       </div>
-    </section>
+    </GlassPanel>
   );
 }

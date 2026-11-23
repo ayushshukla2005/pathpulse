@@ -6,11 +6,12 @@ import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
 import { validateSafeNextPath } from "@/lib/auth/safe-redirect";
 import { PASSWORD_RULE_DESCRIPTION, validatePassword, isValidEmail } from "@pathpulse/validation";
+import { UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { GlassCard } from "@/components/ui/glass";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardFooter,
@@ -88,8 +89,13 @@ export function RegisterForm() {
   };
 
   return (
-    <Card className="w-full max-w-md">
+    <GlassCard className="w-full max-w-md">
       <CardHeader>
+        <div className="flex justify-center mb-2">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[var(--glass-border)] bg-[var(--glass-surface)] text-[var(--primary)] shadow-sm">
+            <UserPlus className="h-6 w-6" aria-hidden="true" />
+          </div>
+        </div>
         <CardTitle className="text-2xl text-center">Create your account</CardTitle>
         <CardDescription className="text-center">
           Join PathPulse to access barrier-free navigation
@@ -213,6 +219,6 @@ export function RegisterForm() {
           </p>
         </CardFooter>
       </form>
-    </Card>
+    </GlassCard>
   );
 }

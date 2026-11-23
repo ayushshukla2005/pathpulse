@@ -1,6 +1,7 @@
 import type { VenueListItem as VenueListItemType } from "@pathpulse/shared-types";
 import { VenueListItem } from "./venue-list-item";
 import { EmptyState } from "./empty-state";
+import { GlassCard } from "@/components/ui/glass";
 
 interface VenueListProps {
   venues: VenueListItemType[];
@@ -22,15 +23,12 @@ export function VenueList({
       <div role="status" aria-label="Loading venues" className="space-y-3">
         <span className="sr-only">Loading venues...</span>
         {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="animate-pulse rounded-lg border-2 border-[var(--border)] bg-[var(--card)] p-4"
-          >
-            <div className="h-4 w-24 rounded bg-[var(--muted)] mb-2" />
-            <div className="h-5 w-48 rounded bg-[var(--muted)] mb-2" />
-            <div className="h-3 w-64 rounded bg-[var(--muted)] mb-3" />
-            <div className="h-3 w-32 rounded bg-[var(--muted)]" />
-          </div>
+          <GlassCard key={i} className="p-4 space-y-2.5">
+            <div className="h-4 w-24 rounded bg-[var(--muted)] shimmer-skeleton motion-reduce:animate-none motion-reduce:after:hidden" />
+            <div className="h-5 w-48 rounded bg-[var(--muted)] shimmer-skeleton motion-reduce:animate-none motion-reduce:after:hidden" />
+            <div className="h-3 w-64 rounded bg-[var(--muted)] shimmer-skeleton motion-reduce:animate-none motion-reduce:after:hidden" />
+            <div className="h-3 w-32 rounded bg-[var(--muted)] shimmer-skeleton motion-reduce:animate-none motion-reduce:after:hidden" />
+          </GlassCard>
         ))}
       </div>
     );

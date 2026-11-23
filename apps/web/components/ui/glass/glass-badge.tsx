@@ -14,11 +14,11 @@ const GlassBadge = React.forwardRef<HTMLDivElement, GlassBadgeProps>(
     const variantClasses = {
       default: isFallback
         ? "bg-[var(--card)] text-[var(--card-foreground)] border-2 border-[var(--border)] shadow-none backdrop-blur-none"
-        : "bg-[var(--glass-surface)] text-[var(--foreground)] border border-[var(--glass-border)] shadow-[var(--glass-shadow)] backdrop-blur-[var(--glass-blur)]",
+        : "bg-emerald-950 text-emerald-100 border border-emerald-700/60 shadow-[var(--glass-shadow)] backdrop-blur-[var(--glass-blur)] dark:bg-emerald-950 dark:text-emerald-100 dark:border-emerald-500/60",
       secondary:
-        "bg-[var(--secondary)] text-[var(--secondary-foreground)] border border-[var(--border)] shadow-none",
+        "bg-amber-950 text-amber-100 border border-amber-700/60 shadow-none dark:bg-amber-950 dark:text-amber-100 dark:border-amber-500/60",
       destructive:
-        "bg-[var(--destructive)] text-[var(--destructive-foreground)] border border-transparent shadow-none",
+        "bg-red-950 text-red-100 border border-red-700/60 shadow-none dark:bg-red-950 dark:text-red-100 dark:border-red-500/60",
       outline:
         "bg-transparent text-[var(--foreground)] border-2 border-[var(--border)] shadow-none",
     }[variant];

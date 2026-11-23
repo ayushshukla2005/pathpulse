@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getOrganizationFacilities, updateFacilityStatus } from "@/lib/api/organizations";
 import { useBuildingRealtime } from "@/lib/hooks/use-building-realtime";
 import { useOrganization } from "../../../organization-context";
+import { GlassBadge, GlassButton, GlassDialog } from "@/components/ui/glass";
 import {
   FacilityType,
   OperationalStatus,
@@ -30,6 +31,8 @@ function FacilityRow({
     facility.verificationLevel,
   );
   const [saveSuccess, setSaveSuccess] = React.useState<boolean>(false);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = React.useState<boolean>(false);
+  const saveButtonRef = React.useRef<HTMLButtonElement>(null);
 
   React.useEffect(() => {
     setSelectedStatus(facility.operationalStatus);
@@ -42,6 +45,7 @@ function FacilityRow({
   const handleSave = () => {
     onSave(facility.id, selectedStatus, selectedLevel);
     setSaveSuccess(true);
+    setIsConfirmDialogOpen(true);
     setTimeout(() => setSaveSuccess(false), 3000);
   };
 
@@ -77,8 +81,18 @@ function FacilityRow({
       <td className="px-4 py-3 text-sm text-[var(--foreground)]">
         <span className="font-medium">{statusLabel}</span>
       </td>
-      <td className="px-4 py-3 text-sm text-[var(--muted-foreground)]">
-        <span className="font-medium">{levelLabel}</span>
+      <td className="px-4 py-3 text-sm">
+        <GlassBadge
+          variant={
+            facility.verificationLevel === "CONFIRMED"
+              ? "default"
+              : facility.verificationLevel === "UNAVAILABLE"
+                ? "destructive"
+                : "secondary"
+          }
+        >
+          {levelLabel}
+        </GlassBadge>
       </td>
       <td className="px-4 py-3 text-xs text-[var(--muted-foreground)]">{formattedDate}</td>
       <td className="px-4 py-3 text-right">
@@ -116,10 +130,11 @@ function FacilityRow({
           </div>
 
           <button
+            ref={saveButtonRef}
             type="button"
             onClick={handleSave}
             disabled={!hasChanges || isSaving}
-            className="rounded-md border-2 border-transparent bg-[var(--primary)] px-3 py-1 text-xs font-semibold text-[var(--primary-foreground)] hover:opacity-90 disabled:opacity-40"
+            className="rounded-md border-2 border-transparent bg-[var(--primary)] px-3 py-1 text-xs font-semibold text-[var(--primary-foreground)] hover:opacity-90 disabled:opacity-40 min-h-[24px]"
           >
             {isSaving ? "Saving..." : "Save"}
           </button>
@@ -132,6 +147,53 @@ function FacilityRow({
               Saved
             </span>
           ) : null}
+
+          <GlassDialog
+            open={isConfirmDialogOpen}
+            onClose={() => setIsConfirmDialogOpen(false)}
+            triggerRef={saveButtonRef}
+            title="Facility Status Updated"
+            description={`Status change for "${facility.name}" has been recorded.`}
+          >
+            <div className="space-y-4">
+              <div className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-3 text-xs space-y-1.5 text-[var(--foreground)]">
+                <div>
+                  <span className="font-semibold text-[var(--muted-foreground)]">
+                    Operational Status:
+                  </span>{" "}
+                  {selectedStatus === "OPERATIONAL"
+                    ? "Operational"
+                    : selectedStatus === "OUT_OF_SERVICE"
+                      ? "Out of service"
+                      : "Unknown"}
+                </div>
+                <div>
+                  <span className="font-semibold text-[var(--muted-foreground)]">
+                    Verification Level:
+                  </span>{" "}
+                  {selectedLevel === "CONFIRMED"
+                    ? "Confirmed"
+                    : selectedLevel === "UNVERIFIED"
+                      ? "Unverified"
+                      : "Unavailable"}
+                </div>
+              </div>
+              <div className="flex items-center justify-between pt-2">
+                <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                  Status updated successfully
+                </span>
+                <GlassButton
+                  type="button"
+                  size="sm"
+                  variant="primary"
+                  onClick={() => setIsConfirmDialogOpen(false)}
+                  className="min-h-[24px]"
+                >
+                  Done
+                </GlassButton>
+              </div>
+            </div>
+          </GlassDialog>
         </div>
       </td>
     </tr>

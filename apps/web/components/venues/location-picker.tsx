@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Crosshair, MapPin, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { GlassPanel } from "@/components/ui/glass";
 import { validateLatitude, validateLongitude } from "@pathpulse/validation";
 
 interface LocationCoordinates {
@@ -105,10 +106,7 @@ export function LocationPicker({ location, onLocationChange, onAnnounce }: Locat
   };
 
   return (
-    <section
-      aria-labelledby="location-picker-heading"
-      className="rounded-lg border-2 border-[var(--border)] bg-[var(--card)] p-4 shadow-sm"
-    >
+    <GlassPanel role="region" aria-labelledby="location-picker-heading" className="p-4 shadow-sm">
       <div className="mb-3 flex items-center justify-between border-b-2 border-[var(--border)] pb-2">
         <div className="flex items-center gap-2">
           <MapPin className="h-5 w-5 text-[var(--primary)]" aria-hidden="true" />
@@ -218,6 +216,6 @@ export function LocationPicker({ location, onLocationChange, onAnnounce }: Locat
           </div>
         )}
       </div>
-    </section>
+    </GlassPanel>
   );
 }

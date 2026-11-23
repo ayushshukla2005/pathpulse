@@ -5,11 +5,12 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
 import { validateSafeNextPath } from "@/lib/auth/safe-redirect";
+import { LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { GlassCard } from "@/components/ui/glass";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardFooter,
@@ -51,8 +52,13 @@ export function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md">
+    <GlassCard className="w-full max-w-md">
       <CardHeader>
+        <div className="flex justify-center mb-2">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[var(--glass-border)] bg-[var(--glass-surface)] text-[var(--primary)] shadow-sm">
+            <LogIn className="h-6 w-6" aria-hidden="true" />
+          </div>
+        </div>
         <CardTitle className="text-2xl text-center">Sign in to PathPulse</CardTitle>
         <CardDescription className="text-center">
           Enter your email and password to access your account
@@ -117,6 +123,6 @@ export function LoginForm() {
           </p>
         </CardFooter>
       </form>
-    </Card>
+    </GlassCard>
   );
 }
