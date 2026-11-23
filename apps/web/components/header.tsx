@@ -47,7 +47,7 @@ export function Header() {
       </a>
       <header
         role="banner"
-        className="glass-panel w-full border-b border-[var(--glass-border)] bg-[var(--glass-surface)] shadow-[var(--glass-shadow)] px-4 py-3 sticky top-0 z-40 transition-colors"
+        className="glass-panel w-full border-b border-[var(--glass-border)] bg-[var(--header-surface)] shadow-[var(--glass-shadow)] px-4 py-3 sticky top-0 z-40"
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <div className="flex items-center space-x-6">
@@ -66,19 +66,19 @@ export function Header() {
             <nav aria-label="Desktop primary" className="hidden md:flex items-center space-x-4">
               <Link
                 href="/explore"
-                className="inline-flex items-center min-h-[24px] rounded-lg border border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] transition-colors"
+                className="inline-flex items-center min-h-[24px] rounded-lg border border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
               >
                 Explore
               </Link>
               <Link
                 href="/navigation"
-                className="inline-flex items-center min-h-[24px] rounded-lg border border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] transition-colors"
+                className="inline-flex items-center min-h-[24px] rounded-lg border border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
               >
                 Route Planner
               </Link>
               <Link
                 href="/reports/new"
-                className="inline-flex items-center min-h-[24px] rounded-lg border border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] transition-colors"
+                className="inline-flex items-center min-h-[24px] rounded-lg border border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
               >
                 Report Barrier
               </Link>
@@ -93,7 +93,7 @@ export function Header() {
                 <>
                   <Link
                     href="/notifications"
-                    className="relative flex items-center gap-1.5 min-h-[24px] rounded-lg border border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] transition-colors"
+                    className="relative flex items-center gap-1.5 min-h-[24px] rounded-lg border border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
                     aria-label={`Notifications${
                       notificationsData?.unreadCount
                         ? `, ${notificationsData.unreadCount} unread`
@@ -114,7 +114,7 @@ export function Header() {
 
                   <Link
                     href="/reports"
-                    className="inline-flex items-center min-h-[24px] rounded-lg border border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] transition-colors"
+                    className="inline-flex items-center min-h-[24px] rounded-lg border border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
                   >
                     My Reports
                   </Link>
@@ -124,7 +124,7 @@ export function Header() {
                   (user?.organizationMemberships && user.organizationMemberships.length > 0) ? (
                     <Link
                       href="/organization"
-                      className="inline-flex items-center min-h-[24px] rounded-lg border border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] transition-colors"
+                      className="inline-flex items-center min-h-[24px] rounded-lg border border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
                     >
                       Organization
                     </Link>
@@ -132,7 +132,7 @@ export function Header() {
 
                   <Link
                     href="/profile"
-                    className="inline-flex items-center min-h-[24px] rounded-lg border border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] transition-colors"
+                    className="inline-flex items-center min-h-[24px] rounded-lg border border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
                   >
                     Profile ({user?.name || "User"})
                   </Link>
@@ -140,7 +140,7 @@ export function Header() {
                   <button
                     type="button"
                     onClick={() => logout()}
-                    className="inline-flex items-center min-h-[24px] rounded-lg border border-[var(--border)] bg-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] transition-colors"
+                    className="inline-flex items-center min-h-[24px] rounded-lg border border-[var(--border)] bg-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
                   >
                     Log out
                   </button>
@@ -149,7 +149,7 @@ export function Header() {
                 <>
                   <Link
                     href="/login"
-                    className="inline-flex items-center min-h-[24px] rounded-lg border border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] transition-colors"
+                    className="inline-flex items-center min-h-[24px] rounded-lg border border-transparent px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
                   >
                     Log in
                   </Link>

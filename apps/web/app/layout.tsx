@@ -74,9 +74,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           aria-hidden="true"
           className="fixed inset-0 -z-10 pointer-events-none overflow-hidden select-none"
         >
-          <div className="decorative-shape-1 absolute -top-40 -left-40 h-[480px] w-[480px] rounded-full bg-teal-500/10 blur-[120px] dark:bg-teal-400/5 motion-reduce:animate-none" />
-          <div className="decorative-shape-2 absolute top-1/4 -right-40 h-[560px] w-[560px] rounded-full bg-violet-600/10 blur-[140px] dark:bg-violet-500/5 motion-reduce:animate-none" />
-          <div className="decorative-shape-3 absolute -bottom-40 left-1/4 h-[520px] w-[520px] rounded-full bg-blue-600/10 blur-[130px] dark:bg-blue-500/5 motion-reduce:animate-none" />
+          <div className="decorative-shape-1 absolute top-32 -left-40 h-[480px] w-[480px] rounded-full bg-teal-500/10 blur-[120px] dark:bg-teal-400/5" />
+          <div className="decorative-shape-2 absolute top-1/3 -right-40 h-[560px] w-[560px] rounded-full bg-violet-600/10 blur-[140px] dark:bg-violet-500/5" />
+          <div className="decorative-shape-3 absolute -bottom-40 left-1/4 h-[520px] w-[520px] rounded-full bg-blue-600/10 blur-[130px] dark:bg-blue-500/5" />
         </div>
         <QueryProvider>
           <AuthProvider>
