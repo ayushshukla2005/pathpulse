@@ -26,10 +26,10 @@ export function VenueListItem({ venue, isSelected = false, onSelect }: VenueList
     <article
       id={`venue-card-${venue.id}`}
       aria-labelledby={`venue-title-${venue.id}`}
-      className={`rounded-lg border-2 p-4 transition-colors ${
+      className={`glass-card rounded-lg border-2 p-4 transition-colors ${
         isSelected
-          ? "border-[var(--primary)] bg-[var(--primary)]/5 shadow-md"
-          : "border-[var(--border)] bg-[var(--card)] hover:border-[var(--primary)]/60"
+          ? "border-[var(--primary)] bg-[var(--primary)]/10 shadow-md"
+          : "border-[var(--glass-border)] bg-[var(--glass-surface)] shadow-[var(--glass-shadow)] hover:border-[var(--primary)]/60"
       }`}
     >
       <div className="flex items-start justify-between gap-3">

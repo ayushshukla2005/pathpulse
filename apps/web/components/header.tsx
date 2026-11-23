@@ -47,7 +47,7 @@ export function Header() {
       </a>
       <header
         role="banner"
-        className="w-full border-b border-[var(--glass-border)] bg-[var(--glass-surface)] backdrop-blur-[var(--glass-blur)] shadow-[var(--glass-shadow)] px-4 py-3 sticky top-0 z-40 transition-colors"
+        className="glass-panel w-full border-b border-[var(--glass-border)] bg-[var(--glass-surface)] shadow-[var(--glass-shadow)] px-4 py-3 sticky top-0 z-40 transition-colors"
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <div className="flex items-center space-x-6">

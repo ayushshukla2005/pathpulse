@@ -8,6 +8,7 @@ import type { FindRouteRequest, MobilityProfile, RoutePlanResult } from "@pathpu
 import { groupStepsByFloor, validateRouteRequest } from "@pathpulse/validation";
 import { useAuth } from "@/lib/auth/auth-context";
 import { getBuildingMap, postRoute } from "@/lib/api/routes";
+import { GlassCard } from "@/components/ui/glass";
 import { RouteSummary } from "@/components/navigation/route-summary";
 import { StepList } from "@/components/navigation/step-list";
 import { FloorSelector } from "@/components/navigation/floor-selector";
@@ -167,12 +168,12 @@ function NavigationPlannerInner() {
   if (!rawBuildingId || rawBuildingId.trim().length === 0) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-        <div className="rounded-xl border border-slate-200 bg-white p-8 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <Navigation className="mx-auto h-12 w-12 text-indigo-600" aria-hidden="true" />
-          <h1 className="mt-4 text-xl font-bold text-slate-900 dark:text-white">
+        <GlassCard className="p-8 text-center">
+          <Navigation className="mx-auto h-12 w-12 text-[var(--primary)]" aria-hidden="true" />
+          <h1 className="mt-4 text-xl font-bold text-[var(--foreground)]">
             Select a Building to Plan Route
           </h1>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+          <p className="mt-2 text-sm text-[var(--muted-foreground)]">
             Please select a building from the Explore dashboard or Venue Details page to start
             navigation.
           </p>
@@ -185,7 +186,7 @@ function NavigationPlannerInner() {
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
-        </div>
+        </GlassCard>
       </main>
     );
   }
