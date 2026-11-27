@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 
 function subscribe(callback: () => void): () => void {
@@ -35,6 +37,9 @@ function getServerSnapshot(): boolean {
 }
 
 export function useGlassFallback(explicitFallback?: boolean): boolean {
-  const isHighContrast = React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const isHighContrast =
+    typeof React.useSyncExternalStore === "function"
+      ? React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
+      : false;
   return Boolean(explicitFallback || isHighContrast);
 }

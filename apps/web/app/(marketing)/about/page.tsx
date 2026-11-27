@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { GlassCard, GlassPanel } from "@/components/ui/glass";
 
 export const metadata: Metadata = {
   title: "About Us — PathPulse Mission & Principles",
@@ -37,7 +38,7 @@ export default function AboutPage() {
           <h2 className="text-2xl font-bold tracking-tight text-[var(--foreground)] mt-8 mb-4">
             The Non-Negotiable Verification Principle
           </h2>
-          <div className="rounded-md border-2 border-[var(--border)] bg-[var(--card)] p-6 my-4">
+          <GlassPanel className="p-6 my-4">
             <p className="text-base font-semibold text-[var(--foreground)] mb-2">
               Rule 1: Unknown accessibility data is never treated as accessible.
             </p>
@@ -48,7 +49,7 @@ export default function AboutPage() {
               confirmed by facility inspection, our system labels it unverified so users can make
               informed personal decisions.
             </p>
-          </div>
+          </GlassPanel>
 
           <h2 className="text-2xl font-bold tracking-tight text-[var(--foreground)] mt-8 mb-4">
             The Project Team
@@ -57,23 +58,50 @@ export default function AboutPage() {
             PathPulse is engineered by researchers, developers, and accessibility advocates working
             in close collaboration with campus stakeholders.
           </p>
-          <div className="rounded-md border border-[var(--border)] bg-[var(--muted)]/40 p-4">
-            <p className="text-sm font-mono text-[var(--foreground)]">
-              [PLACEHOLDER: Team Core Contributors and Academic Advisors — To Be Finalized by
-              Steering Committee]
-            </p>
+
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 my-6">
+            <GlassCard className="p-5">
+              <h3 className="text-base font-bold text-[var(--foreground)]">Core Contributors</h3>
+              <p className="text-xs text-[var(--primary)] font-semibold mt-1">
+                Team names to be added
+              </p>
+              <p className="text-xs font-mono text-[var(--muted-foreground)] mt-3">
+                [PLACEHOLDER: Team Core Contributors — To Be Finalized by Steering Committee]
+              </p>
+            </GlassCard>
+            <GlassCard className="p-5">
+              <h3 className="text-base font-bold text-[var(--foreground)]">Academic Advisors</h3>
+              <p className="text-xs text-[var(--primary)] font-semibold mt-1">
+                Team names to be added
+              </p>
+              <p className="text-xs font-mono text-[var(--muted-foreground)] mt-3">
+                [PLACEHOLDER: Academic Advisors — To Be Finalized by Steering Committee]
+              </p>
+            </GlassCard>
+            <GlassCard className="p-5">
+              <h3 className="text-base font-bold text-[var(--foreground)]">
+                Accessibility Advocates
+              </h3>
+              <p className="text-xs text-[var(--primary)] font-semibold mt-1">
+                Team names to be added
+              </p>
+              <p className="text-xs font-mono text-[var(--muted-foreground)] mt-3">
+                [PLACEHOLDER: Campus Stakeholders and Advocates — To Be Finalized by Steering
+                Committee]
+              </p>
+            </GlassCard>
           </div>
 
           <div className="mt-10 pt-6 border-t border-[var(--border)] flex flex-wrap gap-4">
             <Link
               href="/accessibility"
-              className="text-sm font-semibold text-[var(--primary)] underline-offset-4 hover:underline"
+              className="inline-flex items-center min-h-[24px] text-sm font-semibold text-[var(--primary)] underline-offset-4 hover:underline"
             >
               Read Our Accessibility Statement &rarr;
             </Link>
             <Link
               href="/contact"
-              className="text-sm font-semibold text-[var(--primary)] underline-offset-4 hover:underline"
+              className="inline-flex items-center min-h-[24px] text-sm font-semibold text-[var(--primary)] underline-offset-4 hover:underline"
             >
               Get in Touch With Our Team &rarr;
             </Link>

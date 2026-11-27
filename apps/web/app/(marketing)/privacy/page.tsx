@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GlassPanel } from "@/components/ui/glass";
 
 export const metadata: Metadata = {
   title: "Privacy Notice — PathPulse Data Practices & DPDP 2023",
@@ -42,12 +43,12 @@ export default function PrivacyNoticePage() {
             India on August 11, 2023 by the Ministry of Electronics and Information Technology,
             Government of India).
           </p>
-          <div className="rounded-md border border-[var(--border)] bg-[var(--muted)]/40 p-4">
+          <GlassPanel className="p-4 my-4">
             <p className="text-sm font-mono text-[var(--foreground)]">
               [PLACEHOLDER: Legal Basis under DPDP Act 2023 — Explicit Consent under Section 6 and
               Specified Legitimate Uses under Section 7]
             </p>
-          </div>
+          </GlassPanel>
 
           <h2 className="text-2xl font-bold tracking-tight text-[var(--foreground)] mt-8 mb-4">
             Complete Personal Data Inventory

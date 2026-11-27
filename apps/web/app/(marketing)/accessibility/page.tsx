@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { GlassPanel } from "@/components/ui/glass";
 
 export const metadata: Metadata = {
   title: "Accessibility Statement — PathPulse Standards & Conformance",
@@ -39,7 +40,7 @@ export default function AccessibilityStatementPage() {
             developers to improve accessibility for people with disabilities. It defines three
             levels of conformance: Level A, Level AA, and Level AAA.
           </p>
-          <div className="rounded-md border-2 border-[var(--border)] bg-[var(--card)] p-5">
+          <GlassPanel className="p-5 my-4">
             <p className="text-base font-semibold text-[var(--foreground)] mb-2">
               Status: Partially Conformant with WCAG 2.2 Level AA
             </p>
@@ -51,7 +52,7 @@ export default function AccessibilityStatementPage() {
               without critical or serious blockers, specific interactive components have documented
               limitations outlined below.
             </p>
-          </div>
+          </GlassPanel>
 
           <h2 className="text-2xl font-bold tracking-tight text-[var(--foreground)] mt-8 mb-4">
             Known Technical Limitations

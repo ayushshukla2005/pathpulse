@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GlassPanel } from "@/components/ui/glass";
 
 export const metadata: Metadata = {
   title: "Terms of Use — PathPulse User Agreement & Policies",
@@ -43,7 +44,7 @@ export default function TermsOfUsePage() {
             breakdowns, doors may be locked for maintenance, and temporary obstacles (such as
             delivery pallets or cleaning carts) may obstruct corridors without warning.
           </p>
-          <div className="rounded-md border-2 border-[var(--border)] bg-[var(--card)] p-5">
+          <GlassPanel className="p-5 my-4">
             <p className="text-base font-semibold text-[var(--foreground)] mb-2">
               No Absolute Guarantee of Accessibility or Safety
             </p>
@@ -55,7 +56,7 @@ export default function TermsOfUsePage() {
               staff. Users must exercise personal judgment and assess physical surroundings when
               navigating.
             </p>
-          </div>
+          </GlassPanel>
 
           <h2 className="text-2xl font-bold tracking-tight text-[var(--foreground)] mt-8 mb-4">
             3. User Conduct & Community Reporting Rules

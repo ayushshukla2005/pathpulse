@@ -85,7 +85,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <div className="flex-1 flex flex-col">{children}</div>
               <footer
                 role="contentinfo"
-                className="border-t border-[var(--border)] bg-[var(--card)] px-4 py-8 text-center text-sm text-[var(--muted-foreground)]"
+                className="glass-panel border-t border-[var(--glass-border)] bg-[var(--glass-surface)] shadow-[var(--glass-shadow)] px-4 py-8 text-center text-sm text-[var(--muted-foreground)]"
               >
                 <div className="mx-auto max-w-7xl space-y-4">
                   <nav
