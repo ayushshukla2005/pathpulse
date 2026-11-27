@@ -7,6 +7,7 @@ import { getVenueById } from "@/lib/api/venues";
 import { formatSourceText } from "@/lib/utils";
 import { FacilityGroup } from "@/components/venues/facility-group";
 import { Button } from "@/components/ui/button";
+import { GlassCard } from "@/components/ui/glass";
 import {
   AlertCircle,
   ArrowLeft,
@@ -104,7 +105,7 @@ export default function VenueDetailPage({ params }: VenuePageProps) {
         </Link>
       </div>
 
-      <header className="mb-8 rounded-lg border-2 border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
+      <GlassCard className="mb-8 p-6 shadow-sm">
         <div className="flex flex-wrap items-center gap-3">
           <span className="inline-flex rounded border border-[var(--border)] bg-[var(--muted)] px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
             {venue.category}
@@ -124,105 +125,103 @@ export default function VenueDetailPage({ params }: VenuePageProps) {
             <span>{venue.address}</span>
           </p>
         )}
-      </header>
+      </GlassCard>
 
-      <section
-        aria-labelledby="legend-heading"
-        className="mb-8 rounded-lg border-2 border-[var(--border)] bg-[var(--card)] p-5 shadow-sm"
-      >
-        <h2 id="legend-heading" className="text-base font-bold text-[var(--foreground)]">
-          Facility Verification Legend
-        </h2>
-        <p className="mt-1 text-xs text-[var(--muted-foreground)]">
-          PathPulse explicitly verifies facility accessibility so that you can navigate with
-          confidence.
-        </p>
+      <section aria-labelledby="legend-heading" className="mb-8">
+        <GlassCard className="p-5 shadow-sm">
+          <h2 id="legend-heading" className="text-base font-bold text-[var(--foreground)]">
+            Facility Verification Legend
+          </h2>
+          <p className="mt-1 text-xs text-[var(--muted-foreground)]">
+            PathPulse explicitly verifies facility accessibility so that you can navigate with
+            confidence.
+          </p>
 
-        <ul role="list" className="mt-4 grid gap-3 sm:grid-cols-3">
-          <li className="flex items-start gap-2.5 rounded-md border border-emerald-700 bg-emerald-50/60 p-3 text-xs dark:border-emerald-500 dark:bg-emerald-950/30">
-            <CheckCircle2
-              className="h-4 w-4 shrink-0 text-emerald-700 dark:text-emerald-400 mt-0.5"
-              aria-hidden="true"
-            />
-            <div>
-              <strong className="block font-bold text-emerald-900 dark:text-emerald-200">
-                Confirmed
-              </strong>
-              <span className="text-emerald-800 dark:text-emerald-300">
-                Physically inspected by organization staff or approved moderators and confirmed
-                operational.
-              </span>
-            </div>
-          </li>
+          <ul role="list" className="mt-4 grid gap-3 sm:grid-cols-3">
+            <li className="flex items-start gap-2.5 rounded-md border border-emerald-700 bg-emerald-50/60 p-3 text-xs dark:border-emerald-500 dark:bg-emerald-950/30">
+              <CheckCircle2
+                className="h-4 w-4 shrink-0 text-emerald-700 dark:text-emerald-400 mt-0.5"
+                aria-hidden="true"
+              />
+              <div>
+                <strong className="block font-bold text-emerald-900 dark:text-emerald-200">
+                  Confirmed
+                </strong>
+                <span className="text-emerald-800 dark:text-emerald-300">
+                  Physically inspected by organization staff or approved moderators and confirmed
+                  operational.
+                </span>
+              </div>
+            </li>
 
-          <li className="flex items-start gap-2.5 rounded-md border border-amber-700 bg-amber-50/60 p-3 text-xs dark:border-amber-500 dark:bg-amber-950/30">
-            <HelpCircle
-              className="h-4 w-4 shrink-0 text-amber-700 dark:text-amber-400 mt-0.5"
-              aria-hidden="true"
-            />
-            <div>
-              <strong className="block font-bold text-amber-900 dark:text-amber-200">
-                Unverified
-              </strong>
-              <span className="text-amber-800 dark:text-amber-300">
-                Reported or imported data that has not yet undergone official verification. Never
-                treated as guaranteed.
-              </span>
-            </div>
-          </li>
+            <li className="flex items-start gap-2.5 rounded-md border border-amber-700 bg-amber-50/60 p-3 text-xs dark:border-amber-500 dark:bg-amber-950/30">
+              <HelpCircle
+                className="h-4 w-4 shrink-0 text-amber-700 dark:text-amber-400 mt-0.5"
+                aria-hidden="true"
+              />
+              <div>
+                <strong className="block font-bold text-amber-900 dark:text-amber-200">
+                  Unverified
+                </strong>
+                <span className="text-amber-800 dark:text-amber-300">
+                  Reported or imported data that has not yet undergone official verification. Never
+                  treated as guaranteed.
+                </span>
+              </div>
+            </li>
 
-          <li className="flex items-start gap-2.5 rounded-md border border-red-700 bg-red-50/60 p-3 text-xs dark:border-red-500 dark:bg-red-950/30">
-            <XCircle
-              className="h-4 w-4 shrink-0 text-red-700 dark:text-red-400 mt-0.5"
-              aria-hidden="true"
-            />
-            <div>
-              <strong className="block font-bold text-red-900 dark:text-red-200">
-                Unavailable
-              </strong>
-              <span className="text-red-800 dark:text-red-300">
-                Facility is out of service, undergoing maintenance, or physically blocked.
-              </span>
-            </div>
-          </li>
-        </ul>
+            <li className="flex items-start gap-2.5 rounded-md border border-red-700 bg-red-50/60 p-3 text-xs dark:border-red-500 dark:bg-red-950/30">
+              <XCircle
+                className="h-4 w-4 shrink-0 text-red-700 dark:text-red-400 mt-0.5"
+                aria-hidden="true"
+              />
+              <div>
+                <strong className="block font-bold text-red-900 dark:text-red-200">
+                  Unavailable
+                </strong>
+                <span className="text-red-800 dark:text-red-300">
+                  Facility is out of service, undergoing maintenance, or physically blocked.
+                </span>
+              </div>
+            </li>
+          </ul>
+        </GlassCard>
       </section>
 
       {venue.buildings && venue.buildings.length > 0 && (
-        <section
-          aria-labelledby="buildings-heading"
-          className="mb-8 rounded-lg border-2 border-[var(--border)] bg-[var(--card)] p-5 shadow-sm"
-        >
-          <div className="flex items-center gap-2 border-b-2 border-[var(--border)] pb-3 mb-4">
-            <Building2 className="h-5 w-5 text-[var(--primary)]" aria-hidden="true" />
-            <h2 id="buildings-heading" className="text-lg font-bold text-[var(--foreground)]">
-              Buildings ({venue.buildings.length})
-            </h2>
-          </div>
+        <section aria-labelledby="buildings-heading" className="mb-8">
+          <GlassCard className="p-5 shadow-sm">
+            <div className="flex items-center gap-2 border-b-2 border-[var(--border)] pb-3 mb-4">
+              <Building2 className="h-5 w-5 text-[var(--primary)]" aria-hidden="true" />
+              <h2 id="buildings-heading" className="text-lg font-bold text-[var(--foreground)]">
+                Buildings ({venue.buildings.length})
+              </h2>
+            </div>
 
-          <ul role="list" className="grid gap-3 sm:grid-cols-2">
-            {venue.buildings.map((building) => (
-              <li
-                key={building.id}
-                className="flex items-center justify-between rounded-md border-2 border-[var(--border)] bg-[var(--background)] p-3"
-              >
-                <div>
-                  <h3 className="font-semibold text-[var(--foreground)]">{building.name}</h3>
-                  {building.building_code && (
-                    <span className="text-xs text-[var(--muted-foreground)]">
-                      Code: {building.building_code}
-                    </span>
-                  )}
-                </div>
-                <Link
-                  href={`/buildings/${building.id}/floors`}
-                  className="rounded-md border border-[var(--primary)] bg-[var(--primary)]/10 px-3 py-1.5 text-xs font-semibold text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+            <ul role="list" className="grid gap-3 sm:grid-cols-2">
+              {venue.buildings.map((building) => (
+                <li
+                  key={building.id}
+                  className="flex items-center justify-between rounded-md border-2 border-[var(--border)] bg-[var(--background)] p-3"
                 >
-                  View Floors
-                </Link>
-              </li>
-            ))}
-          </ul>
+                  <div>
+                    <h3 className="font-semibold text-[var(--foreground)]">{building.name}</h3>
+                    {building.building_code && (
+                      <span className="text-xs text-[var(--muted-foreground)]">
+                        Code: {building.building_code}
+                      </span>
+                    )}
+                  </div>
+                  <Link
+                    href={`/buildings/${building.id}/floors`}
+                    className="min-h-[24px] min-w-[24px] inline-flex items-center justify-center rounded-md border border-[var(--primary)] bg-[var(--primary)]/10 px-3 py-1.5 text-xs font-semibold text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+                  >
+                    View Floors
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </GlassCard>
         </section>
       )}
 

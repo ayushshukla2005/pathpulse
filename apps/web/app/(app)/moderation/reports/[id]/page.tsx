@@ -207,7 +207,7 @@ export default function ModeratorReportReviewPage() {
         className="container mx-auto px-4 py-8 focus:outline-none"
       >
         <div className="max-w-2xl mx-auto space-y-4">
-          <div
+          <GlassPanel
             role="alert"
             className="p-5 border-2 border-red-500 rounded-lg bg-red-50 text-red-900 dark:bg-red-950 dark:text-red-200"
           >
@@ -217,7 +217,7 @@ export default function ModeratorReportReviewPage() {
                 ? reportErr.message
                 : "The requested report was not found."}
             </p>
-          </div>
+          </GlassPanel>
           <Link
             href="/reports"
             className="inline-flex items-center text-sm font-semibold text-[var(--primary)] hover:underline"
@@ -468,11 +468,11 @@ export default function ModeratorReportReviewPage() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Duplicate Suggestions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <GlassPanel className="p-6">
+            <h2 className="text-xl font-bold tracking-tight text-[var(--foreground)] mb-4">
+              Duplicate Suggestions
+            </h2>
+            <div className="space-y-3">
               <p className="text-xs text-[var(--muted-foreground)]">
                 Candidates evaluated by normalized token similarity. Suggestions are for moderation
                 review only; reports are never automatically merged.
@@ -516,8 +516,8 @@ export default function ModeratorReportReviewPage() {
                   ))}
                 </ul>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </GlassPanel>
 
           <GlassPanel className="p-6">
             <h2 className="text-lg font-bold text-[var(--foreground)] mb-4">
@@ -571,11 +571,11 @@ export default function ModeratorReportReviewPage() {
         </div>
 
         <div className="space-y-6">
-          <Card className="border-2 border-[var(--border)]">
-            <CardHeader>
-              <CardTitle>Moderator Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <GlassPanel className="p-6">
+            <h2 className="text-xl font-bold tracking-tight text-[var(--foreground)] mb-4">
+              Moderator Actions
+            </h2>
+            <div className="space-y-4">
               <p className="text-xs text-[var(--muted-foreground)]">
                 Available actions are computed by the verification state machine based on your role,
                 separation of duties, and barrier requirements.
@@ -661,8 +661,8 @@ export default function ModeratorReportReviewPage() {
                   </div>
                 </form>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </GlassPanel>
         </div>
       </div>
     </main>

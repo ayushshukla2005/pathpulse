@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { REPORT_CATEGORY_LABELS, REPORT_STATUS_LABELS } from "@pathpulse/validation";
 import { getMyReports } from "@/lib/api/reports";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { GlassCard } from "@/components/ui/glass";
 
 export default function MyReportsPage() {
   const [page, setPage] = React.useState(1);
@@ -36,16 +36,16 @@ export default function MyReportsPage() {
           </div>
           <Link
             href="/reports/new"
-            className="inline-flex items-center justify-center rounded-md bg-[var(--primary)] text-[var(--primary-foreground)] px-4 py-2 text-sm font-semibold hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] self-start sm:self-auto"
+            className="inline-flex items-center justify-center rounded-md bg-[var(--primary)] text-[var(--primary-foreground)] px-4 py-2 text-sm font-semibold hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] self-start sm:self-auto min-h-[36px]"
           >
             Report a Barrier
           </Link>
         </div>
 
         {isLoading && (
-          <div className="p-8 text-center border-2 border-[var(--border)] rounded-lg bg-[var(--card)] text-[var(--muted-foreground)]">
+          <GlassCard className="p-8 text-center text-[var(--muted-foreground)]">
             Loading your reports...
-          </div>
+          </GlassCard>
         )}
 
         {isError && (
@@ -58,23 +58,21 @@ export default function MyReportsPage() {
         )}
 
         {!isLoading && !isError && reports.length === 0 && (
-          <Card className="text-center py-12 border-2 border-[var(--border)]">
-            <CardHeader>
-              <CardTitle className="text-xl text-[var(--foreground)]">No Reports Yet</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <GlassCard className="text-center py-12">
+            <h2 className="text-xl font-bold text-[var(--foreground)] mb-4">No Reports Yet</h2>
+            <div className="space-y-4">
               <p className="text-base text-[var(--muted-foreground)] max-w-md mx-auto">
                 You have not submitted any accessibility reports yet. If you encounter a broken
                 lift, blocked ramp, or inaccessible entrance, let us know!
               </p>
               <Link
                 href="/reports/new"
-                className="inline-flex items-center justify-center rounded-md bg-[var(--primary)] text-[var(--primary-foreground)] px-5 py-2.5 font-semibold hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+                className="inline-flex items-center justify-center rounded-md bg-[var(--primary)] text-[var(--primary-foreground)] px-5 py-2.5 font-semibold hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] min-h-[44px]"
               >
                 Submit Your First Report
               </Link>
-            </CardContent>
-          </Card>
+            </div>
+          </GlassCard>
         )}
 
         {!isLoading && !isError && reports.length > 0 && (
@@ -97,11 +95,11 @@ export default function MyReportsPage() {
 
                 return (
                   <li key={report.id}>
-                    <Card className="border-2 border-[var(--border)] hover:border-[var(--primary)] transition-colors">
-                      <CardContent className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <GlassCard className="hover:border-[var(--primary)] transition-colors">
+                      <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div className="space-y-2 max-w-2xl">
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className="font-mono text-sm font-bold tracking-wider px-2.5 py-0.5 rounded bg-[var(--muted)] text-[var(--foreground)] border border-[var(--border)]">
+                            <span className="font-mono text-sm font-bold tracking-wider px-2.5 py-0.5 rounded bg-[var(--muted)] text-[var(--foreground)] border border-[var(--glass-border)]">
                               {report.tracking_code}
                             </span>
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-900 dark:bg-blue-950 dark:text-blue-200">
@@ -139,12 +137,12 @@ export default function MyReportsPage() {
 
                         <Link
                           href={`/reports/${report.id}`}
-                          className="inline-flex items-center justify-center rounded-md border-2 border-[var(--border)] bg-[var(--background)] px-4 py-2 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] shrink-0 self-start sm:self-center"
+                          className="inline-flex items-center justify-center rounded-md border border-[var(--glass-border)] bg-[var(--glass-surface)] px-4 py-2 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] shrink-0 self-start sm:self-center min-h-[36px]"
                         >
                           View Details
                         </Link>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </GlassCard>
                   </li>
                 );
               })}
@@ -159,7 +157,7 @@ export default function MyReportsPage() {
                   type="button"
                   disabled={page <= 1}
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  className="rounded-md border-2 border-[var(--border)] px-4 py-2 text-sm font-semibold disabled:opacity-50"
+                  className="rounded-md border border-[var(--glass-border)] bg-[var(--glass-surface)] px-4 py-2 text-sm font-semibold disabled:opacity-50 min-h-[36px]"
                 >
                   Previous
                 </button>
@@ -170,7 +168,7 @@ export default function MyReportsPage() {
                   type="button"
                   disabled={page >= data.totalPages}
                   onClick={() => setPage((p) => p + 1)}
-                  className="rounded-md border-2 border-[var(--border)] px-4 py-2 text-sm font-semibold disabled:opacity-50"
+                  className="rounded-md border border-[var(--glass-border)] bg-[var(--glass-surface)] px-4 py-2 text-sm font-semibold disabled:opacity-50 min-h-[36px]"
                 >
                   Next
                 </button>

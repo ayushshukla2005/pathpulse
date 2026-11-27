@@ -4,7 +4,8 @@ import * as React from "react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { GlassCard } from "@/components/ui/glass";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getNotifications, markNotificationRead } from "@/lib/api/notifications";
 
 export default function NotificationsPage() {
@@ -110,33 +111,38 @@ export default function NotificationsPage() {
       </div>
 
       {items.length === 0 ? (
-        <Card>
+        <GlassCard>
           <CardContent className="p-12 text-center text-[var(--muted-foreground)] space-y-3">
             <p>You have no notifications yet.</p>
             <Link
               href="/reports/new"
-              className="inline-flex items-center text-sm font-semibold text-[var(--primary)] hover:underline"
+              className="inline-flex min-h-[24px] items-center text-sm font-semibold text-[var(--primary)] hover:underline"
             >
               Report an accessibility barrier
             </Link>
           </CardContent>
-        </Card>
+        </GlassCard>
       ) : (
         <ul className="space-y-4" aria-label="Notifications list">
           {items.map((item) => (
             <li key={item.id}>
-              <Card
+              <GlassCard
                 className={`transition-colors border-2 ${
-                  !item.readAt
-                    ? "border-[var(--primary)] bg-[var(--primary-subtle)]"
-                    : "border-[var(--border)] bg-[var(--card)]"
+                  !item.readAt ? "border-[var(--primary)]" : "border-[var(--border)]"
                 }`}
               >
                 <CardHeader className="p-4 pb-2 flex flex-row items-start justify-between">
                   <div>
-                    <CardTitle className="text-base font-bold text-[var(--foreground)]">
-                      {item.title}
-                    </CardTitle>
+                    <div className="flex items-center gap-2">
+                      <CardTitle className="text-base font-bold text-[var(--foreground)]">
+                        {item.title}
+                      </CardTitle>
+                      {!item.readAt && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-primary text-primary-foreground">
+                          Unread
+                        </span>
+                      )}
+                    </div>
                     <span className="text-xs text-[var(--muted-foreground)]">
                       {new Date(item.createdAt).toLocaleString()}
                     </span>
@@ -148,7 +154,7 @@ export default function NotificationsPage() {
                       size="sm"
                       onClick={() => markReadMutation.mutate(item.id)}
                       disabled={markReadMutation.isPending}
-                      className="text-xs"
+                      className="text-xs min-h-[24px] min-w-[24px]"
                       aria-label={`Mark "${item.title}" as read`}
                     >
                       Mark read
@@ -160,13 +166,13 @@ export default function NotificationsPage() {
                   {item.link && (
                     <Link
                       href={item.link}
-                      className="inline-flex items-center text-xs font-semibold text-[var(--primary)] hover:underline"
+                      className="inline-flex min-h-[24px] items-center text-xs font-semibold text-[var(--primary)] hover:underline"
                     >
                       View Report Details &rarr;
                     </Link>
                   )}
                 </CardContent>
-              </Card>
+              </GlassCard>
             </li>
           ))}
         </ul>

@@ -466,7 +466,9 @@ export function ReportForm() {
               ))}
             </select>
           </div>
+        </GlassCard>
 
+        <GlassCard className="p-6 space-y-4">
           <div className="space-y-2">
             <Label htmlFor="venue-select">Venue *</Label>
             <select

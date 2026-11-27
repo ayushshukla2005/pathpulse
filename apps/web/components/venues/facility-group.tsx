@@ -1,5 +1,6 @@
 import type { FacilityItem } from "@pathpulse/shared-types";
 import { formatSourceText } from "@/lib/utils";
+import { GlassCard } from "@/components/ui/glass";
 import { VerificationBadge } from "./verification-badge";
 
 const TYPE_LABELS: Record<string, string> = {
@@ -56,9 +57,9 @@ interface FacilityGroupProps {
 export function FacilityGroup({ facilities }: FacilityGroupProps) {
   if (!facilities || facilities.length === 0) {
     return (
-      <div className="rounded-lg border-2 border-[var(--border)] bg-[var(--card)] p-6 text-center text-[var(--muted-foreground)]">
+      <GlassCard className="p-6 text-center text-[var(--muted-foreground)]">
         <p>No recorded accessibility facilities for this venue.</p>
-      </div>
+      </GlassCard>
     );
   }
 
@@ -83,67 +84,65 @@ export function FacilityGroup({ facilities }: FacilityGroupProps) {
         const headingTitle = TYPE_LABELS[groupKey] || "Other Facilities";
 
         return (
-          <section
-            key={groupKey}
-            aria-labelledby={`heading-group-${groupKey.toLowerCase()}`}
-            className="rounded-lg border-2 border-[var(--border)] bg-[var(--card)] p-5 shadow-sm"
-          >
-            <h3
-              id={`heading-group-${groupKey.toLowerCase()}`}
-              className="mb-4 text-lg font-bold text-[var(--foreground)] border-b-2 border-[var(--border)] pb-2"
-            >
-              {headingTitle} ({groupFacilities.length})
-            </h3>
-            <ul role="list" className="divide-y divide-[var(--border)]">
-              {groupFacilities.map((facility) => {
-                const dateText = formatDate(facility.last_verified_at);
-                const isOutOfService = facility.operational_status === "OUT_OF_SERVICE";
-                const isUnverified = facility.verification_level === "UNVERIFIED";
+          <section key={groupKey} aria-labelledby={`heading-group-${groupKey.toLowerCase()}`}>
+            <GlassCard className="p-5 shadow-sm">
+              <h3
+                id={`heading-group-${groupKey.toLowerCase()}`}
+                className="mb-4 text-lg font-bold text-[var(--foreground)] border-b-2 border-[var(--border)] pb-2"
+              >
+                {headingTitle} ({groupFacilities.length})
+              </h3>
+              <ul role="list" className="divide-y divide-[var(--border)]">
+                {groupFacilities.map((facility) => {
+                  const dateText = formatDate(facility.last_verified_at);
+                  const isOutOfService = facility.operational_status === "OUT_OF_SERVICE";
+                  const isUnverified = facility.verification_level === "UNVERIFIED";
 
-                return (
-                  <li key={facility.id} className="py-3.5 first:pt-0 last:pb-0">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-semibold text-[var(--foreground)]">
-                            {facility.name}
-                          </h4>
-                          <VerificationBadge
-                            level={facility.verification_level}
-                            status={facility.operational_status}
-                          />
-                        </div>
-                        <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[var(--muted-foreground)]">
-                          <span>
-                            Status:{" "}
-                            <strong
-                              className={
-                                isOutOfService
-                                  ? "text-red-700 dark:text-red-400"
-                                  : isUnverified
-                                    ? "text-amber-800 dark:text-amber-300"
-                                    : "text-emerald-800 dark:text-emerald-300"
-                              }
-                            >
-                              {formatOperationalStatus(facility.operational_status)}
-                            </strong>
-                          </span>
-                          <span aria-label={dateText}>{dateText}</span>
-                          <span className="text-xs font-medium text-[var(--muted-foreground)]">
-                            {formatSourceText(facility.source, facility.updated_at)}
-                          </span>
-                          {facility.notes && (
-                            <span className="rounded bg-[var(--muted)] px-1.5 py-0.5 text-xs text-[var(--muted-foreground)]">
-                              {facility.notes}
+                  return (
+                    <li key={facility.id} className="py-3.5 first:pt-0 last:pb-0">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-semibold text-[var(--foreground)]">
+                              {facility.name}
+                            </h4>
+                            <VerificationBadge
+                              level={facility.verification_level}
+                              status={facility.operational_status}
+                            />
+                          </div>
+                          <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[var(--muted-foreground)]">
+                            <span>
+                              Status:{" "}
+                              <strong
+                                className={
+                                  isOutOfService
+                                    ? "text-red-700 dark:text-red-400"
+                                    : isUnverified
+                                      ? "text-amber-800 dark:text-amber-300"
+                                      : "text-emerald-800 dark:text-emerald-300"
+                                }
+                              >
+                                {formatOperationalStatus(facility.operational_status)}
+                              </strong>
                             </span>
-                          )}
+                            <span aria-label={dateText}>{dateText}</span>
+                            <span className="text-xs font-medium text-[var(--muted-foreground)]">
+                              {formatSourceText(facility.source, facility.updated_at)}
+                            </span>
+                            {facility.notes && (
+                              <span className="rounded bg-[var(--muted)] px-1.5 py-0.5 text-xs text-[var(--muted-foreground)]">
+                                {facility.notes}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
+                    </li>
+                  );
+                })}
+              </ul>
+            </GlassCard>
           </section>
         );
       })}
